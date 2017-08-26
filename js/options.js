@@ -22,8 +22,9 @@ function saveOptions(){
 }
 
 function resetOptions(){
-	browser.storage.local.set(optionsDefaults);
-	loadOptions();
+	Object.keys(optionsDefaults).forEach(function(key){
+		document.querySelector('#' + key).value = optionsDefaults[key];
+	});
 }
 
 document.querySelector('#save').addEventListener('click', saveOptions);
