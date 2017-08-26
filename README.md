@@ -9,3 +9,5 @@
 * Space is the same as left click
 * Ctrl+Space is the same as right click
 * Alt+Q to hide the button
+
+https://addons.mozilla.org/en-US/firefox/addon/cute-button/
