@@ -1,4 +1,4 @@
-let optionsDefaults = {
+const optionsDefaults = {
 	savePath: 	'',
 	minSize: 	256,
 	exclusions: 'de-video-thumb de-ytube de-file-img html5-main-video vjs-tech'

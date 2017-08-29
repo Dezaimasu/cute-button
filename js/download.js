@@ -1,5 +1,11 @@
-let downloader = {
+function download(downloadRequest, tabId){
+	downloader.saveFile(downloadRequest, tabId);
+}
+
+const downloader = {
 	savePath: null,
+	filename: null,
+	basename: null,
 
 	initSavePath: function(){
 		browser.storage.onChanged.addListener(function(changes){
@@ -8,6 +14,11 @@ let downloader = {
 		browser.storage.local.get('savePath').then(function(result){
 			downloader.setSavePath(result.savePath);
 		});
+	},
+
+	resetFileName: function(){
+		this.filename = null;
+		this.basename = null;
 	},
 
 	/*
@@ -20,18 +31,45 @@ let downloader = {
 	},
 
 	saveFile: function(downloadRequest, tabId){
-		let that = this,
-			filename = downloadRequest.originalName || that.getFilename(downloadRequest.src);
+		this.resetFileName();
 
-		browser.downloads.download({
-			url: downloadRequest.src,
-			filename: that.savePath + filename,
-			conflictAction: 'uniquify'
-		}).then(function(downloadId){
-			that.checkForDuplicate(downloadId, tabId);
-		}, function(error){
-			console.log(error.toString()); ///TODO maybe emit warning
-		});
+		if (downloadRequest.originalName) {
+			this.filename = downloadRequest.originalName;
+		} else {
+			this.getFilename(downloadRequest.src)
+		}
+
+		if (this.filename) {
+			this.download(downloadRequest.src, tabId);
+		} else {
+			let that = this,
+				request = new XMLHttpRequest();
+			request.open('HEAD', downloadRequest.src);
+			request.onload = function(){
+				that.saveFileWithFilenameFromHeaders(downloadRequest.src, tabId, request);
+			};
+			request.send();
+		}
+	},
+
+	saveFileWithFilenameFromHeaders: function(src, tabId, request){
+		let contentDisposition = request.getResponseHeader('Content-Disposition'),
+			tmpFilename;
+
+		if (contentDisposition) {
+			tmpFilename = contentDisposition.match(/^.+filename\*?=(.{0,20}')?(.*)$/i);
+			if (tmpFilename) {
+				this.filename = decodeURI(tmpFilename[2]).replace(/"/g, '');
+			}
+		}
+		if (!this.filename) {
+			let contentType = request.getResponseHeader('Content-Type'),
+				extension = contentType ? ('.' + contentType.split('/').pop().replace('jpeg', 'jpg')) : '';
+
+			this.filename = (this.basename || Date.now()) + extension
+		}
+
+		this.download(src, tabId);
 	},
 
 	/*
@@ -47,7 +85,11 @@ let downloader = {
 		let url = decodeURI(originalUrl).replace(/^https?:\/\/([^/]+)\//, '').split(/[?#:]/)[0],
 			filenameTry = url.match(/^([^/]+\/)*([^/]+\.[\w\d]{3,4})([\/][^.]+)?$/);
 
-		return filenameTry ? filenameTry[2] : url.split('/').pop(); //TODO request for MIME type for fallback filename extension
+		if (filenameTry) {
+			this.filename = filenameTry[2]
+		} else {
+			this.basename = url.split('/').pop();
+		}
 	},
 
 	/*
@@ -61,6 +103,19 @@ let downloader = {
 		}).then(function(downloadItems){
 			if (/\(\d+\)\.[\w\d]{3,4}$/.test(downloadItems[0].filename) === false) {return;}
 			browser.tabs.sendMessage(tabId, 'duplicate_warning');
+		});
+	},
+
+	download: function(src, tabId){
+		let that = this;
+		browser.downloads.download({
+			url: src,
+			filename: that.savePath + that.filename,
+			conflictAction: 'uniquify'
+		}).then(function(downloadId){
+			that.checkForDuplicate(downloadId, tabId);
+		}, function(error){
+			console.log(error.toString()); ///TODO maybe emit warning
 		});
 	}
 };

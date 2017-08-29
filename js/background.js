@@ -43,7 +43,7 @@ function exceptionHandler(e){}
 
 /* Listens for download request from content script */
 browser.runtime.onMessage.addListener(function(message, sender){
-	downloader.saveFile(message, sender.tab.id);
+	download(message, sender.tab.id);
 });
 /* For options initialization after installation */
 browser.runtime.onInstalled.addListener(function(){
