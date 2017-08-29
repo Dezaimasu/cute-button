@@ -100,8 +100,11 @@ let downloader = {
 	* WebExt API is incapable of extracting such filenames.
 	* Cheers pineapple.
 	*/
-	getFilename: function(url){
-		return decodeURI(url).split('?')[0].match(/\/([^/]+\.[\w\d]{3,4})(\/[^.]+)?$/)[1];
+	getFilename: function(originalUrl){
+		let url = decodeURI(originalUrl).replace(/^https?:\/\/([^/]+)\//, '').split(/[?#:]/)[0],
+			filenameTry = url.match(/^([^/]+\/)*([^/]+\.[\w\d]{3,4})([\/][^.]+)?$/);
+
+		return filenameTry ? filenameTry[2] : url.split('/').pop(); //TODO request for MIME type for fallback filename extension
 	},
 
 	/*
