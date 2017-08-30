@@ -1,3 +1,5 @@
+'use strict';
+
 const optionsDefaults = {
 	savePath: 	'',
 	minSize: 	256,

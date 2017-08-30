@@ -1,3 +1,5 @@
+'use strict';
+
 const de_webextApi = {
 	download: function(downloadRequest){
 		browser.runtime.sendMessage(downloadRequest);

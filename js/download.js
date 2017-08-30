@@ -1,3 +1,5 @@
+'use strict';
+
 function download(downloadRequest, tabId){
 	downloader.saveFile(downloadRequest, tabId);
 }
