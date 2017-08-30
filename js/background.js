@@ -1,5 +1,4 @@
 /*
-* TODO remove extension id from manifest.json before release
 * TODO base64 in background-image, blob, etc.
 * TODO Windows filepath max length restrictions
 */
@@ -46,6 +45,9 @@ browser.runtime.onMessage.addListener(function(message, sender){
 	download(message, sender.tab.id);
 });
 /* For options initialization after installation */
-browser.runtime.onInstalled.addListener(function(){
+browser.runtime.onInstalled.addListener(initSettings);
+function initSettings(details){
+	browser.runtime.onInstalled.removeListener(initSettings);
+	if (details.reason !== 'install') {return;}
 	browser.runtime.openOptionsPage();
-});
+}
