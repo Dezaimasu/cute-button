@@ -1,6 +1,6 @@
 'use strict';
 
-const optionsDefaults = {
+const settingsDefaults = {
 	savePath: 	'',
 	minSize: 	256,
 	exclusions: 'de-video-thumb de-ytube de-file-img html5-main-video vjs-tech',
@@ -9,8 +9,8 @@ const optionsDefaults = {
 const elem = {};
 
 function loadOptions(){
-	browser.storage.local.get(optionsDefaults).then(function(result){
-		Object.keys(optionsDefaults).forEach(function(key){
+	browser.storage.local.get(settingsDefaults).then(function(result){
+		Object.keys(settingsDefaults).forEach(function(key){
 			elem[key].value = result[key];
 		});
 		showIcon(elem.icon.value);
@@ -19,15 +19,15 @@ function loadOptions(){
 }
 
 function saveOptions(){
-	let options = {};
-	Object.keys(optionsDefaults).forEach(function(key){
-		options[key] = elem[key].value;
+	let settings = {};
+	Object.keys(settingsDefaults).forEach(function(key){
+		settings[key] = elem[key].value;
 	});
-	browser.storage.local.set(options);
+	browser.storage.local.set(settings);
 }
 
 function resetOptions(){
-	browser.storage.local.set(optionsDefaults);
+	browser.storage.local.set(settingsDefaults);
 	loadOptions();
 }
 
@@ -49,10 +49,10 @@ function fileInputListener(){
 }
 
 function initSelectors(){
-	let optionsElems = Object.keys(optionsDefaults),
+	let settingsElems = Object.keys(settingsDefaults),
 		otherElems = ['save', 'reset', 'iconDisplay', 'fileInput'];
 
-	optionsElems.concat(otherElems).forEach(function(a){
+	settingsElems.concat(otherElems).forEach(function(a){
 		elem[a] = document.querySelector('#' + a);
 	});
 }

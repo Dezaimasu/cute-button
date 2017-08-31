@@ -20,11 +20,10 @@
 		]
 	},
 	"web_accessible_resources": [
-		"bestgirl.png",
-		"css/button.css"
+		"bestgirl.png"
 	],
 	"options_ui": {
-		"page": "options.html",
+		"page": "settings.html",
 		"browser_style": true,
 		"open_in_tab": true
 	},
