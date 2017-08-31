@@ -30,6 +30,7 @@ function resetOptions(){
 	Object.keys(settingsDefault).forEach(function(key){
 		elem[key].value = settingsDefault[key];
 	});
+	refreshIcon();
 }
 
 function refreshIcon(){
