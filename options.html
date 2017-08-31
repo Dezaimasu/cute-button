@@ -6,6 +6,10 @@
 		input:not([type]) {
 			width: 400px;
 		}
+		#icon-display {
+			width: 100px;
+			height: 100px;
+		}
 	</style>
 </head>
 <body>
@@ -21,6 +25,17 @@
 		<tr>
 			<td><label for="exclusions">Classes of elements exluded from scanning (split by spaces):</label></td>
 			<td><input id="exclusions"></td>
+		</tr>
+		<tr>
+			<td><label for="file-input">Your custom cute icon:</label></td>
+			<td>
+				<input id="icon" hidden>
+				<input id="file-input" type="file">
+			</td>
+		</tr>
+		<tr>
+			<td></td>
+			<td><div id="icon-display"></div></td>
 		</tr>
 		<tr>
 			<td>
