@@ -49,6 +49,6 @@ browser.runtime.onMessage.addListener(function(message, sender){
 browser.runtime.onInstalled.addListener(initSettings);
 function initSettings(details){
 	browser.runtime.onInstalled.removeListener(initSettings);
-	// if (details.reason !== 'install') {return;} //TODO uncomment
+	if (details.reason !== 'install') {return;}
 	browser.runtime.openOptionsPage();
 }

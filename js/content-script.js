@@ -122,7 +122,7 @@ const de_contentscript = {
 	setSettings: function(newSettings){
 		this.settings.minSize = newSettings.minSize;
 		this.settings.exclusions = newSettings.exclusions.split(' ');
-		de_button.elem.style.backgroundImage = 'url("' + newSettings.icon + '")';
+		de_button.elem.style.backgroundImage = newSettings.icon;
 	},
 
 	nodeTools: {

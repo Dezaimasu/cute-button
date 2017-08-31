@@ -1,38 +1,41 @@
 'use strict';
 
-const settingsDefaults = {
+const settingsDefault = {
 	savePath: 	'',
 	minSize: 	256,
 	exclusions: 'de-video-thumb de-ytube de-file-img html5-main-video vjs-tech',
-	icon:		browser.extension.getURL('bestgirl.png')
+	icon:		wrapIconForBgImage(browser.extension.getURL('bestgirl.png'))
 };
 const elem = {};
 
 function loadOptions(){
-	browser.storage.local.get(settingsDefaults).then(function(result){
-		Object.keys(settingsDefaults).forEach(function(key){
+	browser.storage.local.get(settingsDefault).then(function(result){
+		Object.keys(settingsDefault).forEach(function(key){
 			elem[key].value = result[key];
 		});
-		showIcon(elem.icon.value);
+		refreshIcon();
 		saveOptions();
 	});
 }
 
 function saveOptions(){
 	let settings = {};
-	Object.keys(settingsDefaults).forEach(function(key){
+	Object.keys(settingsDefault).forEach(function(key){
 		settings[key] = elem[key].value;
 	});
 	browser.storage.local.set(settings);
 }
 
 function resetOptions(){
-	browser.storage.local.set(settingsDefaults);
+	browser.storage.local.set(settingsDefault);
 	loadOptions();
 }
 
-function showIcon(encodedIcon){
-	elem.iconDisplay.style.backgroundImage = 'url("' + encodedIcon + '")';
+function refreshIcon(){
+	elem.iconDisplay.style.backgroundImage = elem.icon.value;
+}
+function wrapIconForBgImage(icon){
+	return 'url("' + icon + '")';
 }
 
 function fileInputListener(){
@@ -43,13 +46,13 @@ function fileInputListener(){
 			console.log(reader.result.length); //TODO add proper error message
 			return;
 		}
-		elem.icon.value = reader.result;
-		showIcon(reader.result);
+		elem.icon.value = wrapIconForBgImage(reader.result);
+		refreshIcon();
 	};
 }
 
 function initSelectors(){
-	let settingsElems = Object.keys(settingsDefaults),
+	let settingsElems = Object.keys(settingsDefault),
 		otherElems = ['save', 'reset', 'iconDisplay', 'fileInput'];
 
 	settingsElems.concat(otherElems).forEach(function(a){
