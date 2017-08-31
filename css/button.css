@@ -1,6 +1,6 @@
 de_tsbutton {
-	border-radius: 3px;
-	background: #444 url(moz-extension://__MSG_@@extension_id__/bestgirl.png) center/26px no-repeat;
+	border-radius: 4px;
+	background: #444 url(moz-extension://__MSG_@@extension_id__/bestgirl.png) center/28px no-repeat;
 	visibility: hidden;
 	position: absolute;
 	z-index: 2147483647;

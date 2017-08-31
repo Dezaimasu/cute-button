@@ -6,9 +6,8 @@
 		input:not([type]) {
 			width: 400px;
 		}
-		#icon-display {
-			width: 100px;
-			height: 100px;
+		de_tsbutton#iconDisplay {
+			visibility: visible !important;
 		}
 	</style>
 </head>
@@ -27,21 +26,22 @@
 			<td><input id="exclusions"></td>
 		</tr>
 		<tr>
-			<td><label for="file-input">Your custom cute icon:</label></td>
+			<td><label for="fileInput">Your custom cute icon:</label></td>
 			<td>
 				<input id="icon" hidden>
-				<input id="file-input" type="file">
+				<input id="fileInput" type="file">
 			</td>
 		</tr>
 		<tr>
 			<td></td>
-			<td><div id="icon-display"></div></td>
+			<td><de_tsbutton id="iconDisplay"></de_tsbutton></td>
 		</tr>
 		<tr>
 			<td>
 				<button id="save">Save</button>
 				<button id="reset">Reset</button>
 			</td>
+			<td id="error"></td>
 		</tr>
 	</table>
 <script src="js/options.js"></script>
