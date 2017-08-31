@@ -13,10 +13,14 @@ const de_webextApi = {
 	},
 	settings: function(){
 		browser.storage.onChanged.addListener(function(changes){
-			de_contentscript.setSettings(changes.minSize.newValue, changes.exclusions.newValue);
+			de_contentscript.setSettings({
+				minSize: 	changes.minSize.newValue,
+				exclusions: changes.exclusions.newValue,
+				icon: 		changes.icon.newValue
+			});
 		});
-		browser.storage.local.get(['minSize', 'exclusions']).then(function(result){
-			de_contentscript.setSettings(result.minSize, result.exclusions);
+		browser.storage.local.get(['minSize', 'exclusions', 'icon']).then(function(result){
+			de_contentscript.setSettings(result);
 		});
 	}
 };
@@ -111,13 +115,14 @@ const de_contentscript = {
 		let isSeparateTab = ['image/', 'video/'].indexOf(document.contentType.substr(0, 6)) > -1;
 
 		this.srcLocation = isSeparateTab ? 'baseURI' : 'currentSrc';
-		de_webextApi.settings();
 		de_button.init();
+		de_webextApi.settings();
 	},
 
-	setSettings: function(minSize, exclusions){
-		this.settings.minSize = minSize;
-		this.settings.exclusions = exclusions.split(' ');
+	setSettings: function(newSettings){
+		this.settings.minSize = newSettings.minSize;
+		this.settings.exclusions = newSettings.exclusions.split(' ');
+		de_button.elem.style.backgroundImage = 'url("' + newSettings.icon + '")';
 	},
 
 	nodeTools: {
