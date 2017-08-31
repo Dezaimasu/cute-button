@@ -27,8 +27,9 @@ function saveOptions(){
 }
 
 function resetOptions(){
-	browser.storage.local.set(settingsDefault);
-	loadOptions();
+	Object.keys(settingsDefault).forEach(function(key){
+		elem[key].value = settingsDefault[key];
+	});
 }
 
 function refreshIcon(){
