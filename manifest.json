@@ -24,8 +24,7 @@
 	],
 	"options_ui": {
 		"page": "settings.html",
-		"browser_style": true,
-		"open_in_tab": true
+		"browser_style": true
 	},
 	"applications": {
 		"gecko": {

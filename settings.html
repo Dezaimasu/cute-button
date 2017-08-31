@@ -2,9 +2,19 @@
 <html lang="en">
 <head>
 	<meta charset="utf-8">
+	<link rel="stylesheet" type="text/css" href="css/button.css">
 	<style>
 		input:not([type]) {
 			width: 400px;
+		}
+		input[type=file] {
+			width: 350px;
+		}
+		#iconContainer {
+			vertical-align: bottom;
+			display: inline-block;
+			height: 32px;
+			width: 50px;
 		}
 		de_tsbutton#iconDisplay {
 			visibility: visible !important;
@@ -28,13 +38,12 @@
 		<tr>
 			<td><label for="fileInput">Your custom cute icon:</label></td>
 			<td>
+				<div id="iconContainer">
+					<de_tsbutton id="iconDisplay"></de_tsbutton>
+				</div>
 				<input id="icon" hidden>
 				<input id="fileInput" type="file">
 			</td>
-		</tr>
-		<tr>
-			<td></td>
-			<td><de_tsbutton id="iconDisplay"></de_tsbutton></td>
 		</tr>
 		<tr>
 			<td>
