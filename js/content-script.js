@@ -54,7 +54,7 @@ const de_button = {
 
 		de_webextApi.listen();
 
-		that.elem = document.createElement('de_tsbutton');
+		that.elem = document.createElement('de_cbutton');
 		btnElem = that.elem;
 		btnElem.addEventListener('contextmenu', event => event.preventDefault());
 		btnElem.addEventListener('mousedown', mousedownListener);
@@ -219,7 +219,7 @@ const de_contentscript = {
 			src = currentTarget[that.srcLocation],
 			coords;
 
-		if (!currentTarget || ctrlKey || currentTarget.tagName === 'DE_TSBUTTON') {return;}
+		if (!currentTarget || ctrlKey || currentTarget.tagName === 'DE_CBUTTON') {return;}
 		if (!src || src !== that.previousSrc) {
 			de_button.hide();
 		}

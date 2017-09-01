@@ -1,4 +1,4 @@
-de_tsbutton {
+de_cbutton {
 	border-radius: 4px;
 	background: #444 url(moz-extension://__MSG_@@extension_id__/bestgirl.png) center/28px no-repeat;
 	visibility: hidden;
@@ -8,13 +8,13 @@ de_tsbutton {
 	height: 32px;
 	width: 32px;
 }
-de_tsbutton:hover {
+de_cbutton:hover {
 	background-color: #666;
 }
-de_tsbutton.implying-click,
-de_tsbutton.click:hover {
+de_cbutton.implying-click,
+de_cbutton.click:hover {
 	margin: 1px 0 0 1px;
 }
-de_tsbutton.warning {
+de_cbutton.warning {
 	box-shadow: inset 0 0 0 3px #F24;
 }
