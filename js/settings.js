@@ -24,6 +24,7 @@ function saveOptions(){
 		settings[key] = elem[key].value;
 	});
 	browser.storage.local.set(settings);
+	disableSave();
 }
 
 function resetOptions(){
@@ -31,6 +32,7 @@ function resetOptions(){
 		elem[key].value = settingsDefault[key];
 	});
 	refreshIcon();
+	enableSave();
 }
 
 function refreshIcon(){
@@ -53,6 +55,13 @@ function fileInputListener(){
 	};
 }
 
+function disableSave(){
+	elem.save.disabled = true;
+}
+function enableSave(){
+	elem.save.disabled = false;
+}
+
 function initSelectors(){
 	let settingsElems = Object.keys(settingsDefault),
 		otherElems = ['save', 'reset', 'iconDisplay', 'fileInput'];
@@ -62,9 +71,18 @@ function initSelectors(){
 	});
 }
 
-initSelectors();
+function init(){
+	initSelectors();
 
-elem.fileInput.addEventListener('change', fileInputListener);
-elem.save.addEventListener('click', saveOptions);
-elem.reset.addEventListener('click', resetOptions);
-document.addEventListener('DOMContentLoaded', loadOptions);
+	elem.fileInput.addEventListener('change', fileInputListener);
+	elem.save.addEventListener('click', saveOptions);
+	elem.reset.addEventListener('click', resetOptions);
+	document.querySelectorAll('input:not([type=hidden])').forEach(function(elem){
+		elem.addEventListener('input', enableSave);
+	});
+
+	disableSave();
+	loadOptions();
+}
+
+document.addEventListener('DOMContentLoaded', init);
