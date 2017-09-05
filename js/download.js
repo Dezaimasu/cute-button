@@ -5,9 +5,9 @@ function download(downloadRequest, tabId){
 }
 
 const downloader = {
-	savePath: null,
-	filename: null,
-	basename: null,
+	savePath: '',
+	filename: '',
+	basename: '',
 
 	initSavePath: function(){
 		browser.storage.onChanged.addListener(function(changes){
@@ -19,8 +19,8 @@ const downloader = {
 	},
 
 	resetFileName: function(){
-		this.filename = null;
-		this.basename = null;
+		this.filename = '';
+		this.basename = '';
 	},
 
 	/*
@@ -108,11 +108,15 @@ const downloader = {
 		});
 	},
 
+	prepareWinFilename: function(){
+		return decodeURIComponent(this.filename).replace(/[/\\:*?"<>|\x09]/g, '');
+	},
+
 	download: function(src, tabId){
 		let that = this;
 		browser.downloads.download({
 			url: src,
-			filename: that.savePath + that.filename,
+			filename: that.savePath + that.prepareWinFilename(),
 			conflictAction: 'uniquify'
 		}).then(function(downloadId){
 			that.checkForDuplicate(downloadId, tabId);
