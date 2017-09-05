@@ -1,8 +1,4 @@
 'use strict';
-/*
-* TODO base64 in background-image, blob, etc.
-* TODO Windows filepath max length restrictions
-*/
 
 /*
 * Content scripts and styles injection
