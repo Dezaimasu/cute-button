@@ -149,10 +149,10 @@ const de_contentscript = {
 			if (!modifier) {return false;}
 
 			bgImg = getComputedStyle(node).getPropertyValue('background-image');
-			if (bgImg && bgImg.indexOf('url') === 0) {
-				bgImg = bgImg.match(/^url\((.+)\).*/i);
-				if (bgImg) {
-					de_contentscript.bgSrc = bgImg[1].replace(/(^(\s|"|')|(\s|"|')$)/g, '');
+			if (bgImg) {
+				let bgUrlMatches = bgImg.match(/^url\([\s"']*(https?:\/\/[^\s"']+)[\s"']*\).*/i);
+				if (bgUrlMatches) {
+					de_contentscript.bgSrc = bgUrlMatches[1];
 					return true;
 				}
 			}
@@ -162,7 +162,7 @@ const de_contentscript = {
 			return (tagName !== 'IMG' && tagName !== 'VIDEO');
 		},
 		filterBySrc: function(src){
-			return (!src || ['http', 'data', 'blob'].indexOf(src.substr(0, 4)) === -1);
+			return (!src || src.indexOf('http') !== 0);
 		},
 		filterByClass: function(classList){
 			return de_contentscript.settings.exclusions.some(exclusion => classList.contains(exclusion));
