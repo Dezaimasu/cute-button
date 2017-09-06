@@ -12,17 +12,32 @@ const de_webextApi = {
 		});
 	},
 	settings: function(){
+		let settingsList = ['minSize', 'exclusions', 'icon', 'originalNameByDefault'];
+
 		browser.storage.onChanged.addListener(function(changes){
-			de_contentscript.setSettings({
-				minSize: 	changes.minSize.newValue,
-				exclusions: changes.exclusions.newValue,
-				icon: 		changes.icon.newValue
+			let newSettings = {};
+			settingsList.forEach(function(settingName){
+				newSettings[settingName] = changes[settingName].newValue;
 			});
+			de_settings.setSettings(newSettings);
 		});
-		browser.storage.local.get(['minSize', 'exclusions', 'icon']).then(function(result){
-			de_contentscript.setSettings(result);
+		browser.storage.local.get(settingsList).then(function(result){
+			de_settings.setSettings(result);
 		});
 	}
+};
+
+const de_settings = {
+	minSize: null,
+	exclusions: [],
+	originalNameButton: null,
+
+	setSettings: function(newSettings){
+		this.minSize = newSettings.minSize;
+		this.exclusions = newSettings.exclusions.split(' ');
+		this.originalNameButton = newSettings.originalNameByDefault ? 0 : 2;
+		de_button.elem.style.backgroundImage = newSettings.icon;
+	},
 };
 
 const de_button = {
@@ -40,7 +55,7 @@ const de_button = {
 			if (!btnElem.classList.contains('click') || !that.downloadRequest.src) {return;}
 			de_webextApi.download({
 				src: that.downloadRequest.src,
-				originalName: event.button === 2 ? that.downloadRequest.originalName : null
+				originalName: event.button === de_settings.originalNameButton ? that.downloadRequest.originalName : null
 			});
 			if (event.button === 1) { //TODO move this call from here to background script listener, so filename could be copied too
 				that.copyToClipboard(that.downloadRequest.src); //TODO copy filename (maybe filepath too) instead if some modifier was pressed
@@ -120,10 +135,6 @@ const de_contentscript = {
 	bgSrc: null,
 	srcLocation: null,
 	previousSrc: null,
-	settings: {
-		minSize: null,
-		exclusions: []
-	},
 
 	init: function(){
 		let isSeparateTab = ['image/', 'video/'].indexOf(document.contentType.substr(0, 6)) > -1;
@@ -131,12 +142,6 @@ const de_contentscript = {
 		this.srcLocation = isSeparateTab ? 'baseURI' : 'currentSrc';
 		de_button.init();
 		de_webextApi.settings();
-	},
-
-	setSettings: function(newSettings){
-		this.settings.minSize = newSettings.minSize;
-		this.settings.exclusions = newSettings.exclusions.split(' ');
-		de_button.elem.style.backgroundImage = newSettings.icon;
 	},
 
 	nodeTools: {
@@ -179,7 +184,7 @@ const de_contentscript = {
 			return (!src || src.indexOf('http') !== 0);
 		},
 		filterByClass: function(classList){
-			return de_contentscript.settings.exclusions.some(exclusion => classList.contains(exclusion));
+			return de_settings.exclusions.some(exclusion => classList.contains(exclusion));
 		},
 		filterBySize: function(node, modifier){
 			let that = de_contentscript,
@@ -191,10 +196,10 @@ const de_contentscript = {
 			if (that.srcLocation === 'baseURI' || node.tagName === 'VIDEO' || modifier) {
 				return false;
 			}
-			if (node.complete && !(node.naturalWidth < that.settings.minSize || node.naturalHeight < that.settings.minSize)) {
+			if (node.complete && !(node.naturalWidth < de_settings.minSize || node.naturalHeight < de_settings.minSize)) {
 				return false;
 			}
-			return (node.width < that.settings.minSize || node.height < that.settings.minSize);
+			return (node.width < de_settings.minSize || node.height < de_settings.minSize);
 		},
 		processByHost: function(node, modifier){
 			let hostHandler = de_contentscript.nodeTools.hostCrutches[de_contentscript.host];

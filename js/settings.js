@@ -1,17 +1,18 @@
 'use strict';
 
 const settingsDefault = {
-	savePath: 	'',
-	minSize: 	256,
-	exclusions: 'de-video-thumb de-ytube de-file-img html5-main-video vjs-tech',
-	icon:		wrapIconForBgImage(browser.extension.getURL('bestgirl.png'))
+	savePath: 				'',
+	minSize: 				256,
+	exclusions: 			'de-video-thumb de-ytube de-file-img html5-main-video vjs-tech',
+	icon:					wrapIconForBgImage(browser.extension.getURL('bestgirl.png')),
+	originalNameByDefault: 	false
 };
 const elem = {};
 
 function loadOptions(){
 	browser.storage.local.get(settingsDefault).then(function(result){
 		Object.keys(settingsDefault).forEach(function(key){
-			elem[key].value = result[key];
+			elem[key][elem[key].de_val] = result[key];
 		});
 		refreshIcon();
 		saveOptions();
@@ -21,7 +22,7 @@ function loadOptions(){
 function saveOptions(){
 	let settings = {};
 	Object.keys(settingsDefault).forEach(function(key){
-		settings[key] = elem[key].value;
+		settings[key] = elem[key][elem[key].de_val];
 	});
 	browser.storage.local.set(settings);
 	disableSave();
@@ -29,7 +30,7 @@ function saveOptions(){
 
 function resetOptions(){
 	Object.keys(settingsDefault).forEach(function(key){
-		elem[key].value = settingsDefault[key];
+		elem[key][elem[key].de_val] = settingsDefault[key];
 	});
 	refreshIcon();
 	enableSave();
@@ -66,8 +67,12 @@ function initSelectors(){
 	let settingsElems = Object.keys(settingsDefault),
 		otherElems = ['save', 'reset', 'iconDisplay', 'fileInput'];
 
-	settingsElems.concat(otherElems).forEach(function(a){
-		elem[a] = document.querySelector('#' + a);
+	settingsElems.forEach(function(name){
+		elem[name] = document.querySelector('#' + name);
+		elem[name].de_val = elem[name].type === 'checkbox' ? 'checked' : 'value';
+	});
+	otherElems.forEach(function(name){
+		elem[name] = document.querySelector('#' + name);
 	});
 }
 

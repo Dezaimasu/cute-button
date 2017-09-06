@@ -4,6 +4,9 @@
 	<meta charset="utf-8">
 	<link rel="stylesheet" type="text/css" href="css/button.css">
 	<style>
+		td:first-child {
+			padding-right: 10px;
+		}
 		input:not([type]) {
 			width: 400px;
 		}
@@ -38,6 +41,10 @@
 		<tr>
 			<td><label for="exclusions">Classes of elements exluded from scanning (split by spaces):</label></td>
 			<td><input id="exclusions"></td>
+		</tr>
+		<tr>
+			<td><label for="originalNameByDefault">Save with original name by default if available (swaps LMB and RMB actions):</label></td>
+			<td><input id="originalNameByDefault" type="checkbox"></td>
 		</tr>
 		<tr>
 			<td><label for="fileInput">Your custom cute icon:</label></td>
