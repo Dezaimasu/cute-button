@@ -12,27 +12,27 @@ const de_webextApi = {
         });
     },
     settings: function(){
-        let settingsList = ['minSize', 'exclusions', 'icon', 'originalNameByDefault'];
-
         browser.storage.onChanged.addListener(function(changes){
             let newSettings = {};
-            settingsList.forEach(function(settingName){
+            de_settings.originalNames.forEach(function(settingName){
                 newSettings[settingName] = changes[settingName].newValue;
             });
             de_settings.setSettings(newSettings);
         });
-        browser.storage.local.get(settingsList).then(function(result){
+        browser.storage.local.get(de_settings.originalNames).then(function(result){
             de_settings.setSettings(result);
         });
     }
 };
 
 const de_settings = {
+    originalNames: ['minSize', 'exclusions', 'icon', 'originalNameByDefault'],
+
     minSize: null,
     exclusions: [],
     originalNameButton: null,
 
-    setSettings: function(newSettings){
+    setSettings: function(newSettings){ //TODO check if all settings are set, open settings page otherwise
         this.minSize = newSettings.minSize;
         this.exclusions = newSettings.exclusions.split(' ');
         this.originalNameButton = newSettings.originalNameByDefault ? 0 : 2;
