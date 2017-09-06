@@ -42,6 +42,9 @@ const de_button = {
 				src: that.downloadRequest.src,
 				originalName: event.button === 2 ? that.downloadRequest.originalName : null
 			});
+			if (event.button === 1) { //TODO move this call from here to background script listener, so filename could be copied too
+				that.copyToClipboard(that.downloadRequest.src); //TODO copy filename (maybe filepath too) instead if some modifier was pressed
+			}
 			btnElem.classList.remove('click');
 		}
 		function mousedownListener(event){
@@ -98,6 +101,17 @@ const de_button = {
 			src: src,
 			originalName: originalName
 		};
+	},
+
+	copyToClipboard: function(string){
+		let clpbrd = document.createElement('input'),
+			body = document.body;
+
+		body.appendChild(clpbrd);
+		clpbrd.value = string;
+		clpbrd.select();
+		document.execCommand('copy');
+		body.removeChild(clpbrd);
 	}
 };
 
