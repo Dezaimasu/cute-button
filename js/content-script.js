@@ -44,7 +44,8 @@ const de_button = {
     elem: null,
     downloadRequest: {
         src: null,
-        originalName: null
+        originalName: null,
+        backupName: null,
     },
 
     init: function(){
@@ -53,10 +54,10 @@ const de_button = {
 
         function mouseupListener(event){
             if (!btnElem.classList.contains('click') || !that.downloadRequest.src) {return;}
-            de_webextApi.download({
-                src: that.downloadRequest.src,
-                originalName: event.button === de_settings.originalNameButton ? that.downloadRequest.originalName : null
-            });
+            if (event.button !== de_settings.originalNameButton) {
+                that.downloadRequest.originalName = null;
+            }
+            de_webextApi.download(that.downloadRequest);
             if (event.button === 1) { //TODO move this call from here to background script listener, so filename could be copied too
                 that.copyToClipboard(that.downloadRequest.src); //TODO copy filename (maybe filepath too) instead if some modifier was pressed
             }
@@ -114,7 +115,8 @@ const de_button = {
     prepareDL: function(src, originalName){
         this.downloadRequest = {
             src: src,
-            originalName: originalName
+            originalName: originalName,
+            backupName: (src && de_contentscript.isSeparateTab) ? document.title : null
         };
     },
 
@@ -135,11 +137,12 @@ const de_contentscript = {
     bgSrc: null,
     srcLocation: null,
     previousSrc: null,
+    isSeparateTab: null,
 
     init: function(){
-        let isSeparateTab = ['image/', 'video/'].indexOf(document.contentType.substr(0, 6)) > -1;
+        this.isSeparateTab = ['image/', 'video/'].indexOf(document.contentType.substr(0, 6)) > -1;
+        this.srcLocation = this.isSeparateTab ? 'baseURI' : 'currentSrc';
 
-        this.srcLocation = isSeparateTab ? 'baseURI' : 'currentSrc';
         de_button.init();
         de_webextApi.settings();
     },
@@ -193,7 +196,7 @@ const de_contentscript = {
             if (node.tagName === 'IMG' && node.width < buttonPlaceholderSize && node.height < buttonPlaceholderSize) {
                 return true;
             }
-            if (that.srcLocation === 'baseURI' || node.tagName === 'VIDEO' || modifier) {
+            if (that.isSeparateTab || node.tagName === 'VIDEO' || modifier) {
                 return false;
             }
             if (node.complete && !(node.naturalWidth < de_settings.minSize || node.naturalHeight < de_settings.minSize)) {
@@ -311,7 +314,7 @@ const de_contentscript = {
             parent = node,
             container;
 
-        if (!getter || this.srcLocation === 'baseURI') {return null;}
+        if (!getter || this.isSeparateTab) {return null;}
         for (let i = 0, parentLevel = getter.parentLevels[node.tagName]; i < parentLevel; i++) {
             parent = parent.parentNode;
         }

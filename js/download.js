@@ -50,6 +50,10 @@ const downloader = {
             request.onload = function(){
                 that.saveFileWithFilenameFromHeaders(downloadRequest.src, tabId, request);
             };
+            request.onerror = function(){
+                that.filename = downloadRequest.backupName;
+                that.download(downloadRequest.src, tabId);
+            };
             request.send();
         }
     },
