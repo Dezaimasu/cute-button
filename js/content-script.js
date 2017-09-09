@@ -253,13 +253,34 @@ const de_contentscript = {
         de_button.show(
             coords.x,
             coords.y,
-            src || currentTarget.src || that.bgSrc,
-            that.originalFilenameGrabber(currentTarget)
+            that.getOriginalSrc(currentTarget) || src || currentTarget.src || that.bgSrc,
+            that.getOriginalFilename(currentTarget)
         );
         that.bgSrc = null;
     },
 
-    originalFilenameGrabber: function(node){
+    getOriginalSrc: function(node){
+        let getters = {
+                'vk.com': function(){
+                    let info = eval('(' + node.getAttribute('onclick').match(/[^{]*({.+})[^}]*/)[1] + ')');
+                    return info['temp']['base'] + info['temp']['w_'][0] + '.jpg'; //TODO find actual extension and biggest available resolution instead of "w_"
+                },
+                'twitter.com': function(){
+                    //TODO
+                }
+            },
+            getter = getters[this.host],
+            originalSrc = null;
+
+        if (!getter) {return;}
+        try {
+            originalSrc = getter();
+        } catch (e) {} //tfw no safe navigation operator in 2017
+
+        return originalSrc;
+    },
+
+    getOriginalFilename: function(node){
         let gettersInfo = {
                 'boards.4chan.org': {
                     containerSelector: '.fileText',
