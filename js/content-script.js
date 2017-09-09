@@ -329,11 +329,15 @@ const de_tsblisteners = {
         de_contentscript.nodeHandler(event.target, event.shiftKey, event.ctrlKey);
     },
     keydownListener: function(event){
-        if (event.keyCode === 32 && de_button.isVisible()) {event.preventDefault();}
+        if (de_tsblisteners.isSpaceHotkey(event)) {event.preventDefault();}
     },
     keyupListener: function(event){
-        if (event.keyCode === 32 && de_button.isVisible()) {de_button.emulateClick(event.ctrlKey ? 2 : 0);}
+        if (de_tsblisteners.isSpaceHotkey(event)) {de_button.emulateClick(event.ctrlKey ? 2 : 0);}
         if (event.keyCode === 81 && event.altKey) {de_button.hide();}
+    },
+    
+    isSpaceHotkey: function(event){
+        return event.keyCode === 32 && de_button.isVisible() && ['INPUT', 'TEXTAREA'].indexOf(event.target.tagName) === -1;
     }
 };
 
