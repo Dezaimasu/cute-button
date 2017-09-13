@@ -340,6 +340,7 @@ const de_contentscript = {
         for (let i = 0, parentLevel = getter.parentLevels[node.tagName]; i < parentLevel; i++) {
             parent = parent.parentNode;
         }
+        if (parent.nodeName === 'HTML' || parent.nodeName === 'BODY') {return false;}
         container = parent.querySelector(getter.containerSelector);
 
         return container ? getter.getFilename(container) : null;
