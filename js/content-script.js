@@ -82,14 +82,14 @@ const de_button = {
         btnElem.addEventListener('mouseup', mouseupListener);
     },
 
-    show: function(x, y, src, originalName){
+    show: function(attachTo, src, originalName){
         let btnElem = this.elem,
             offset = 6;
 
         this.prepareDL(src, originalName);
-        btnElem.style.left = x + offset + 'px';
-        btnElem.style.top = y + offset + 'px';
-        document.body.appendChild(btnElem);
+        btnElem.style.left = attachTo.x + offset + 'px';
+        btnElem.style.top = attachTo.y + offset + 'px';
+        (attachTo.elem || document.body).appendChild(btnElem);
         setTimeout(() => {btnElem.style.visibility = 'visible';}, 32);
     },
 
@@ -237,10 +237,25 @@ const de_contentscript = {
         };
     },
 
+    checkForOverlay: function(node){
+        let overlayPath = {
+                '2ch.hk': '#fullscreen-container, .de-img-center'
+            }[this.host],
+            overlayElem;
+
+        if (!overlayPath) {return;}
+        overlayElem = document.querySelector(overlayPath);
+
+        return (overlayElem && overlayElem.contains(node)) ? {
+            elem: overlayElem,
+            x   : node.offsetLeft,
+            y   : node.offsetTop
+        } : null;
+    },
+
     nodeHandler: function(currentTarget, shiftKey, ctrlKey){
         let that = de_contentscript,
-            src = currentTarget[that.srcLocation],
-            coords;
+            src = currentTarget[that.srcLocation];
 
         if (!currentTarget || ctrlKey || currentTarget.tagName === 'DE_CBUTTON') {return;}
         if (!src || src !== that.previousSrc) {
@@ -250,10 +265,9 @@ const de_contentscript = {
             return;
         }
         that.previousSrc = src;
-        coords = that.getNodeCoordinates(currentTarget);
+
         de_button.show(
-            coords.x,
-            coords.y,
+            that.checkForOverlay(currentTarget) || that.getNodeCoordinates(currentTarget),
             that.getOriginalSrc(currentTarget) || src || currentTarget.src || that.bgSrc,
             that.getOriginalFilename(currentTarget)
         );
