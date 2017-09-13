@@ -26,7 +26,7 @@ const de_webextApi = {
 };
 
 const de_settings = {
-    originalNames: ['minSize', 'exclusions', 'icon', 'originalNameByDefault'],
+    originalNames: ['minSize', 'exclusions', 'icon', 'originalNameByDefault', 'hideButton'],
 
     minSize: null,
     exclusions: [],
@@ -37,6 +37,7 @@ const de_settings = {
         this.exclusions = newSettings.exclusions.split(' ');
         this.originalNameButton = newSettings.originalNameByDefault ? 0 : 2;
         de_button.elem.style.backgroundImage = newSettings.icon;
+        de_button.elem.classList.toggle('shy', newSettings.hideButton);
     },
 };
 

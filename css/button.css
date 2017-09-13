@@ -18,3 +18,6 @@ de_cbutton.click:hover {
 de_cbutton.warning {
 	box-shadow: inset 0 0 0 3px #F24;
 }
+de_cbutton.shy:not(:hover) {
+	opacity: 0.2;
+}
