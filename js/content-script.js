@@ -267,7 +267,7 @@ const de_contentscript = {
                     return info['temp']['base'] + info['temp']['w_'][0] + '.jpg'; //TODO find actual extension and biggest available resolution instead of "w_"
                 },
                 'twitter.com': function(){
-                    //TODO
+                    return node.currentSrc + ':orig';
                 }
             },
             getter = getters[this.host],
