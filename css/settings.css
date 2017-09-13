@@ -1,0 +1,23 @@
+td:first-child {
+	padding: 0 10px;
+	height: 25px;
+}
+input:not([type]) {
+	width: 400px;
+}
+input[type=file] {
+	width: 350px;
+}
+button {
+	margin: 20px 5px 5px;
+	font-size: 1.25em;
+}
+#iconContainer {
+	vertical-align: bottom;
+	display: inline-block;
+	height: 32px;
+	width: 50px;
+}
+de_cbutton#iconDisplay {
+	visibility: visible !important;
+}
