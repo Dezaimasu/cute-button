@@ -32,7 +32,7 @@ const de_settings = {
     exclusions: [],
     originalNameButton: null,
 
-    setSettings: function(newSettings){ //TODO check if all settings are set, open settings page otherwise
+    setSettings: function(newSettings){
         this.minSize = newSettings.minSize;
         this.exclusions = newSettings.exclusions.split(' ');
         this.originalNameButton = newSettings.originalNameByDefault ? 0 : 2;
@@ -54,18 +54,19 @@ const de_button = {
             btnElem;
 
         function mouseupListener(event){
+            that.disableDefaultClick(event);
             if (!btnElem.classList.contains('click') || !that.downloadRequest.src) {return;}
             if (event.button !== de_settings.originalNameButton) {
                 that.downloadRequest.originalName = null;
             }
             de_webextApi.download(that.downloadRequest);
-            if (event.button === 1) { //TODO move this call from here to background script listener, so filename could be copied too
-                that.copyToClipboard(that.downloadRequest.src); //TODO copy filename (maybe filepath too) instead if some modifier was pressed
+            if (event.button === 1) {
+                that.copyToClipboard(that.downloadRequest.src);
             }
             btnElem.classList.remove('click');
         }
         function mousedownListener(event){
-            event.preventDefault();
+            that.disableDefaultClick(event);
             btnElem.classList.add('click')
         }
         function mouseoutListener(event){
@@ -76,10 +77,15 @@ const de_button = {
 
         that.elem = document.createElement('de_cbutton');
         btnElem = that.elem;
-        btnElem.addEventListener('contextmenu', event => event.preventDefault());
+        btnElem.addEventListener('contextmenu', that.disableDefaultClick);
         btnElem.addEventListener('mousedown', mousedownListener);
         btnElem.addEventListener('mouseout', mouseoutListener);
         btnElem.addEventListener('mouseup', mouseupListener);
+    },
+
+    disableDefaultClick: function(event){
+        event.stopPropagation();
+        event.preventDefault();
     },
 
     show: function(attachTo, src, originalName){
@@ -283,7 +289,7 @@ const de_contentscript = {
         let getters = {
                 'vk.com': function(){
                     let info = eval('(' + node.getAttribute('onclick').match(/[^{]*({.+})[^}]*/)[1] + ')');
-                    return info['temp']['base'] + info['temp']['w_'][0] + '.jpg'; //TODO find actual extension and biggest available resolution instead of "w_"
+                    return info['temp']['base'] + info['temp']['w_'][0] + '.jpg';
                 },
                 'twitter.com': function(){
                     return node.currentSrc + ':orig';
