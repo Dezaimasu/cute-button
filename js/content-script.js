@@ -288,8 +288,8 @@ const de_contentscript = {
     getOriginalSrc: function(node){
         let getters = {
                 'vk.com': function(){
-                    let info = eval('(' + node.getAttribute('onclick').match(/[^{]*({.+})[^}]*/)[1] + ')');
-                    return info['temp']['base'] + info['temp']['w_'][0] + '.jpg';
+                    let info = JSON.parse(node.getAttribute('onclick').match(/^.*"?temp"? *: *({[^{}]+}).*$/)[1]);
+                    return info['base'] + (info['w_'] || info['z_'] || info['y_'])[0] + '.jpg';
                 },
                 'twitter.com': function(){
                     return node.currentSrc + ':orig';
