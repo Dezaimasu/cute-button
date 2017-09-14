@@ -139,10 +139,12 @@ const de_contentscript = {
     srcLocation: null,
     previousSrc: null,
     isSeparateTab: null,
+    overlayMayExist: null,
 
     init: function(){
         this.isSeparateTab = ['image/', 'video/'].indexOf(document.contentType.substr(0, 6)) > -1;
         this.srcLocation = this.isSeparateTab ? 'baseURI' : 'currentSrc';
+        this.overlayMayExist = this.checkForOverlay();
 
         de_button.init();
         de_webextApi.settings();
@@ -237,15 +239,18 @@ const de_contentscript = {
         };
     },
 
-    checkForOverlay: function(node){
-        let overlayPath = {
-                '2ch.hk': '#fullscreen-container, .de-img-center'
-            }[this.host],
-            overlayElem;
+    checkForOverlay: function(){
+        return (
+            (this.host === '2ch.hk' && !!document.querySelector('#fullscreen-container')) ||
+            !!document.querySelector('#de-main') // dollchan extension
+        );
+    },
 
-        if (!overlayPath) {return;}
-        overlayElem = document.querySelector(overlayPath);
+    getOverlayInfo: function(node){
+        let overlayElem;
+        if (!this.overlayMayExist) {return;}
 
+        overlayElem = document.querySelector('.de-img-center, #fullscreen-container');
         return (overlayElem && overlayElem.contains(node)) ? {
             elem: overlayElem,
             x   : node.offsetLeft,
@@ -267,7 +272,7 @@ const de_contentscript = {
         that.previousSrc = src;
 
         de_button.show(
-            that.checkForOverlay(currentTarget) || that.getNodeCoordinates(currentTarget),
+            that.getOverlayInfo(currentTarget) || that.getNodeCoordinates(currentTarget),
             that.getOriginalSrc(currentTarget) || src || currentTarget.src || that.bgSrc,
             that.getOriginalFilename(currentTarget)
         );
