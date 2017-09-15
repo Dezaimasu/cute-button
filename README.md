@@ -6,9 +6,10 @@
 
 https://addons.mozilla.org/en-US/firefox/addon/cute-button/
 
-* Now you can set your custom icon so the button would be even more cuter. Protip: it won't.
+* You can set your custom icon so the button would be even more cuter. Protip: it won't.
+* Always downloads orginal full-sized images (currently supported: vk.com, twitter.com)
 * Click on the button to save the file
-* Right click to save with original filename (currently supported sites: 4chan.org, 2ch.hk, iichan.hk, boards.fireden.net, yuki.la, exhentai.org)
+* Right click to save with original filename (currently supported: 4chan.org, 2ch.hk, iichan.hk, boards.fireden.net, yuki.la, exhentai.org)
 * Middle click to save the file and copy its url to clipboard
 * Space is the same as left click
 * Ctrl+Space is the same as right click
