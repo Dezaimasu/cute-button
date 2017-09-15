@@ -14,5 +14,5 @@ https://addons.mozilla.org/en-US/firefox/addon/cute-button/
 * Space is the same as left click
 * Ctrl+Space is the same as right click
 * Alt+Q to hide the button
-* Hold Shift to ignore filtering by image size
+* Hold Shift for "deep scan" (checks for background-image and ignores filtering by image size)
 * Hold Ctrl to delay button hiding for 1 second (can be useful if button somehow appeared outside of the image area)
