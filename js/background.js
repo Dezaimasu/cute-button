@@ -27,8 +27,7 @@ function penetrate(tabId, frameId = 0){
     browser.tabs.insertCSS(tabId, {
         file: 'css/button.css',
         runAt: 'document_start',
-        frameId: frameId,
-        cssOrigin: 'user'
+        frameId: frameId
     }).catch(exceptionHandler);
 }
 /*

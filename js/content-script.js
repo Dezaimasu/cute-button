@@ -1,6 +1,6 @@
 'use strict';
 
-const de_webextApi = {
+var de_webextApi = {
     download: function(downloadRequest){
         browser.runtime.sendMessage(downloadRequest);
     },
@@ -25,7 +25,7 @@ const de_webextApi = {
     }
 };
 
-const de_settings = {
+var de_settings = {
     originalNames: ['minSize', 'exclusions', 'icon', 'originalNameByDefault', 'hideButton'],
 
     minSize: null,
@@ -41,7 +41,7 @@ const de_settings = {
     },
 };
 
-const de_button = {
+var de_button = {
     elem: null,
     downloadRequest: {
         src: null,
@@ -139,7 +139,7 @@ const de_button = {
     }
 };
 
-const de_contentscript = {
+var de_contentscript = {
     host: document.location.host.replace(/^www\./, ''),
     bgSrc: null,
     srcLocation: null,
@@ -372,7 +372,7 @@ const de_contentscript = {
     }
 };
 
-const de_tsblisteners = {
+var de_tsblisteners = {
     mouseoverListener: function(event){
         de_contentscript.nodeHandler(event.target, event.shiftKey, event.ctrlKey);
     },
