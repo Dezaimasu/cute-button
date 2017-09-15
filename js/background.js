@@ -44,6 +44,6 @@ browser.runtime.onMessage.addListener(function(message, sender){
 browser.runtime.onInstalled.addListener(initSettings);
 function initSettings(details){
     browser.runtime.onInstalled.removeListener(initSettings);
-    if (details.reason !== 'install') {return;}
+    // if (details.reason !== 'install') {return;} //TODO uncomment later; open options page EVERY TIME new option is added
     browser.runtime.openOptionsPage();
 }
