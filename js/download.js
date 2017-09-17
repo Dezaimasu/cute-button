@@ -63,7 +63,7 @@ const downloader = {
             tmpFilename;
 
         if (contentDisposition) {
-            tmpFilename = contentDisposition.match(/^.+filename\*?=(.{0,20}')?(.*);?$/i);
+            tmpFilename = contentDisposition.match(/^.+filename\*?=(.{0,20}')?([^;]*);?$/i);
             if (tmpFilename) {
                 this.filename = decodeURI(tmpFilename[2]).replace(/"/g, '');
             }
