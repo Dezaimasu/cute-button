@@ -1,13 +1,5 @@
 'use strict';
 
-const settingsDefault = {
-    savePath                : '',
-    minSize                 : 256,
-    exclusions              : 'de-video-thumb de-ytube de-file-img html5-main-video vjs-tech',
-    icon                    : wrapIconForBgImage(browser.extension.getURL('bestgirl.png')),
-    originalNameByDefault   : false,
-    hideButton              : false,
-};
 const elem = {};
 
 function loadOptions(){
@@ -40,9 +32,6 @@ function resetOptions(){
 function refreshIcon(){
     elem.iconDisplay.style.backgroundImage = elem.icon.value;
 }
-function wrapIconForBgImage(icon){
-    return 'url("' + icon + '")';
-}
 
 function fileInputListener(){
     let reader = new FileReader();
@@ -52,7 +41,7 @@ function fileInputListener(){
             console.log(reader.result.length); //TODO add proper error message
             return;
         }
-        elem.icon.value = wrapIconForBgImage(reader.result);
+        elem.icon.value = 'url("' + reader.result + '")';
         refreshIcon();
     };
 }

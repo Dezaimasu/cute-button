@@ -11,6 +11,7 @@ const downloader = {
 
     initSavePath: function(){
         browser.storage.onChanged.addListener(function(changes){
+            if (typeof changes.savePath === 'undefined') {return;}
             downloader.setSavePath(changes.savePath.newValue);
         });
         browser.storage.local.get('savePath').then(function(result){

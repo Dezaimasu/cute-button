@@ -42,8 +42,16 @@ browser.runtime.onMessage.addListener(function(message, sender){
 });
 /* For options initialization after installation */
 browser.runtime.onInstalled.addListener(initSettings);
-function initSettings(details){
+function initSettings(){
+    let settingsNames = Object.keys(settingsDefault);
     browser.runtime.onInstalled.removeListener(initSettings);
-    // if (details.reason !== 'install') {return;} //TODO uncomment later; open options page EVERY TIME new option is added
-    browser.runtime.openOptionsPage();
+    browser.storage.local.get(settingsNames).then(function(currentSettings){
+        settingsNames.forEach(function(settingName){ // god I love callbacks
+            if (typeof currentSettings[settingName] === 'undefined') {
+                let newSetting = {};
+                newSetting[settingName] = settingsDefault[settingName];
+                browser.storage.local.set(newSetting);
+            }
+        });
+    });
 }
