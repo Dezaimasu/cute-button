@@ -1,10 +1,10 @@
 ![cute](https://i.imgur.com/ILlSir4.png)
 
-# Cute Button
+# Cute Save Button
 
 **Little button to save images and webms in one click. Praise cute!**
 
-https://addons.mozilla.org/en-US/firefox/addon/cute-button/
+https://addons.mozilla.org/en-US/firefox/addon/cute-save-button/
 
 * You can set your custom icon so the button would be even more cuter. Protip: it won't.
 * Always downloads orginal full-sized images (currently supported: vk.com, twitter.com)
