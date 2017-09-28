@@ -1,5 +1,10 @@
 'use strict';
 
+let isCute; // used for content scripts enabling/disabling
+
+browser.storage.local.get('isCute').then(items => isCute = items.isCute);
+browser.storage.onChanged.addListener(changes => isCute = changes.isCute.newValue);
+
 /*
 * Content scripts and styles injection
 * tabs.onUpdated used only for images/videos in separate tabs.
@@ -40,6 +45,7 @@ function exceptionHandler(e){}
 browser.runtime.onMessage.addListener(function(message, sender){
     download(message, sender.tab.id);
 });
+
 /* For options initialization after installation */
 browser.runtime.onInstalled.addListener(initSettings);
 function initSettings(){
@@ -55,3 +61,17 @@ function initSettings(){
         });
     });
 }
+
+/* Turns on/off content scripts across all tabs */
+browser.browserAction.onClicked.addListener(function(){
+    let state = isCute ? {text: 'on', color: '#6D6'} : {text: 'off', color: '#D66'};
+
+    browser.browserAction.setBadgeText({text: state.text});
+    browser.browserAction.setBadgeBackgroundColor({color: state.color});
+
+    browser.tabs.query({}).then(function(tabs){
+        for (let tab of tabs) {
+            browser.tabs.sendMessage(tab.id, state.text);
+        }
+    });
+});

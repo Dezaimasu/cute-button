@@ -5,4 +5,5 @@ const settingsDefault = {
     icon                    : 'url("' + browser.extension.getURL('bestgirl.png') + '")',
     originalNameByDefault   : false,
     hideButton              : false,
+	isCute					: true,
 };

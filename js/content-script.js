@@ -6,8 +6,10 @@ const de_webextApi = {
     },
     listen: function(){
         browser.runtime.onMessage.addListener(function(message){
-            if (message === 'duplicate_warning') {
-                de_button.jerkClass('warning');
+            switch (message) {
+                case 'on': {de_tsblisteners.switch(true); break;}
+                case 'off': {de_tsblisteners.switch(false); break;}
+                case 'duplicate_warning': {de_button.jerkClass('warning'); break;}
             }
         });
     },
@@ -19,8 +21,8 @@ const de_webextApi = {
             });
             de_settings.setSettings(newSettings);
         });
-        browser.storage.local.get(de_settings.originalNames).then(function(result){
-            de_settings.setSettings(result);
+        browser.storage.local.get(de_settings.originalNames).then(function(items){
+            de_settings.setSettings(items);
         });
     }
 };
@@ -386,11 +388,17 @@ const de_tsblisteners = {
     
     isSpaceHotkey: function(event){
         return event.keyCode === 32 && de_button.isVisible() && ['INPUT', 'TEXTAREA'].indexOf(event.target.tagName) === -1;
-    }
+    },
+
+    switch: function(turnOn = true){
+        let functionName = turnOn ? 'addEventListener' : 'removeEventListener';
+
+        window[functionName]('mouseover', de_tsblisteners.mouseoverListener);
+        window[functionName]('keydown', de_tsblisteners.keydownListener);
+        window[functionName]('keyup', de_tsblisteners.keyupListener);
+    },
 };
 
-window.addEventListener('mouseover', de_tsblisteners.mouseoverListener);
-window.addEventListener('keydown', de_tsblisteners.keydownListener);
-window.addEventListener('keyup', de_tsblisteners.keyupListener);
+de_tsblisteners.switch(true);
 
 de_contentscript.init();
