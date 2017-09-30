@@ -16,6 +16,7 @@ browser.tabs.onUpdated.addListener(function(tabId, changeInfo, tabInfo){
     penetrate(tabId);
 });
 browser.webNavigation.onDOMContentLoaded.addListener(function(details){
+    if (details.frameId === 0) {return;} // script for top-level frame will be injected via tabs.onUpdated listener
     penetrate(details.tabId, details.frameId);
 }, {
     url: [{schemes: ['http', 'https']}]
