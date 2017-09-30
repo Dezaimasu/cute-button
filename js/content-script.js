@@ -149,7 +149,7 @@ const de_button = {
 };
 
 const de_contentscript = {
-    host: document.location.host.replace(/^www\./, ''),
+    host: null,
     bgSrc: null,
     srcLocation: null,
     previousSrc: null,
@@ -157,12 +157,17 @@ const de_contentscript = {
     overlayMayExist: null,
 
     init: function(){
+        this.host = this.getFilteredHost();
         this.isSeparateTab = ['image/', 'video/'].indexOf(document.contentType.substr(0, 6)) > -1;
         this.srcLocation = this.isSeparateTab ? 'baseURI' : 'currentSrc';
         this.overlayMayExist = this.checkForOverlay();
 
         de_button.init();
         de_webextApi.settings();
+    },
+
+    getFilteredHost: function(){
+        return document.location.host.replace(/^www\./, '').replace(/(.*)\.(tumblr\.com)$/, '$2');
     },
 
     nodeTools: {
@@ -302,6 +307,9 @@ const de_contentscript = {
                 },
                 'twitter.com': function(){
                     return node.currentSrc + ':orig';
+                },
+                'tumblr.com': function(){
+                    return node.currentSrc.replace(/(tumblr_[\d\w]+)(_\d{2,3}).(jpg|jpeg|png)$/, '$1_1280.$3');
                 }
             },
             getter = getters[this.host],

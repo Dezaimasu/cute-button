@@ -7,7 +7,7 @@
 https://addons.mozilla.org/en-US/firefox/addon/cute-save-button/
 
 * You can set your custom icon so the button would be even more cuter. Protip: it won't.
-* Always downloads orginal full-sized images (currently supported: vk.com, twitter.com)
+* Always downloads orginal full-sized images (currently supported: vk.com, twitter.com, tumblr.com)
 * Click on the button to save the file
 * Right click to save with original filename (currently supported: 4chan.org, 2ch.hk, iichan.hk, boards.fireden.net, yuki.la, exhentai.org)
 * Middle click to save the file and copy its url to clipboard
