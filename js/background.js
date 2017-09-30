@@ -2,9 +2,6 @@
 
 let isCute; // used for content scripts enabling/disabling
 
-browser.storage.local.get('isCute').then(items => isCute = items.isCute);
-browser.storage.onChanged.addListener(changes => isCute = changes.isCute.newValue);
-
 /*
 * Content scripts and styles injection
 * tabs.onUpdated used only for images/videos in separate tabs.
@@ -62,16 +59,24 @@ function initSettings(){
     });
 }
 
-/* Turns on/off content scripts across all tabs */
+/* Turns on/off content script across all tabs */
+function setCuteState(state){
+    let stateProps = state ? {text: 'on', color: '#6D6'} : {text: 'off', color: '#D66'};
+
+    isCute = state;
+    browser.browserAction.setBadgeText({text: stateProps.text});
+    browser.browserAction.setBadgeBackgroundColor({color: stateProps.color});
+}
+
 browser.browserAction.onClicked.addListener(function(){
-    let state = isCute ? {text: 'on', color: '#6D6'} : {text: 'off', color: '#D66'};
+    isCute = !isCute;
+    browser.storage.local.set({'isCute': isCute});
+});
 
-    browser.browserAction.setBadgeText({text: state.text});
-    browser.browserAction.setBadgeBackgroundColor({color: state.color});
-
-    browser.tabs.query({}).then(function(tabs){
-        for (let tab of tabs) {
-            browser.tabs.sendMessage(tab.id, state.text);
-        }
-    });
+browser.storage.onChanged.addListener(function(changes){
+    if (typeof changes.isCute === 'undefined') {return;}
+    setCuteState(changes.isCute.newValue);
+});
+browser.storage.local.get('isCute').then(function(items){
+    setCuteState(items.isCute);
 });

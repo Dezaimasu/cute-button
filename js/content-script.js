@@ -16,6 +16,12 @@ const de_webextApi = {
     settings: function(){
         browser.storage.onChanged.addListener(function(changes){
             let newSettings = {};
+
+            if (Object.keys(changes).toString() === 'isCute') {
+                de_tsblisteners.switch(changes.isCute.newValue);
+                return; // click on browser_action button changes only "isCute" setting
+            }
+
             de_settings.originalNames.forEach(function(settingName){
                 newSettings[settingName] = changes[settingName].newValue;
             });
@@ -28,7 +34,7 @@ const de_webextApi = {
 };
 
 const de_settings = {
-    originalNames: ['minSize', 'exclusions', 'icon', 'originalNameByDefault', 'hideButton'],
+    originalNames: ['minSize', 'exclusions', 'icon', 'originalNameByDefault', 'hideButton', 'isCute'],
 
     minSize: null,
     exclusions: [],
@@ -40,6 +46,7 @@ const de_settings = {
         this.originalNameButton = newSettings.originalNameByDefault ? 0 : 2;
         de_button.elem.style.backgroundImage = newSettings.icon;
         de_button.elem.classList.toggle('shy', newSettings.hideButton);
+        de_tsblisteners.switch(newSettings.isCute);
     },
 };
 
@@ -398,7 +405,5 @@ const de_tsblisteners = {
         window[functionName]('keyup', de_tsblisteners.keyupListener);
     },
 };
-
-de_tsblisteners.switch(true);
 
 de_contentscript.init();
