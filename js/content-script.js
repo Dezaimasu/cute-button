@@ -53,9 +53,9 @@ const de_settings = {
 const de_button = {
     elem: null,
     downloadRequest: {
-        src: null,
+        src         : null,
         originalName: null,
-        backupName: null,
+        backupName  : null
     },
 
     init: function(){
@@ -65,10 +65,12 @@ const de_button = {
         function mouseupListener(event){
             that.disableDefaultClick(event);
             if (!btnElem.classList.contains('click') || !that.downloadRequest.src) {return;}
-            if (event.button !== de_settings.originalNameButton) {
-                that.downloadRequest.originalName = null;
-            }
-            de_webextApi.download(that.downloadRequest);
+
+            de_webextApi.download(Object.assign(
+                {},
+                that.downloadRequest,
+                that.isOriginalNameButton(event) ? {} : {originalName: null}
+            ));
             if (event.button === 1) {
                 that.copyToClipboard(that.downloadRequest.src);
             }
@@ -136,6 +138,10 @@ const de_button = {
         };
     },
 
+    isOriginalNameButton: function(event){
+        return event.button === de_settings.originalNameButton;
+    },
+
     copyToClipboard: function(string){
         let clpbrd = document.createElement('input'),
             body = document.body;
@@ -149,12 +155,12 @@ const de_button = {
 };
 
 const de_contentscript = {
-    host: null,
-    bgSrc: null,
-    srcLocation: null,
-    previousSrc: null,
-    isSeparateTab: null,
-    overlayMayExist: null,
+    host            : null,
+    bgSrc           : null,
+    srcLocation     : null,
+    previousSrc     : null,
+    isSeparateTab   : null,
+    overlayMayExist : null,
 
     init: function(){
         this.host = this.getFilteredHost();
