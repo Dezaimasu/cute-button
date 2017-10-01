@@ -7,8 +7,8 @@ const de_webextApi = {
     listen: function(){
         browser.runtime.onMessage.addListener(function(message){
             switch (message) {
-                case 'on': {de_tsblisteners.switch(true); break;}
-                case 'off': {de_tsblisteners.switch(false); break;}
+                case 'on': {de_listeners.switch(true); break;}
+                case 'off': {de_listeners.switch(false); break;}
                 case 'duplicate_warning': {de_button.jerkClass('warning'); break;}
             }
         });
@@ -18,7 +18,7 @@ const de_webextApi = {
             let newSettings = {};
 
             if (Object.keys(changes).toString() === 'isCute') {
-                de_tsblisteners.switch(changes.isCute.newValue);
+                de_listeners.switch(changes.isCute.newValue);
                 return; // click on browser_action button changes only "isCute" setting
             }
 
@@ -46,7 +46,7 @@ const de_settings = {
         this.originalNameButton = newSettings.originalNameByDefault ? 0 : 2;
         de_button.elem.style.backgroundImage = newSettings.icon;
         de_button.elem.classList.toggle('shy', newSettings.hideButton);
-        de_tsblisteners.switch(newSettings.isCute);
+        de_listeners.switch(newSettings.isCute);
     },
 };
 
@@ -389,15 +389,15 @@ const de_contentscript = {
     }
 };
 
-const de_tsblisteners = {
+const de_listeners = {
     mouseoverListener: function(event){
         de_contentscript.nodeHandler(event.target, event.shiftKey, event.ctrlKey);
     },
     keydownListener: function(event){
-        if (de_tsblisteners.isSpaceHotkey(event)) {event.preventDefault();}
+        if (de_listeners.isSpaceHotkey(event)) {event.preventDefault();}
     },
     keyupListener: function(event){
-        if (de_tsblisteners.isSpaceHotkey(event)) {de_button.emulateClick(event.ctrlKey ? 2 : 0);}
+        if (de_listeners.isSpaceHotkey(event)) {de_button.emulateClick(event.ctrlKey ? 2 : 0);}
         if (event.keyCode === 81 && event.altKey) {de_button.hide();}
     },
     
@@ -408,9 +408,9 @@ const de_tsblisteners = {
     switch: function(turnOn = true){
         let functionName = turnOn ? 'addEventListener' : 'removeEventListener';
 
-        window[functionName]('mouseover', de_tsblisteners.mouseoverListener);
-        window[functionName]('keydown', de_tsblisteners.keydownListener);
-        window[functionName]('keyup', de_tsblisteners.keyupListener);
+        window[functionName]('mouseover', de_listeners.mouseoverListener);
+        window[functionName]('keydown', de_listeners.keydownListener);
+        window[functionName]('keyup', de_listeners.keyupListener);
     },
 };
 
