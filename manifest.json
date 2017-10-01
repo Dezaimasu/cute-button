@@ -29,7 +29,6 @@
 	},
 	"browser_action": {
 		"browser_style": true,
-		"default_area": "menupanel",
 		"default_icon": {
 			"48": "bestgirl.png"
 		}
@@ -37,7 +36,7 @@
 	"applications": {
 		"gecko": {
 			"id": "ochecuteextension@plaza.ink",
-			"strict_min_version": "54.0"
+			"strict_min_version": "52.0"
 		}
 	}
 }
