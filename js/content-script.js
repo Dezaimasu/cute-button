@@ -34,14 +34,16 @@ const de_webextApi = {
 };
 
 const de_settings = {
-    originalNames: ['minSize', 'exclusions', 'icon', 'originalNameByDefault', 'hideButton', 'isCute'],
+    originalNames: ['minSize', 'exclusions', 'icon', 'originalNameByDefault', 'hideButton', 'isCute', 'position'],
 
     minSize: null,
+    position: null,
     exclusions: [],
     originalNameButton: null,
 
     setSettings: function(newSettings){
         this.minSize = newSettings.minSize;
+        this.position = newSettings.position;
         this.exclusions = newSettings.exclusions.split(' ');
         this.originalNameButton = newSettings.originalNameByDefault ? 0 : 2;
         de_button.elem.style.backgroundImage = newSettings.icon;
