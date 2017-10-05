@@ -250,12 +250,13 @@ const de_contentscript = {
     },
 
     getNodeSizes: function(node){
+        let nodeRect = node.getBoundingClientRect();
         return {
             parent  : node.offsetParent,
-            left    : node.offsetLeft,
-            top     : node.offsetTop,
-            width   : node.clientWidth,
-            height  : node.clientHeight,
+            left    : node.offsetLeft - Math.min(0, nodeRect.left),
+            top     : node.offsetTop - Math.min(0, nodeRect.top),
+            width   : nodeRect.width,
+            height  : nodeRect.height
         };
     },
 
