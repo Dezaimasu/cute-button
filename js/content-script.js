@@ -177,24 +177,6 @@ const de_contentscript = {
     },
 
     nodeTools: {
-        hostCrutches: {
-            'tumblr.com': function(node, modifier){
-                let observer,
-                    observerLifetime;
-                observer = new MutationObserver(function(mutations){
-                    clearTimeout(observerLifetime);
-                    de_contentscript.nodeHandler(mutations[mutations.length - 1].target, modifier);
-                    this.disconnect();
-                });
-                observer.observe(node, {
-                    attributes: true,
-                    childList: false,
-                    characterData: false,
-                    attributeFilter: ['src']
-                });
-                observerLifetime = setTimeout(() => observer.disconnect(), 3000);
-            }
-        },
         checkForBgSrc: function(node, modifier){
             let bgImg;
             if (!modifier) {return false;}
@@ -232,12 +214,6 @@ const de_contentscript = {
                 return false;
             }
             return (node.width < de_settings.minSize || node.height < de_settings.minSize);
-        },
-        processByHost: function(node, modifier){
-            let hostHandler = de_contentscript.nodeTools.hostCrutches[de_contentscript.host];
-            if (hostHandler) {
-                hostHandler(node, modifier);
-            }
         }
     },
 
@@ -253,7 +229,6 @@ const de_contentscript = {
         ) {
             return true;
         }
-        that.nodeTools.processByHost(node, modifier);
         return that.nodeTools.filterBySize(node, modifier);
     },
 
@@ -262,8 +237,8 @@ const de_contentscript = {
             parent  : node.offsetParent,
             left    : node.offsetLeft,
             top     : node.offsetTop,
-            // width   : node.clientWidth,
-            // height  : node.clientHeight,
+            width   : node.clientWidth,
+            height  : node.clientHeight,
         };
     },
 
