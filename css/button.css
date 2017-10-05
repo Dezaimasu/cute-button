@@ -5,6 +5,7 @@ de_cbutton {
 	position: absolute;
 	z-index: 2147483647;
 	border: 1px solid #777;
+	cursor: default;
 	height: 32px;
 	width: 32px;
 }

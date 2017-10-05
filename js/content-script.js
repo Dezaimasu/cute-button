@@ -90,6 +90,7 @@ const de_button = {
 
         that.elem = document.createElement('de_cbutton');
         btnElem = that.elem;
+        btnElem.addEventListener('click', that.disableDefaultClick);
         btnElem.addEventListener('contextmenu', that.disableDefaultClick);
         btnElem.addEventListener('mousedown', mousedownListener);
         btnElem.addEventListener('mouseout', mouseoutListener);
