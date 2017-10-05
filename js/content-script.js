@@ -322,7 +322,7 @@ const de_contentscript = {
             getter = getters[this.host],
             originalSrc = null;
 
-        if (!getter) {return;}
+        if (!getter || this.isSeparateTab) {return null;}
         try {
             originalSrc = getter();
         } catch (e) {} //tfw no safe navigation operator in 2017

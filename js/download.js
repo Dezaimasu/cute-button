@@ -71,7 +71,7 @@ const downloader = {
         }
         if (!this.filename) {
             let contentType = request.getResponseHeader('Content-Type'),
-                extension = contentType ? ('.' + contentType.split('/').pop().replace('jpeg', 'jpg')) : '';
+                extension = contentType ? ('.' + contentType.match(/[\d\w]+\/([\d\w]+)/)[1].replace('jpeg', 'jpg')) : '';
 
             this.filename = (this.basename || Date.now()) + extension
         }
