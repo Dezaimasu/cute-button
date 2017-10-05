@@ -6,4 +6,5 @@ const settingsDefault = {
     originalNameByDefault   : false,
     hideButton              : false,
 	isCute					: true,
+    position                : 'top-left',
 };
