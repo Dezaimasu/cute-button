@@ -101,14 +101,14 @@ const de_button = {
         event.preventDefault();
     },
 
-    show: function(attachTo, src, originalName){
+    show: function(target, src, originalName){
         let btnElem = this.elem,
             offset = 6;
 
         this.prepareDL(src, originalName);
-        btnElem.style.left = attachTo.x + offset + 'px';
-        btnElem.style.top = attachTo.y + offset + 'px';
-        (attachTo.elem || document.body).appendChild(btnElem);
+        btnElem.style.left = target.left + offset + 'px';
+        btnElem.style.top = target.top + offset + 'px';
+        target.parent.appendChild(btnElem);
         setTimeout(() => {btnElem.style.visibility = 'visible';}, 32);
     },
 
@@ -162,13 +162,11 @@ const de_contentscript = {
     srcLocation     : null,
     previousSrc     : null,
     isSeparateTab   : null,
-    overlayMayExist : null,
 
     init: function(){
         this.host = this.getFilteredHost();
         this.isSeparateTab = ['image/', 'video/'].indexOf(document.contentType.substr(0, 6)) > -1;
         this.srcLocation = this.isSeparateTab ? 'baseURI' : 'currentSrc';
-        this.overlayMayExist = this.checkForOverlay();
 
         de_button.init();
         de_webextApi.settings();
@@ -259,31 +257,14 @@ const de_contentscript = {
         return that.nodeTools.filterBySize(node, modifier);
     },
 
-    getNodeCoordinates: function(node){
-        let nodeRect = node.getBoundingClientRect();
+    getNodeSizes: function(node){
         return {
-            x: Math.max(0, nodeRect.left) + window.scrollX,
-            y: Math.max(0, nodeRect.top) + window.scrollY
+            parent  : node.offsetParent,
+            left    : node.offsetLeft,
+            top     : node.offsetTop,
+            // width   : node.clientWidth,
+            // height  : node.clientHeight,
         };
-    },
-
-    checkForOverlay: function(){
-        return (
-            (this.host === '2ch.hk' && !!document.querySelector('#fullscreen-container')) ||
-            !!document.querySelector('#de-main') // dollchan extension
-        );
-    },
-
-    getOverlayInfo: function(node){
-        let overlayElem;
-        if (!this.overlayMayExist) {return;}
-
-        overlayElem = document.querySelector('.de-img-center, #fullscreen-container');
-        return (overlayElem && overlayElem.contains(node)) ? {
-            elem: overlayElem,
-            x   : node.offsetLeft,
-            y   : node.offsetTop
-        } : null;
     },
 
     nodeHandler: function(currentTarget, shiftKey, ctrlKey){
@@ -300,7 +281,7 @@ const de_contentscript = {
         that.previousSrc = src;
 
         de_button.show(
-            that.getOverlayInfo(currentTarget) || that.getNodeCoordinates(currentTarget),
+            that.getNodeSizes(currentTarget),
             that.getOriginalSrc(currentTarget) || src || currentTarget.src || that.bgSrc,
             that.getOriginalFilename(currentTarget)
         );
