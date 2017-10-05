@@ -274,15 +274,27 @@ const de_contentscript = {
         return that.nodeTools.filterBySize(node, modifier);
     },
 
+    isPositioned: function(node){
+        return window.getComputedStyle(node).position !== 'static';
+    },
+
     getNodeSizes: function(node){
-        let nodeRect = node.getBoundingClientRect();
-        return {
+        let nodeRect = node.getBoundingClientRect(),
+            sizes = {
+                width   : nodeRect.width,
+                height  : nodeRect.height
+            };
+
+        // according to the specification, offsetParent position can't be static, but somehow it can
+        return Object.assign(sizes, this.isPositioned(node.offsetParent) ? {
             parent  : node.offsetParent,
             left    : node.offsetLeft - Math.min(0, nodeRect.left),
             top     : node.offsetTop - Math.min(0, nodeRect.top),
-            width   : nodeRect.width,
-            height  : nodeRect.height
-        };
+        } : {
+            parent  : document.body,
+            left    : Math.max(0, nodeRect.left) + window.scrollX,
+            top     : Math.max(0, nodeRect.top) + window.scrollY,
+        });
     },
 
     nodeHandler: function(currentTarget, shiftKey, ctrlKey){
