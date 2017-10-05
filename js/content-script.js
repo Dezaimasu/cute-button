@@ -102,12 +102,10 @@ const de_button = {
     },
 
     show: function(target, src, originalName){
-        let btnElem = this.elem,
-            offset = 6;
+        let btnElem = this.elem;
 
         this.prepareDL(src, originalName);
-        btnElem.style.left = target.left + offset + 'px';
-        btnElem.style.top = target.top + offset + 'px';
+        this.place(btnElem, target);
         target.parent.appendChild(btnElem);
         setTimeout(() => {btnElem.style.visibility = 'visible';}, 32);
     },
@@ -115,6 +113,24 @@ const de_button = {
     hide: function(){
         this.prepareDL(null, null);
         this.elem.style.visibility = 'hidden';
+    },
+
+    place: function(btnElem, target){
+        let btnSide = 32,
+            offset = 6,
+            btnOffset = btnSide + offset,
+            left = 0,
+            top = 0,
+            positionSetters = {
+                'top-left'      : () => {left = offset;                     top = offset;},
+                'top-right'     : () => {left = target.width - btnOffset;   top = offset;},
+                'bottom-left'   : () => {left = offset;                     top = target.height - btnOffset;},
+                'bottom-right'  : () => {left = target.width - btnOffset;   top = target.height - btnOffset;},
+            };
+
+        positionSetters[de_settings.position]();
+        btnElem.style.left = target.left + left + 'px';
+        btnElem.style.top = target.top + top + 'px';
     },
 
     isVisible: function(){
