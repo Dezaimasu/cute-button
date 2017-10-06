@@ -102,33 +102,19 @@ const de_button = {
         event.preventDefault();
     },
 
-    show: function(target, src, originalName){
+    show: function(position, src, originalName){
         let btnElem = this.elem;
 
         this.prepareDL(src, originalName);
-        this.place(btnElem, target);
-        target.parent.appendChild(btnElem);
+        btnElem.style.left = position.x + 'px';
+        btnElem.style.top = position.y + 'px';
+        position.container.appendChild(btnElem);
         setTimeout(() => {btnElem.style.visibility = 'visible';}, 32);
     },
 
     hide: function(){
         this.prepareDL(null, null);
         this.elem.style.visibility = 'hidden';
-    },
-
-    place: function(btnElem, target){
-        let btnSide = 32,
-            offset = 6,
-            btnOffset = btnSide + offset;
-
-        switch (de_settings.vertical) {
-            case 'top'      : {btnElem.style.top = target.top + offset + target.scrollY + 'px'; break;}
-            case 'bottom'   : {btnElem.style.top = target.bottom - btnOffset + target.scrollY + 'px';}
-        }
-        switch (de_settings.horizontal) {
-            case 'left'     : {btnElem.style.left = target.left + offset + target.scrollX + 'px'; break;}
-            case 'right'    : {btnElem.style.left = target.right - btnOffset + target.scrollX + 'px';}
-        }
     },
 
     isVisible: function(){
@@ -275,33 +261,42 @@ const de_contentscript = {
         return window.getComputedStyle(node).position !== 'static';
     },
 
-    getNodeSizes: function(node){
+    getPositionForButton: function(node){
         let nodeRect = node.getBoundingClientRect(),
             parentRect,
-            sizes = {
-                parent  : document.body,
-                scrollX : window.scrollX,
-                scrollY : window.scrollY,
-                left    : Math.max(0, nodeRect.left),
-                top     : Math.max(0, nodeRect.top),
-                right   : Math.min(document.documentElement.clientWidth, nodeRect.right),
-                bottom  : Math.min(document.documentElement.clientHeight, nodeRect.bottom),
-            };
+            offset = 6,
+            reverseOffset = 38, // offset + button width (32px)
+            position = {};
 
-        if (!this.isPositioned(node.offsetParent)) {
-            return sizes;
+        let sizeGettersRegular = {
+            left    : () => Math.max(0, nodeRect.left) + offset,
+            top     : () => Math.max(0, nodeRect.top) + offset,
+            right   : () => Math.min(document.documentElement.clientWidth, nodeRect.right) - reverseOffset,
+            bottom  : () => Math.min(document.documentElement.clientHeight, nodeRect.bottom) - reverseOffset,
+        };
+        let sizeGettersInPositioned = {
+            left    : () => nodeRect.left - Math.max(0, parentRect.left) + offset,
+            top     : () => nodeRect.top - Math.max(0, parentRect.top) + offset,
+            right   : () => nodeRect.right - Math.min(document.documentElement.clientWidth, parentRect.right) - reverseOffset,
+            bottom  : () => nodeRect.bottom - Math.min(document.documentElement.clientHeight, parentRect.bottom) - reverseOffset,
+        };
+
+        if (this.isPositioned(node.offsetParent)) {
+            parentRect = node.offsetParent.getBoundingClientRect();
+            position = {
+                x: sizeGettersInPositioned[de_settings.horizontal](),
+                y: sizeGettersInPositioned[de_settings.vertical](),
+                container: node.offsetParent,
+            }
+        } else {
+            position = {
+                x: sizeGettersRegular[de_settings.horizontal]() + window.scrollX,
+                y: sizeGettersRegular[de_settings.vertical]() + window.scrollY,
+                container: document.body,
+            }
         }
 
-        parentRect = node.offsetParent.getBoundingClientRect();
-        return Object.assign(sizes, {
-            parent  : node.offsetParent,
-            scrollX : 0,
-            scrollY : 0,
-            left    : nodeRect.left - Math.max(0, parentRect.left),
-            top     : nodeRect.top - Math.max(0, parentRect.top),
-            right   : nodeRect.right - Math.min(document.documentElement.clientWidth, parentRect.right),
-            bottom  : nodeRect.bottom - Math.min(document.documentElement.clientHeight, parentRect.bottom),
-        });
+        return position;
     },
 
     nodeHandler: function(currentTarget, shiftKey, ctrlKey){
@@ -318,7 +313,7 @@ const de_contentscript = {
         that.previousSrc = src;
 
         de_button.show(
-            that.getNodeSizes(currentTarget),
+            that.getPositionForButton(currentTarget),
             that.getOriginalSrc(currentTarget) || src || currentTarget.src || that.bgSrc,
             that.getOriginalFilename(currentTarget)
         );
