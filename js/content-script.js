@@ -275,8 +275,8 @@ const de_contentscript = {
             bottom  : () => Math.min(document.documentElement.clientHeight, nodeRect.bottom) - reverseOffset,
         };
         let sizeGettersInPositioned = {
-            left    : () => nodeRect.left - Math.max(0, parentRect.left) + offset,
-            top     : () => nodeRect.top - Math.max(0, parentRect.top) + offset,
+            left    : () => nodeRect.left - parentRect.left - Math.min(0, nodeRect.left) + offset,
+            top     : () => nodeRect.top - parentRect.top - Math.min(0, nodeRect.top) + offset,
             right   : () => nodeRect.right - Math.min(document.documentElement.clientWidth, parentRect.right) - reverseOffset,
             bottom  : () => nodeRect.bottom - Math.min(document.documentElement.clientHeight, parentRect.bottom) - reverseOffset,
         };
@@ -296,6 +296,7 @@ const de_contentscript = {
             }
         }
 
+        console.log(position);
         return position;
     },
 
