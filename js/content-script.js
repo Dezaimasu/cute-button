@@ -106,8 +106,10 @@ const de_button = {
         let btnElem = this.elem;
 
         this.prepareDL(src, originalName);
-        btnElem.style.left = position.x + 'px';
-        btnElem.style.top = position.y + 'px';
+        btnElem.style.top = position.top;
+        btnElem.style.bottom = position.bottom;
+        btnElem.style.left = position.left;
+        btnElem.style.right = position.right;
         position.container.appendChild(btnElem);
         setTimeout(() => {btnElem.style.visibility = 'visible';}, 32);
     },
@@ -277,27 +279,22 @@ const de_contentscript = {
         let sizeGettersInPositioned = {
             left    : () => nodeRect.left - parentRect.left - Math.min(0, nodeRect.left) + offset,
             top     : () => nodeRect.top - parentRect.top - Math.min(0, nodeRect.top) + offset,
-            right   : () => nodeRect.right - Math.min(document.documentElement.clientWidth, parentRect.right) - reverseOffset,
-            bottom  : () => nodeRect.bottom - Math.min(document.documentElement.clientHeight, parentRect.bottom) - reverseOffset,
+            right   : () => parentRect.right - nodeRect.right + Math.max(0, nodeRect.right - document.documentElement.clientWidth) + offset,
+            bottom  : () => parentRect.bottom - nodeRect.bottom + Math.max(0, nodeRect.bottom - document.documentElement.clientHeight) + offset,
         };
 
         if (this.isPositioned(node.offsetParent)) {
             parentRect = node.offsetParent.getBoundingClientRect();
-            position = {
-                x: sizeGettersInPositioned[de_settings.horizontal](),
-                y: sizeGettersInPositioned[de_settings.vertical](),
-                container: node.offsetParent,
-            }
+            position.container = node.offsetParent;
+            position[de_settings.vertical] = sizeGettersInPositioned[de_settings.vertical]() + 'px';
+            position[de_settings.horizontal] = sizeGettersInPositioned[de_settings.horizontal]() + 'px';
         } else {
-            position = {
-                x: sizeGettersRegular[de_settings.horizontal]() + window.scrollX,
-                y: sizeGettersRegular[de_settings.vertical]() + window.scrollY,
-                container: document.body,
-            }
+            position.container = document.body;
+            position.left = sizeGettersRegular[de_settings.horizontal]() + window.scrollX + 'px';
+            position.top = sizeGettersRegular[de_settings.vertical]() + window.scrollY + 'px';
         }
 
-        console.log(position);
-        return position;
+        return position; // only two position properties are defined at once, other two are undefined on purpose to reset their default values
     },
 
     nodeHandler: function(currentTarget, shiftKey, ctrlKey){
