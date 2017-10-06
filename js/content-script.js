@@ -43,9 +43,9 @@ const de_settings = {
 
     setSettings: function(newSettings){
         this.minSize = newSettings.minSize;
-        this.position = newSettings.position;
         this.exclusions = newSettings.exclusions.split(' ');
         this.originalNameButton = newSettings.originalNameByDefault ? 0 : 2;
+        [this.vertical, this.horizontal] = newSettings.position.split('-');
         de_button.elem.style.backgroundImage = newSettings.icon;
         de_button.elem.classList.toggle('shy', newSettings.hideButton);
         de_listeners.switch(newSettings.isCute);
@@ -119,19 +119,16 @@ const de_button = {
     place: function(btnElem, target){
         let btnSide = 32,
             offset = 6,
-            btnOffset = btnSide + offset,
-            left = 0,
-            top = 0,
-            positionSetters = {
-                'top-left'      : () => {left = offset;                     top = offset;},
-                'top-right'     : () => {left = target.width - btnOffset;   top = offset;},
-                'bottom-left'   : () => {left = offset;                     top = target.height - btnOffset;},
-                'bottom-right'  : () => {left = target.width - btnOffset;   top = target.height - btnOffset;},
-            };
+            btnOffset = btnSide + offset;
 
-        positionSetters[de_settings.position]();
-        btnElem.style.left = target.left + left + 'px';
-        btnElem.style.top = target.top + top + 'px';
+        switch (de_settings.vertical) {
+            case 'top'      : {btnElem.style.top = target.top + offset + target.scrollY + 'px'; break;}
+            case 'bottom'   : {btnElem.style.top = target.bottom - btnOffset + target.scrollY + 'px';}
+        }
+        switch (de_settings.horizontal) {
+            case 'left'     : {btnElem.style.left = target.left + offset + target.scrollX + 'px'; break;}
+            case 'right'    : {btnElem.style.left = target.right - btnOffset + target.scrollX + 'px';}
+        }
     },
 
     isVisible: function(){
@@ -280,20 +277,30 @@ const de_contentscript = {
 
     getNodeSizes: function(node){
         let nodeRect = node.getBoundingClientRect(),
+            parentRect,
             sizes = {
-                width   : nodeRect.width,
-                height  : nodeRect.height
+                parent  : document.body,
+                scrollX : window.scrollX,
+                scrollY : window.scrollY,
+                left    : Math.max(0, nodeRect.left),
+                top     : Math.max(0, nodeRect.top),
+                right   : Math.min(document.documentElement.clientWidth, nodeRect.right),
+                bottom  : Math.min(document.documentElement.clientHeight, nodeRect.bottom),
             };
 
-        // according to the specification, offsetParent position can't be static, but somehow it can
-        return Object.assign(sizes, this.isPositioned(node.offsetParent) ? {
+        if (!this.isPositioned(node.offsetParent)) {
+            return sizes;
+        }
+
+        parentRect = node.offsetParent.getBoundingClientRect();
+        return Object.assign(sizes, {
             parent  : node.offsetParent,
-            left    : node.offsetLeft - Math.min(0, nodeRect.left),
-            top     : node.offsetTop - Math.min(0, nodeRect.top),
-        } : {
-            parent  : document.body,
-            left    : Math.max(0, nodeRect.left) + window.scrollX,
-            top     : Math.max(0, nodeRect.top) + window.scrollY,
+            scrollX : 0,
+            scrollY : 0,
+            left    : nodeRect.left - Math.max(0, parentRect.left),
+            top     : nodeRect.top - Math.max(0, parentRect.top),
+            right   : nodeRect.right - Math.min(document.documentElement.clientWidth, parentRect.right),
+            bottom  : nodeRect.bottom - Math.min(document.documentElement.clientHeight, parentRect.bottom),
         });
     },
 
