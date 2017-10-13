@@ -28,26 +28,26 @@ button#reset {
 	display: none;
 }
 
-.folders {
-	height: 30px;
+.folder {
+	height: 25px;
 }
-.folders td:first-child {
+.folder td:first-child {
 	vertical-align: middle;
-	line-height: 25px;
+	line-height: 23px;
 }
-.folders td:first-child span {
+.folder td:first-child span {
 	padding-right: 13px;
 }
-.folders td > div {
+.folder td > div {
 	display: inline-block;
 }
-.folders td > div:last-child {
+.folder td > div:last-child {
 	float: right;
 }
-.folders input.key {
+.folder input.key {
 	text-transform: uppercase;
 }
-#add-folder-container {
+#addFolderContainer td {
 	padding-bottom: 13px;
 	text-align: center;
 }

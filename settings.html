@@ -6,88 +6,92 @@
 	<link rel="stylesheet" type="text/css" href="css/settings.css">
 </head>
 <body>
-	<table id="container">
-		<tr>
-			<td><label for="savePath">Save files to (default folder, relative to your downloads directory):</label></td>
-			<td><input id="savePath"></td>
-		</tr>
-		<tr class="folders" id="folder-0">
-			<td>
-				<span>Save files to (more folders):</span>
-				<label>
-					key
-					<input class="key" size="1" maxlength="1">
-					<input class="keyCode" type="hidden">
-				</label>
-				<label>
-					modifier
-					<select class="modifier">
-						<option value="-">none</option>
-						<option value="ctrlKey">Ctrl</option>
-						<option value="shiftKey">Shift</option>
-						<option value="altKey">Alt</option>
+	<table>
+		<tbody id="container">
+			<tr>
+				<td><label for="savePath">Save files to (default folder, relative to your downloads directory):</label></td>
+				<td><input id="savePath"></td>
+			</tr>
+			<tr class="folder" data-num="0">
+				<td>
+					<span>Save files to (more folders):</span>
+					<label>
+						key
+						<input class="key" size="1" maxlength="1">
+						<input class="keyCode" type="hidden">
+					</label>
+					<label>
+						modifier
+						<select class="modifier">
+							<option value="-">none</option>
+							<option value="ctrlKey">Ctrl</option>
+							<option value="shiftKey">Shift</option>
+							<option value="altKey">Alt</option>
+						</select>
+					</label>
+				</td>
+				<td>
+					<label><input class="path"></label>
+					<button class="deleteFolder" data-num="0">X</button>
+				</td>
+			</tr>
+			<tr id="addFolderContainer">
+				<td colspan="2">
+					<button id="addFolder">Add folder</button>
+				</td>
+			</tr>
+			<tr>
+				<td><label for="minSize">Minimum image width/height (px):</label></td>
+				<td><input id="minSize" type="number" min="0"></td>
+			</tr>
+			<tr>
+				<td><label for="exclusions">Classes of elements exluded from scanning (split by spaces):</label></td>
+				<td><input id="exclusions"></td>
+			</tr>
+			<tr>
+				<td><label for="originalNameByDefault">Save with original name by default if available (swaps LMB and RMB actions):</label></td>
+				<td><input id="originalNameByDefault" type="checkbox"></td>
+			</tr>
+			<tr>
+				<td><label for="hideButton">Hide the button when not hovered:</label></td>
+				<td><input id="hideButton" type="checkbox"></td>
+			</tr>
+			<tr>
+				<td><label for="position">Button position:</label></td>
+				<td>
+					<select id="position">
+						<option value="top-left">Top left</option>
+						<option value="top-right">Top right</option>
+						<option value="bottom-left">Bottom left</option>
+						<option value="bottom-right">Bottom right</option>
 					</select>
-				</label>
-			</td>
-			<td>
-				<label><input class="path"></label>
-			</td>
-		</tr>
-		<tr>
-			<td id="add-folder-container" colspan="2">
-				<button id="add-folder">Add folder</button>
-			</td>
-		</tr>
-		<tr>
-			<td><label for="minSize">Minimum image width/height (px):</label></td>
-			<td><input id="minSize" type="number" min="0"></td>
-		</tr>
-		<tr>
-			<td><label for="exclusions">Classes of elements exluded from scanning (split by spaces):</label></td>
-			<td><input id="exclusions"></td>
-		</tr>
-		<tr>
-			<td><label for="originalNameByDefault">Save with original name by default if available (swaps LMB and RMB actions):</label></td>
-			<td><input id="originalNameByDefault" type="checkbox"></td>
-		</tr>
-		<tr>
-			<td><label for="hideButton">Hide the button when not hovered:</label></td>
-			<td><input id="hideButton" type="checkbox"></td>
-		</tr>
-		<tr>
-			<td><label for="position">Button position:</label></td>
-			<td>
-				<select id="position">
-					<option value="top-left">Top left</option>
-					<option value="top-right">Top right</option>
-					<option value="bottom-left">Bottom left</option>
-					<option value="bottom-right">Bottom right</option>
-				</select>
-			</td>
-		</tr>
-		<tr>
-			<td><label for="fileInput">Your custom cute icon:</label></td>
-			<td>
-				<div id="iconContainer">
-					<de_cbutton id="iconDisplay"></de_cbutton>
-				</div>
-				<input id="icon" type="hidden">
-				<input id="fileInput" type="file">
-			</td>
-		</tr>
-		<tr>
-			<td>
-				<button id="save">Save</button>
-				<button id="reset">Reset</button>
-			</td>
-			<td id="error"></td>
-		</tr>
+				</td>
+			</tr>
+			<tr>
+				<td><label for="fileInput">Your custom cute icon:</label></td>
+				<td>
+					<div id="iconContainer">
+						<de_cbutton id="iconDisplay"></de_cbutton>
+					</div>
+					<input id="icon" type="hidden">
+					<input id="fileInput" type="file">
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<button id="save">Save</button>
+					<button id="reset">Reset</button>
+				</td>
+				<td id="error"></td>
+			</tr>
 
-		<tr id="hidden-settings">
-			<td>
-				<input id="isCute" type="hidden">
-			</td>
-		</tr>
+			<tr id="hidden-settings">
+				<td>
+					<input id="isCute" type="hidden">
+					<input id="folders" type="hidden">
+				</td>
+			</tr>
+		</tbody>
 	</table>
 
 	<script src="js/settings-default.js"></script>
