@@ -15,20 +15,22 @@
 			<tr class="folder" data-num="0">
 				<td>
 					<span>Save files to (more folders):</span>
-					<label>
-						key
-						<input class="key" size="1" maxlength="1">
-						<input class="keyCode" type="hidden">
-					</label>
-					<label>
-						modifier
-						<select class="modifier">
-							<option value="-">none</option>
-							<option value="ctrlKey">Ctrl</option>
-							<option value="shiftKey">Shift</option>
-							<option value="altKey">Alt</option>
-						</select>
-					</label>
+					<span class="keyContainer">
+						<label>
+							key
+							<input class="key" size="1" maxlength="1">
+							<input class="keyCode" type="hidden">
+						</label>
+						<label>
+							modifier
+							<select class="modifier">
+								<option value="-">none</option>
+								<option value="ctrlKey">Ctrl</option>
+								<option value="shiftKey">Shift</option>
+								<option value="altKey">Alt</option>
+							</select>
+						</label>
+					</span>
 				</td>
 				<td>
 					<label><input class="path"></label>
@@ -36,8 +38,9 @@
 				</td>
 			</tr>
 			<tr id="addFolderContainer">
-				<td colspan="2">
-					<button id="addFolder">Add folder</button>
+				<td></td>
+				<td>
+					<button id="addFolder">Add another folder</button>
 				</td>
 			</tr>
 			<tr>

@@ -1,8 +1,12 @@
-/*td {border: 1px solid #66F;}*/
-
+table {
+	border-collapse:collapse;
+	border: 1px solid grey;
+}
+table tr:not(.folder) td {
+	border-bottom: 1px solid grey;
+}
 td:first-child {
-	text-align: right;
-	padding: 0 10px;
+	padding: 6px 10px;
 	height: 25px;
 }
 input#savePath,
@@ -31,6 +35,9 @@ button#reset {
 .folder {
 	height: 25px;
 }
+.folder .keyContainer {
+	float: right;
+}
 .folder td:first-child {
 	vertical-align: middle;
 	line-height: 23px;
@@ -49,7 +56,6 @@ button#reset {
 }
 #addFolderContainer td {
 	padding-bottom: 13px;
-	text-align: center;
 }
 
 de_cbutton#iconDisplay {
