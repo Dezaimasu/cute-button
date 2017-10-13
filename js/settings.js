@@ -56,6 +56,9 @@ function enableSave(){
 function refreshSaveFolders(){
 
 }
+function listenFolderKey(event){
+
+}
 
 function initSelectors(){
     let settingsElems = Object.keys(settingsDefault),

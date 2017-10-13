@@ -11,32 +11,31 @@
 			<td><label for="savePath">Save files to (default folder, relative to your downloads directory):</label></td>
 			<td><input id="savePath"></td>
 		</tr>
-		<tr id="folders">
+		<tr class="folders" id="folder-0">
 			<td>
-				<div>Save files to (more folders):</div>
-				<div>
-					<div class="key-folder">
-						<label>
-							Key:
-							<input class="key" size="1" maxlength="1">
-							<input class="keyCode" type="hidden">
-						</label>
-						<label>
-							Modifier:
-							<select class="modifier">
-								<option value="-">none</option>
-								<option value="ctrlKey">Ctrl</option>
-								<option value="shiftKey">Shift</option>
-								<option value="altKey">Alt</option>
-							</select>
-						</label>
-					</div>
-				</div>
+				<span>Save files to (more folders):</span>
+				<label>
+					key
+					<input class="key" size="1" maxlength="1">
+					<input class="keyCode" type="hidden">
+				</label>
+				<label>
+					modifier
+					<select class="modifier">
+						<option value="-">none</option>
+						<option value="ctrlKey">Ctrl</option>
+						<option value="shiftKey">Shift</option>
+						<option value="altKey">Alt</option>
+					</select>
+				</label>
 			</td>
 			<td>
-				<div class="key-folder">
-					<label><input class="path"><br></label>
-				</div>
+				<label><input class="path"></label>
+			</td>
+		</tr>
+		<tr>
+			<td id="add-folder-container" colspan="2">
+				<button id="add-folder">Add folder</button>
 			</td>
 		</tr>
 		<tr>

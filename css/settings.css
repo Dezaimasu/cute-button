@@ -1,10 +1,12 @@
 /*td {border: 1px solid #66F;}*/
 
 td:first-child {
+	text-align: right;
 	padding: 0 10px;
 	height: 25px;
 }
 input#savePath,
+input#exclusions,
 input.path {
 	width: 400px;
 }
@@ -26,17 +28,28 @@ button#reset {
 	display: none;
 }
 
-#folders {
-	margin-bottom: 30px;
+.folders {
+	height: 30px;
 }
-#folders td:first-child > div {
+.folders td:first-child {
+	vertical-align: middle;
+	line-height: 25px;
+}
+.folders td:first-child span {
+	padding-right: 13px;
+}
+.folders td > div {
 	display: inline-block;
 }
-#folders td:first-child > div:last-child {
+.folders td > div:last-child {
 	float: right;
 }
-#folders input.key {
+.folders input.key {
 	text-transform: uppercase;
+}
+#add-folder-container {
+	padding-bottom: 13px;
+	text-align: center;
 }
 
 de_cbutton#iconDisplay {
