@@ -53,6 +53,10 @@ function enableSave(){
     elem.save.disabled = false;
 }
 
+function refreshSaveFolders(){
+
+}
+
 function initSelectors(){
     let settingsElems = Object.keys(settingsDefault),
         otherElems = ['save', 'reset', 'iconDisplay', 'fileInput'];
@@ -72,7 +76,7 @@ function init(){
     elem.fileInput.addEventListener('change', fileInputListener);
     elem.save.addEventListener('click', saveOptions);
     elem.reset.addEventListener('click', resetOptions);
-    document.querySelectorAll('select, input:not([type=hidden])').forEach(function(elem){
+    document.querySelectorAll('select, input').forEach(function(elem){
         elem.addEventListener('input', enableSave);
     });
 
