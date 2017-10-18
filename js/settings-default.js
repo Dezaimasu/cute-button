@@ -7,4 +7,5 @@ const settingsDefault = {
     hideButton              : false,
 	isCute					: true,
     position                : 'top-left',
+    folders                 : [],
 };

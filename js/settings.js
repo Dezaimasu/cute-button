@@ -1,6 +1,7 @@
 'use strict';
 
 const elem = {};
+let folders;
 
 /*
 -------------------- Generic functions --------------------
@@ -11,15 +12,18 @@ function loadOptions(){
             elem[key][elem[key].de_val] = result[key];
         });
         refreshIcon();
+        refreshFolders(result.folders);
         saveOptions();
     });
 }
 
 function saveOptions(){
     let settings = {};
+    saveCurrentFolders();
     Object.keys(settingsDefault).forEach(function(key){
         settings[key] = elem[key][elem[key].de_val];
     });
+    settings.folders = folders; //TODO delet this chthonic abomination
     browser.storage.local.set(settings);
     disableSave();
 }
@@ -29,6 +33,7 @@ function resetOptions(){
         elem[key][elem[key].de_val] = settingsDefault[key];
     });
     refreshIcon();
+    refreshFolders(settingsDefault.folders);
     enableSave();
 }
 
@@ -63,14 +68,21 @@ function fileInputListener(){
 /*
 -------------------- Custom Directories --------------------
 */
-function refreshFolders(){
-    elem.folders.forEach(function(folder){
-
+function refreshFolders(foldersSettings = null){
+    folders = foldersSettings;
+    folders.forEach(function(folder){
+        addNewFolder(folder);
     });
 }
 
-function listenFolderKey(event){
-    event.target.parentNode.querySelector('.keyCode').value = event.keyCode;
+function saveCurrentFolders(){
+    let currentFoldersList = [];
+    document.querySelectorAll('.folder').forEach(function(folderElem){
+        let folderSettings = buildFolderSettings(folderElem);
+        if (!folderSettings.key || !folderSettings.keyCode) {return;}
+        currentFoldersList.push(folderSettings);
+    });
+    folders = currentFoldersList;
 }
 
 function addNewFolder(folderSettings = null){
@@ -78,7 +90,10 @@ function addNewFolder(folderSettings = null){
     let folders = document.querySelectorAll('.folder');
     let newFolderNum = Number(folders[folders.length - 1].dataset.num) + 1;
 
-
+    newFolder.querySelector('.key').addEventListener('keyup', function(event){
+        if (event.key !== event.target.value) {return;}
+        event.target.parentNode.querySelector('.keyCode').value = event.keyCode;
+    });
     newFolder.dataset.num = newFolderNum;
     let deleteBtn = newFolder.querySelector('.deleteFolder');
     deleteBtn.dataset.num = newFolderNum;
@@ -102,10 +117,10 @@ function deleteFolder(event){
 }
 function buildFolderSettings(folderElem){
     return {
-        key     : folderElem.querySelector('.key'),
-        keyCode : folderElem.querySelector('.keyCode'),
-        modifier: folderElem.querySelector('.modifier'),
-        path    : folderElem.querySelector('.path')
+        key     : folderElem.querySelector('.key').value,
+        keyCode : folderElem.querySelector('.keyCode').value,
+        modifier: folderElem.querySelector('.modifier').value,
+        path    : folderElem.querySelector('.path').value
     };
 }
 
@@ -123,8 +138,6 @@ function initSelectors(){
     otherElems.forEach(function(name){
         elem[name] = document.querySelector('#' + name);
     });
-
-    elem.foldersList = [];
 }
 
 function init(){
@@ -133,7 +146,9 @@ function init(){
     elem.fileInput.addEventListener('change', fileInputListener);
     elem.save.addEventListener('click', saveOptions);
     elem.reset.addEventListener('click', resetOptions);
-    elem.addFolder.addEventListener('click', addNewFolder);
+    elem.addFolder.addEventListener('click', function(event){
+        addNewFolder();
+    });
     document.querySelectorAll('select, input').forEach(function(elem){
         elem.addEventListener('input', enableSave);
     });
