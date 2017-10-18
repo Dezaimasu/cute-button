@@ -2,7 +2,7 @@ table {
 	border-collapse:collapse;
 	border: 1px solid grey;
 }
-table tr:not(.folder) td {
+table tr:not(.folder):not(:first-child) td {
 	border-bottom: 1px solid grey;
 }
 td:first-child {
@@ -32,18 +32,26 @@ button#reset {
 	display: none;
 }
 
-.folder {
+.folder,
+#default-path {
 	height: 25px;
 }
-.folder .keyContainer {
-	float: right;
-}
-.folder td:first-child {
+.folder td:first-child,
+#default-path td:first-child {
 	vertical-align: middle;
 	line-height: 23px;
 }
-.folder td:first-child span {
+.folder td:first-child span,
+#default-path td:first-child span {
 	padding-right: 13px;
+}
+.folder .keyContainer,
+#default-path .keyContainer {
+	float: right;
+}
+
+.folder#blankFolder {
+	display: none;
 }
 .folder td > div {
 	display: inline-block;
@@ -55,9 +63,9 @@ button#reset {
 	text-transform: uppercase;
 }
 #addFolderContainer td {
-	padding-bottom: 13px;
+	padding: 6px 0 13px;
 }
 
-de_cbutton#iconDisplay {
+de_cbutton#de-cute-id {
 	visibility: visible !important;
 }

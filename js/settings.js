@@ -19,11 +19,11 @@ function loadOptions(){
 
 function saveOptions(){
     let settings = {};
-    saveCurrentFolders();
+    prepareCurrentFoldersForSave();
     Object.keys(settingsDefault).forEach(function(key){
         settings[key] = elem[key][elem[key].de_val];
     });
-    settings.folders = folders; //TODO delet this chthonic abomination
+    settings.folders = folders;
     browser.storage.local.set(settings);
     disableSave();
 }
@@ -49,7 +49,7 @@ function enableSave(){
 -------------------- Icon --------------------
 */
 function refreshIcon(){
-    elem.iconDisplay.style.backgroundImage = elem.icon.value;
+    elem['de-cute-id'].style.backgroundImage = elem.icon.value;
 }
 
 function fileInputListener(){
@@ -68,14 +68,12 @@ function fileInputListener(){
 /*
 -------------------- Custom Directories --------------------
 */
-function refreshFolders(foldersSettings = null){
+function refreshFolders(foldersSettings){
     folders = foldersSettings;
-    folders.forEach(function(folder){
-        addNewFolder(folder);
-    });
+    folders.forEach(addNewFolder);
 }
 
-function saveCurrentFolders(){
+function prepareCurrentFoldersForSave(){
     let currentFoldersList = [];
     document.querySelectorAll('.folder').forEach(function(folderElem){
         let folderSettings = buildFolderSettings(folderElem);
@@ -86,23 +84,26 @@ function saveCurrentFolders(){
 }
 
 function addNewFolder(folderSettings = null){
-    let newFolder = elem.container.querySelector('tr[data-num="0"]').cloneNode(true); //TODO put hidden blank template elsewhere
-    let folders = document.querySelectorAll('.folder');
-    let newFolderNum = Number(folders[folders.length - 1].dataset.num) + 1;
+    let newFolder = elem.blankFolder.cloneNode(true);
 
-    newFolder.querySelector('.key').addEventListener('keyup', function(event){
-        if (event.key !== event.target.value) {return;}
-        event.target.parentNode.querySelector('.keyCode').value = event.keyCode;
-    });
-    newFolder.dataset.num = newFolderNum;
-    let deleteBtn = newFolder.querySelector('.deleteFolder');
-    deleteBtn.dataset.num = newFolderNum;
-    deleteBtn.addEventListener('click', deleteFolder);
-    newFolder.querySelector('span').innerHTML = '';
+    newFolder.removeAttribute('id');
+    newFolder.querySelector('.key').addEventListener('keyup', keyInputListener);
+    newFolder.querySelector('.deleteFolder').addEventListener('click', deleteFolder);
     if (folderSettings) {
     	fillFolder(newFolder, folderSettings);
     }
-    elem.container.insertBefore(newFolder, elem.addFolderContainer);
+    elem.blankFolder.parentNode.insertBefore(newFolder, elem.addFolderContainer);
+}
+
+function deleteFolder(event){
+    event.target.parentNode.parentNode.remove();
+    enableSave();
+}
+
+function keyInputListener(event){
+    if (event.keyCode === 32) {event.target.value = ''; return;}
+    if (event.key !== event.target.value) {return;}
+    event.target.parentNode.querySelector('.keyCode').value = event.keyCode;
 }
 
 function fillFolder(folderElem, folderSettings){
@@ -112,9 +113,6 @@ function fillFolder(folderElem, folderSettings){
     folderElem.querySelector('.path').value     = folderSettings.path;
 }
 
-function deleteFolder(event){
-    document.querySelector('tr[data-num="' + event.target.dataset.num + '"]').remove();
-}
 function buildFolderSettings(folderElem){
     return {
         key     : folderElem.querySelector('.key').value,
@@ -129,7 +127,7 @@ function buildFolderSettings(folderElem){
 */
 function initSelectors(){
     let settingsElems = Object.keys(settingsDefault),
-        otherElems = ['container', 'addFolder', 'addFolderContainer', 'save', 'reset', 'iconDisplay', 'fileInput'];
+        otherElems = ['blankFolder', 'addFolder', 'addFolderContainer', 'save', 'reset', 'fileInput', 'de-cute-id'];
 
     settingsElems.forEach(function(name){
         elem[name] = document.querySelector('#' + name);
@@ -148,6 +146,7 @@ function init(){
     elem.reset.addEventListener('click', resetOptions);
     elem.addFolder.addEventListener('click', function(event){
         addNewFolder();
+        enableSave();
     });
     document.querySelectorAll('select, input').forEach(function(elem){
         elem.addEventListener('input', enableSave);
