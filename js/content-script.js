@@ -34,7 +34,7 @@ const de_webextApi = {
 };
 
 const de_settings = {
-    originalNames: ['minSize', 'exclusions', 'icon', 'originalNameByDefault', 'hideButton', 'isCute', 'position'],
+    originalNames: ['minSize', 'exclusions', 'icon', 'originalNameByDefault', 'hideButton', 'isCute', 'position', 'folders'],
 
     minSize: null,
     position: null,
@@ -43,6 +43,7 @@ const de_settings = {
 
     setSettings: function(newSettings){
         this.minSize = newSettings.minSize;
+        this.folders = newSettings.folders;
         this.exclusions = newSettings.exclusions.split(' ');
         this.originalNameButton = newSettings.originalNameByDefault ? 0 : 2;
         [this.vertical, this.horizontal] = newSettings.position.split('-');
@@ -414,15 +415,21 @@ const de_listeners = {
         de_contentscript.nodeHandler(event.target, event.shiftKey, event.ctrlKey);
     },
     keydownListener: function(event){
-        if (de_listeners.isSpaceHotkey(event)) {event.preventDefault();}
+        if (de_listeners.isPossibleHotkey(event) && event.keyCode === 32) {event.preventDefault();}
     },
     keyupListener: function(event){
-        if (de_listeners.isSpaceHotkey(event)) {de_button.emulateClick(event.ctrlKey ? 2 : 0);}
         if (event.keyCode === 81 && event.altKey) {de_button.hide();}
+        if (!de_listeners.isPossibleHotkey(event)) {return;}
+        if (event.keyCode === 32) {de_button.emulateClick(event.ctrlKey ? 2 : 0);}
+        for (const folder of de_settings.folders) {
+            if (folder.keyCode !== event.keyCode || !event[folder.modifier]) {continue;}
+            de_button.emulateClick();
+            break;
+        }
     },
     
-    isSpaceHotkey: function(event){
-        return event.keyCode === 32 && de_button.isVisible() && ['INPUT', 'TEXTAREA'].indexOf(event.target.tagName) === -1;
+    isPossibleHotkey: function(event){
+        return de_button.isVisible() && ['INPUT', 'TEXTAREA'].indexOf(event.target.tagName) === -1;
     },
 
     switch: function(turnOn = true){
