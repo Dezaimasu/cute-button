@@ -8,9 +8,7 @@ let folders;
 */
 function loadOptions(){
     browser.storage.local.get(settingsDefault).then(function(result){
-        Object.keys(settingsDefault).forEach(function(key){
-            setting[key][setting[key].dataset.valueLocation] = result[key];
-        });
+        Object.keys(settingsDefault).forEach(key => setting[key][setting[key].dataset.valueLocation] = result[key]);
         refreshIcon();
         refreshFolders(result.folders);
         saveOptions();
@@ -20,18 +18,14 @@ function loadOptions(){
 function saveOptions(){
     let newSettings = {};
     prepareCurrentFoldersForSave();
-    Object.keys(settingsDefault).forEach(function(key){
-        newSettings[key] = setting[key][setting[key].dataset.valueLocation];
-    });
+    Object.keys(settingsDefault).forEach(key => newSettings[key] = setting[key][setting[key].dataset.valueLocation]);
     newSettings.folders = folders;
     browser.storage.local.set(newSettings);
     disableSave();
 }
 
 function resetOptions(){
-    Object.keys(settingsDefault).forEach(function(key){
-        setting[key][setting[key].dataset.valueLocation] = settingsDefault[key];
-    });
+    Object.keys(settingsDefault).forEach(key => setting[key][setting[key].dataset.valueLocation] = settingsDefault[key]);
     refreshIcon();
     refreshFolders(settingsDefault.folders);
     enableSave();
@@ -69,9 +63,7 @@ function fileInputListener(){
 -------------------- Custom Directories --------------------
 */
 function refreshFolders(foldersSettings){
-    document.querySelectorAll('.folder').forEach(function(folderElem){
-        folderElem.remove();
-    });
+    document.querySelectorAll('.folder').forEach(folderElem => folderElem.remove());
     folders = foldersSettings;
     folders.forEach(addNewFolder);
 }
@@ -143,9 +135,7 @@ function initSelectors(){
 }
 
 function enableInputListeners(inputsContainer){
-    inputsContainer.querySelectorAll('select, input').forEach(function(editableElem){
-        editableElem.addEventListener('input', enableSave);
-    });
+    inputsContainer.querySelectorAll('select, input').forEach(editableElem => editableElem.addEventListener('input', enableSave));
 }
 
 function init(){
