@@ -2,7 +2,7 @@ table {
 	border-collapse:collapse;
 	border: 1px solid grey;
 }
-table tr:not(.folder):not(:first-child) td {
+table tr:not(#default-path):not(.folder) td {
 	border-bottom: 1px solid grey;
 }
 td:first-child {

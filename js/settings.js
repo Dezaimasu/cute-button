@@ -1,6 +1,6 @@
 'use strict';
 
-const elem = {};
+const setting = {}, elem = {};
 let folders;
 
 /*
@@ -9,7 +9,7 @@ let folders;
 function loadOptions(){
     browser.storage.local.get(settingsDefault).then(function(result){
         Object.keys(settingsDefault).forEach(function(key){
-            elem[key][elem[key].de_val] = result[key];
+            setting[key][setting[key].dataset.valueLocation] = result[key];
         });
         refreshIcon();
         refreshFolders(result.folders);
@@ -18,19 +18,19 @@ function loadOptions(){
 }
 
 function saveOptions(){
-    let settings = {};
+    let newSettings = {};
     prepareCurrentFoldersForSave();
     Object.keys(settingsDefault).forEach(function(key){
-        settings[key] = elem[key][elem[key].de_val];
+        newSettings[key] = setting[key][setting[key].dataset.valueLocation];
     });
-    settings.folders = folders;
-    browser.storage.local.set(settings);
+    newSettings.folders = folders;
+    browser.storage.local.set(newSettings);
     disableSave();
 }
 
 function resetOptions(){
     Object.keys(settingsDefault).forEach(function(key){
-        elem[key][elem[key].de_val] = settingsDefault[key];
+        setting[key][setting[key].dataset.valueLocation] = settingsDefault[key];
     });
     refreshIcon();
     refreshFolders(settingsDefault.folders);
@@ -49,7 +49,7 @@ function enableSave(){
 -------------------- Icon --------------------
 */
 function refreshIcon(){
-    elem['de-cute-id'].style.backgroundImage = elem['icon'].value;
+    elem['de-cute-id'].style.backgroundImage = setting['icon'].value;
 }
 
 function fileInputListener(){
@@ -60,7 +60,7 @@ function fileInputListener(){
             console.log(reader.result.length); //TODO add proper error message
             return;
         }
-        elem['icon'].value = 'url("' + reader.result + '")';
+        setting['icon'].value = 'url("' + reader.result + '")';
         refreshIcon();
     };
 }
@@ -89,13 +89,13 @@ function addNewFolder(folderSettings = null){
     newFolder.removeAttribute('id');
     newFolder.querySelector('.key').addEventListener('keyup', keyInputListener);
     newFolder.querySelector('.delete-folder').addEventListener('click', deleteFolder);
-    newFolder.querySelectorAll('select, input').forEach(function(elem){
-        elem.addEventListener('input', enableSave);
+    newFolder.querySelectorAll('select, input').forEach(function(editableElem){
+        editableElem.addEventListener('input', enableSave);
     });
     if (folderSettings) {
     	fillFolder(newFolder, folderSettings);
     }
-    elem['blank-folder'].parentNode.insertBefore(newFolder, elem['add-folder-container']);
+    elem['add-folder-container'].parentNode.insertBefore(newFolder, elem['add-folder-container']);
 }
 
 function deleteFolder(event){
@@ -133,8 +133,8 @@ function initSelectors(){
         otherElems = ['blank-folder', 'add-folder', 'add-folder-container', 'save', 'reset', 'file-input', 'de-cute-id'];
 
     settingsElems.forEach(function(name){
-        elem[name] = document.querySelector('#' + name);
-        elem[name].de_val = elem[name].type === 'checkbox' ? 'checked' : 'value';
+        setting[name] = document.querySelector('#' + name);
+        setting[name].dataset.valueLocation = setting[name].type === 'checkbox' ? 'checked' : 'value';
     });
     otherElems.forEach(function(name){
         elem[name] = document.querySelector('#' + name);
@@ -151,8 +151,8 @@ function init(){
         addNewFolder();
         enableSave();
     });
-    document.querySelectorAll('select, input').forEach(function(elem){
-        elem.addEventListener('input', enableSave);
+    document.querySelectorAll('select, input').forEach(function(editableElem){
+        editableElem.addEventListener('input', enableSave);
     });
 
     disableSave();
