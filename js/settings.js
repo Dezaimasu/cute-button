@@ -89,6 +89,9 @@ function addNewFolder(folderSettings = null){
     newFolder.removeAttribute('id');
     newFolder.querySelector('.key').addEventListener('keyup', keyInputListener);
     newFolder.querySelector('.deleteFolder').addEventListener('click', deleteFolder);
+    newFolder.querySelectorAll('select, input').forEach(function(elem){
+        elem.addEventListener('input', enableSave);
+    });
     if (folderSettings) {
     	fillFolder(newFolder, folderSettings);
     }
