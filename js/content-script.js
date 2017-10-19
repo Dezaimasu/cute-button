@@ -41,6 +41,8 @@ const de_settings = {
     exclusions: [],
     originalNameButton: null,
 
+    selectedSavePath: null,
+
     setSettings: function(newSettings){
         this.minSize = newSettings.minSize;
         this.folders = newSettings.folders;
@@ -70,10 +72,11 @@ const de_button = {
             if (!btnElem.classList.contains('click') || !that.downloadRequest.src) {return;}
 
             de_webextApi.download(Object.assign(
-                {},
+                {path: de_settings.selectedSavePath},
                 that.downloadRequest,
                 that.isOriginalNameButton(event) ? {} : {originalName: null}
             ));
+            de_settings.selectedSavePath = null;
             if (event.button === 1) {
                 that.copyToClipboard(that.downloadRequest.src);
             }
@@ -420,9 +423,14 @@ const de_listeners = {
     keyupListener: function(event){
         if (event.keyCode === 81 && event.altKey) {de_button.hide();}
         if (!de_listeners.isPossibleHotkey(event)) {return;}
-        if (event.keyCode === 32) {de_button.emulateClick(event.ctrlKey ? 2 : 0);}
+
+        if (event.keyCode === 32) {
+            de_settings.selectedSavePath = null;
+            de_button.emulateClick(event.ctrlKey ? 2 : 0);
+        }
         for (const folder of de_settings.folders) {
             if (folder.keyCode !== event.keyCode || !event[folder.modifier]) {continue;}
+            de_settings.selectedSavePath = folder.path;
             de_button.emulateClick();
             break;
         }
