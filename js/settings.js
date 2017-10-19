@@ -116,7 +116,7 @@ function fillFolder(folderElem, folderSettings){
 function buildFolderSettings(folderElem){
     return {
         key     : folderElem.querySelector('.key').value,
-        keyCode : folderElem.querySelector('.keyCode').value,
+        keyCode : Number(folderElem.querySelector('.keyCode').value),
         modifier: folderElem.querySelector('.modifier').value,
         path    : folderElem.querySelector('.path').value
     };

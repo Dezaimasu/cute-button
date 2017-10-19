@@ -128,7 +128,7 @@ const de_button = {
         return this.elem.style.visibility === 'visible';
     },
 
-    emulateClick: function(buttonCode){
+    emulateClick: function(buttonCode = 0){
         this.jerkClass('implying-click', 'click');
         this.elem.dispatchEvent(new MouseEvent('mouseup', {button: buttonCode}));
     },
@@ -421,15 +421,23 @@ const de_listeners = {
         if (de_listeners.isPossibleHotkey(event) && event.keyCode === 32) {event.preventDefault();}
     },
     keyupListener: function(event){
-        if (event.keyCode === 81 && event.altKey) {de_button.hide();}
+        if (event.keyCode === 81 && event.altKey) {de_button.hide(); return;}
         if (!de_listeners.isPossibleHotkey(event)) {return;}
 
         if (event.keyCode === 32) {
             de_settings.selectedSavePath = null;
             de_button.emulateClick(event.ctrlKey ? 2 : 0);
+            return;
         }
         for (const folder of de_settings.folders) {
-            if (folder.keyCode !== event.keyCode || !event[folder.modifier]) {continue;}
+            if (
+                folder.keyCode !== event.keyCode ||
+                (folder.modifier && !event[folder.modifier]) ||
+                (!folder.modifier && (event.shiftKey || event.ctrlKey || event.altKey))
+            ) {
+                continue;
+            }
+
             de_settings.selectedSavePath = folder.path;
             de_button.emulateClick();
             break;
