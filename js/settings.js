@@ -69,6 +69,9 @@ function fileInputListener(){
 -------------------- Custom Directories --------------------
 */
 function refreshFolders(foldersSettings){
+    document.querySelectorAll('.folder').forEach(function(folderElem){
+        folderElem.remove();
+    });
     folders = foldersSettings;
     folders.forEach(addNewFolder);
 }
@@ -89,9 +92,7 @@ function addNewFolder(folderSettings = null){
     newFolder.removeAttribute('id');
     newFolder.querySelector('.key').addEventListener('keyup', keyInputListener);
     newFolder.querySelector('.delete-folder').addEventListener('click', deleteFolder);
-    newFolder.querySelectorAll('select, input').forEach(function(editableElem){
-        editableElem.addEventListener('input', enableSave);
-    });
+    enableInputListeners(newFolder);
     if (folderSettings) {
     	fillFolder(newFolder, folderSettings);
     }
@@ -141,6 +142,12 @@ function initSelectors(){
     });
 }
 
+function enableInputListeners(inputsContainer){
+    inputsContainer.querySelectorAll('select, input').forEach(function(editableElem){
+        editableElem.addEventListener('input', enableSave);
+    });
+}
+
 function init(){
     initSelectors();
 
@@ -151,10 +158,8 @@ function init(){
         addNewFolder();
         enableSave();
     });
-    document.querySelectorAll('select, input').forEach(function(editableElem){
-        editableElem.addEventListener('input', enableSave);
-    });
 
+    enableInputListeners(document);
     disableSave();
     loadOptions();
 }
