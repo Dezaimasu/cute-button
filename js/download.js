@@ -5,17 +5,19 @@ function download(downloadRequest, tabId){
 }
 
 const downloader = {
-    savePath: '',
+    defaultSavePath: '',
+    currentSavePath: '',
     filename: '',
     basename: '',
 
-    initSavePath: function(){
+    initSavePath: function(){ //TODO move "savePath" setting handling to content script, pass path with downloadRequest
+        let that = this;
         browser.storage.onChanged.addListener(function(changes){
             if (typeof changes.savePath === 'undefined') {return;}
-            downloader.setSavePath(changes.savePath.newValue);
+            that.defaultSavePath = that.prepareSavePath(changes.savePath.newValue);
         });
         browser.storage.local.get('savePath').then(function(result){
-            downloader.setSavePath(result.savePath);
+            that.defaultSavePath = that.prepareSavePath(result.savePath);
         });
     },
 
@@ -25,16 +27,17 @@ const downloader = {
     },
 
     /*
-    * If savePath option is not empty then trims leading/trailing slashes/backslashes
+    * If the path is not empty then trims leading/trailing slashes/backslashes
     * and adds a single slash to the end for concating with filename.
-    * Doesn't matter which slashes are used in savePath, WebExt API recognizes both.
+    * Doesn't matter which slashes are used in save path, WebExt API recognizes both.
     */
-    setSavePath: function(optionValue){
-        this.savePath = optionValue && (optionValue.replace(/^\\+|^\/+|\\+$|\/+$/, '') + '/');
+    prepareSavePath: function(rawPath){
+        return rawPath && (rawPath.replace(/^\\+|^\/+|\\+$|\/+$/, '') + '/');
     },
 
     saveFile: function(downloadRequest, tabId){
         this.resetFileName();
+        this.currentSavePath = downloadRequest.path === null ? this.defaultSavePath : this.prepareSavePath(downloadRequest.path);
 
         if (downloadRequest.originalName) {
             this.filename = downloadRequest.originalName;
@@ -121,7 +124,7 @@ const downloader = {
         let that = this;
         browser.downloads.download({
             url: src,
-            filename: that.savePath + that.prepareWinFilename(),
+            filename: that.currentSavePath + that.prepareWinFilename(),
             conflictAction: 'uniquify'
         }).then(function(downloadId){
             that.checkForDuplicate(downloadId, tabId);
