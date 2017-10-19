@@ -22,7 +22,7 @@ button#reset {
 	margin: 20px 5px 5px;
 	font-size: 1.25em;
 }
-#iconContainer {
+#icon-container {
 	vertical-align: bottom;
 	display: inline-block;
 	height: 32px;
@@ -45,12 +45,12 @@ button#reset {
 #default-path td:first-child span {
 	padding-right: 13px;
 }
-.folder .keyContainer,
-#default-path .keyContainer {
+.folder .key-container,
+#default-path .key-container {
 	float: right;
 }
 
-.folder#blankFolder {
+.folder#blank-folder {
 	display: none;
 }
 .folder td > div {
@@ -62,7 +62,7 @@ button#reset {
 .folder input.key {
 	text-transform: uppercase;
 }
-#addFolderContainer td {
+#add-folder-container td {
 	padding: 6px 0 13px;
 }
 

@@ -38,29 +38,29 @@ function resetOptions(){
 }
 
 function disableSave(){
-    elem.save.disabled = true;
+    elem['save'].disabled = true;
 }
 
 function enableSave(){
-    elem.save.disabled = false;
+    elem['save'].disabled = false;
 }
 
 /*
 -------------------- Icon --------------------
 */
 function refreshIcon(){
-    elem['de-cute-id'].style.backgroundImage = elem.icon.value;
+    elem['de-cute-id'].style.backgroundImage = elem['icon'].value;
 }
 
 function fileInputListener(){
     let reader = new FileReader();
-    reader.readAsDataURL(elem.fileInput.files[0]);
+    reader.readAsDataURL(elem['file-input'].files[0]);
     reader.onload = function(){
         if (reader.result.length > 2097152) {
             console.log(reader.result.length); //TODO add proper error message
             return;
         }
-        elem.icon.value = 'url("' + reader.result + '")';
+        elem['icon'].value = 'url("' + reader.result + '")';
         refreshIcon();
     };
 }
@@ -84,18 +84,18 @@ function prepareCurrentFoldersForSave(){
 }
 
 function addNewFolder(folderSettings = null){
-    let newFolder = elem.blankFolder.cloneNode(true);
+    let newFolder = elem['blank-folder'].cloneNode(true);
 
     newFolder.removeAttribute('id');
     newFolder.querySelector('.key').addEventListener('keyup', keyInputListener);
-    newFolder.querySelector('.deleteFolder').addEventListener('click', deleteFolder);
+    newFolder.querySelector('.delete-folder').addEventListener('click', deleteFolder);
     newFolder.querySelectorAll('select, input').forEach(function(elem){
         elem.addEventListener('input', enableSave);
     });
     if (folderSettings) {
     	fillFolder(newFolder, folderSettings);
     }
-    elem.blankFolder.parentNode.insertBefore(newFolder, elem.addFolderContainer);
+    elem['blank-folder'].parentNode.insertBefore(newFolder, elem['add-folder-container']);
 }
 
 function deleteFolder(event){
@@ -130,7 +130,7 @@ function buildFolderSettings(folderElem){
 */
 function initSelectors(){
     let settingsElems = Object.keys(settingsDefault),
-        otherElems = ['blankFolder', 'addFolder', 'addFolderContainer', 'save', 'reset', 'fileInput', 'de-cute-id'];
+        otherElems = ['blank-folder', 'add-folder', 'add-folder-container', 'save', 'reset', 'file-input', 'de-cute-id'];
 
     settingsElems.forEach(function(name){
         elem[name] = document.querySelector('#' + name);
@@ -144,10 +144,10 @@ function initSelectors(){
 function init(){
     initSelectors();
 
-    elem.fileInput.addEventListener('change', fileInputListener);
-    elem.save.addEventListener('click', saveOptions);
-    elem.reset.addEventListener('click', resetOptions);
-    elem.addFolder.addEventListener('click', function(event){
+    elem['file-input'].addEventListener('change', fileInputListener);
+    elem['save'].addEventListener('click', saveOptions);
+    elem['reset'].addEventListener('click', resetOptions);
+    elem['add-folder'].addEventListener('click', function(event){
         addNewFolder();
         enableSave();
     });
