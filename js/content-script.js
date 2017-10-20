@@ -90,8 +90,6 @@ const de_button = {
             btnElem.classList.remove('click');
         }
 
-        de_webextApi.listen();
-
         that.elem = document.createElement('de_cbutton');
         btnElem = that.elem;
         btnElem.id = 'de-cute-id';
@@ -177,6 +175,7 @@ const de_contentscript = {
         this.srcLocation = this.isSeparateTab ? 'baseURI' : 'currentSrc';
 
         de_button.init();
+        de_webextApi.listen();
         de_webextApi.settings();
     },
 
