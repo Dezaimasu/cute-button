@@ -4,6 +4,8 @@ body de_cbutton#de-cute-id {
 	visibility: hidden;
 	position: absolute;
 	z-index: 2147483647;
+	padding: 0;
+	margin: 0;
 	border: 1px solid #777;
 	cursor: default;
 	min-height: 32px;

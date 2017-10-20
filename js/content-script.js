@@ -95,6 +95,7 @@ const de_button = {
         that.elem = document.createElement('de_cbutton');
         btnElem = that.elem;
         btnElem.id = 'de-cute-id';
+        btnElem.classList.add('de-img-full-src'); // crutch for Dollchan Extension Script for expanded by center images
         btnElem.addEventListener('click', that.disableDefaultClick);
         btnElem.addEventListener('contextmenu', that.disableDefaultClick);
         btnElem.addEventListener('mousedown', mousedownListener);

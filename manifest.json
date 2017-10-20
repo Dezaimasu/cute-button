@@ -1,7 +1,7 @@
 {
 	"manifest_version": 2,
 	"name": "Cute Save Button",
-	"version": "0.4.5pre1",
+	"version": "0.4.5pre2",
 	"description": "Little button to save images and webms in one click. Praise cute!",
 	"author": "Deil",
 	"icons": {
