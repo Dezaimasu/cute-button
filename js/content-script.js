@@ -334,7 +334,7 @@ const de_contentscript = {
                 },
                 'tumblr.com': function(){
                     return node.currentSrc.replace(/(tumblr_[\d\w]+)(_\d{2,3}).(jpg|jpeg|png)$/, '$1_1280.$3');
-                }
+                },
             },
             getter = getters[this.host],
             originalSrc = null;
@@ -358,14 +358,11 @@ const de_contentscript = {
                     return container.title || container.innerHTML;
                 },
                 'iichan.hk': () => {
-                    return xpath('../preceding-sibling[@class="filesize"]/em').innerHTML.match(/([^,]+, ){2}(.+)/)[2];
+                    return xpath('../preceding-sibling::span[@class="filesize"]/em').innerHTML.match(/([^,]+, ){2}(.+)/)[2];
                 },
                 'boards.fireden.net': () => {
-                    let container = xpath('../following-sibling::div[@class="post_file"]/a[@class="post_file_filename"]');
+                    let container = xpath('(../following-sibling::div[@class="post_file"]|../../preceding-sibling::div[@class="post_file"])/a[@class="post_file_filename"]');
                     return container.title || container.innerHTML;
-                },
-                'exhentai.org': () => {
-                    return xpath('../../preceding-sibling::div[@id="i2"]/div[2 and contains(., "::")]').innerHTML.match(/(.+?)( :: )/)[1];
                 },
             },
             aliases = {'yuki.la': 'boards.4chan.org'},
@@ -380,7 +377,7 @@ const de_contentscript = {
                 dollchanImproved = ['boards.4chan.org', '2ch.hk', 'iichan.hk'];
 
             if (dollchanImproved.indexOf(de_contentscript.host) === -1) {return null;}
-            filenameTry = xpath('following-sibling::div[@class="de-img-full-info"]/a[@class="de-img-full-src" and text() != "Spoiler Image"]');
+            filenameTry = xpath('following-sibling::div[@class="de-img-full-info" and not(contains(parent::div/@class, "de-img-wrapper-inpost"))]/a[@class="de-img-full-src" and text() != "Spoiler Image"]');
 
             return filenameTry ? filenameTry.innerHTML : null;
         }
