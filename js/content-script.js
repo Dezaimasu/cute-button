@@ -348,68 +348,49 @@ const de_contentscript = {
     },
 
     getOriginalFilename: function(node){
-        let gettersInfo = {
-                'boards.4chan.org': {
-                    containerSelector: '.fileText',
-                    parentLevels: {'VIDEO': 1, 'IMG': 2},
-                    getFilename: function(container){
-                        let a,
-                            conTitle = container.title;
-                        if (conTitle) {
-                            return conTitle;
-                        }
-                        a = container.querySelector('a');
-                        return a ? (a.title || a.innerHTML) : null;
-                    },
+        let getters = {
+                'boards.4chan.org': () => {
+                    let container = xpath('ancestor::div[@class="file"]//*[(@class="fileText" and @title) or self::a]');
+                    return container.title || container.innerHTML;
                 },
-                '2ch.hk': {
-                    containerSelector: 'figcaption a',
-                    parentLevels: {'VIDEO': 2, 'IMG': 3},
-                    getFilename: function(container){
-                        return container.title || container.innerHTML;
-                    },
+                '2ch.hk': () => {
+                    let container = xpath('ancestor::figure[@class="image"]/figcaption/a');
+                    return container.title || container.innerHTML;
                 },
-                'iichan.hk': {
-                    containerSelector: '.filesize em',
-                    parentLevels: {'IMG': 2},
-                    getFilename: function(container){
-                        let match,
-                            str = container.innerHTML;
-                        if (!str) {return null;}
-                        match = str.match(/[^(, )]+,\s[^(, )]+,\s(.+)/);
-                        return match ? match[1] : null;
-                    },
+                'iichan.hk': () => {
+                    return xpath('../preceding-sibling[@class="filesize"]/em').innerHTML.match(/([^,]+, ){2}(.+)/)[2];
                 },
-                'boards.fireden.net': {
-                    containerSelector: '.post_file a.post_file_filename',
-                    parentLevels: {'IMG': 3},
-                    getFilename: function(container){
-                        return container.title || container.innerHTML;
-                    },
+                'boards.fireden.net': () => {
+                    let container = xpath('../following-sibling::div[@class="post_file"]/a[@class="post_file_filename"]');
+                    return container.title || container.innerHTML;
                 },
-                'exhentai.org': {
-                    containerSelector: 'div#i2 div:nth-child(2)',
-                    parentLevels: {'IMG': 3},
-                    getFilename: function(container){
-                        let str = container.innerHTML;
-                        if (!str) {return null;}
-                        return str.substr(0, str.indexOf(' :: '));
-                    },
+                'exhentai.org': () => {
+                    return xpath('../../preceding-sibling::div[@id="i2"]/div[2 and contains(., "::")]').innerHTML.match(/(.+?)( :: )/)[1];
                 },
             },
             aliases = {'yuki.la': 'boards.4chan.org'},
-            getter = gettersInfo[this.host] || gettersInfo[aliases[this.host]],
-            parent = node,
-            container;
+            getter = getters[this.host] || getters[aliases[this.host]],
+            originalFilename = null;
+
+        function xpath(path){
+            return document.evaluate(path, node, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
+        }
+        function tryFilenameFromDollchanImageByCenter(){
+            let filenameTry,
+                dollchanImproved = ['boards.4chan.org', '2ch.hk', 'iichan.hk'];
+
+            if (dollchanImproved.indexOf(de_contentscript.host) === -1) {return null;}
+            filenameTry = xpath('following-sibling::div[@class="de-img-full-info"]/a[@class="de-img-full-src" and text() != "Spoiler Image"]');
+
+            return filenameTry ? filenameTry.innerHTML : null;
+        }
 
         if (!getter || this.isSeparateTab) {return null;}
-        for (let i = 0, parentLevel = getter.parentLevels[node.tagName]; i < parentLevel; i++) {
-            parent = parent.parentNode;
-        }
-        if (parent.nodeName === 'HTML' || parent.nodeName === 'BODY') {return false;}
-        container = parent.querySelector(getter.containerSelector);
+        try {
+            originalFilename = tryFilenameFromDollchanImageByCenter() || getter();
+        } catch (e) {} //tfw still no safe navigation operator
 
-        return container ? getter.getFilename(container) : null;
+        return originalFilename;
     }
 };
 
