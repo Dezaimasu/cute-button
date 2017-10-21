@@ -330,7 +330,7 @@ const de_contentscript = {
                     return info['base'] + (info['w_'] || info['z_'] || info['y_'])[0] + '.jpg';
                 },
                 'twitter.com': function(){
-                    return node.currentSrc + ':orig';
+                    return node.currentSrc.replace(/(:[\d\w]+)$/, '') + ':orig';
                 },
                 'tumblr.com': function(){
                     return node.currentSrc.replace(/(tumblr_[\d\w]+)(_\d{2,3}).(jpg|jpeg|png)$/, '$1_1280.$3');
