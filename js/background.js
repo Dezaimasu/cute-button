@@ -47,17 +47,24 @@ browser.runtime.onMessage.addListener(function(message, sender){
 /* For options initialization after installation */
 browser.runtime.onInstalled.addListener(initSettings);
 function initSettings(){
-    let settingsNames = Object.keys(settingsDefault);
     browser.runtime.onInstalled.removeListener(initSettings);
-    browser.storage.local.get(settingsNames).then(function(currentSettings){
-        settingsNames.forEach(function(settingName){ // god I love callbacks
-            if (typeof currentSettings[settingName] === 'undefined') {
-                let newSetting = {};
-                newSetting[settingName] = settingsDefault[settingName];
-                browser.storage.local.set(newSetting);
-            }
+    browser.storage.local.get().then(function(currentSettings){
+        let actualSettingsNames = Object.keys(settingsDefault),
+            currentSettingsNames = Object.keys(currentSettings),
+            newSettings = {},
+            newSettingsList = arrayDiff(actualSettingsNames, currentSettingsNames),
+            obsoleteSettingsList = arrayDiff(currentSettingsNames, actualSettingsNames);
+
+        newSettingsList.forEach(function(settingName){
+            newSettings[settingName] = settingsDefault[settingName];
         });
+        browser.storage.local.set(newSettings);
+        browser.storage.local.remove(obsoleteSettingsList);
     });
+}
+
+function arrayDiff(arr1, arr2){
+    return arr1.filter(x => arr2.indexOf(x) === -1);
 }
 
 /* Turns on/off content script across all tabs */
