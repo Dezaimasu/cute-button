@@ -9,7 +9,7 @@ td:first-child {
 	padding: 6px 10px;
 	height: 25px;
 }
-input#savePath,
+input#defaultSavePath,
 input#exclusions,
 input.path {
 	width: 400px;

@@ -5,21 +5,9 @@ function download(downloadRequest, tabId){
 }
 
 const downloader = {
-    defaultSavePath: '',
-    currentSavePath: '',
+    savePath: '',
     filename: '',
     basename: '',
-
-    initSavePath: function(){ //TODO move "savePath" setting handling to content script, pass path with downloadRequest
-        let that = this;
-        browser.storage.onChanged.addListener(function(changes){
-            if (typeof changes.savePath === 'undefined') {return;}
-            that.defaultSavePath = that.prepareSavePath(changes.savePath.newValue);
-        });
-        browser.storage.local.get('savePath').then(function(result){
-            that.defaultSavePath = that.prepareSavePath(result.savePath);
-        });
-    },
 
     resetFileName: function(){
         this.filename = '';
@@ -37,7 +25,7 @@ const downloader = {
 
     saveFile: function(downloadRequest, tabId){
         this.resetFileName();
-        this.currentSavePath = downloadRequest.path === null ? this.defaultSavePath : this.prepareSavePath(downloadRequest.path);
+        this.savePath = this.prepareSavePath(downloadRequest.path);
 
         if (downloadRequest.originalName) {
             this.filename = downloadRequest.originalName;
@@ -124,7 +112,7 @@ const downloader = {
         let that = this;
         browser.downloads.download({
             url: src,
-            filename: that.currentSavePath + that.prepareWinFilename(),
+            filename: that.savePath + that.prepareWinFilename(),
             conflictAction: 'uniquify'
         }).then(function(downloadId){
             that.checkForDuplicate(downloadId, tabId);
@@ -133,5 +121,3 @@ const downloader = {
         });
     }
 };
-
-downloader.initSavePath();

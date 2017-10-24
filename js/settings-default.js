@@ -1,5 +1,5 @@
 const settingsDefault = {
-    savePath                : '',
+    defaultSavePath         : '',
     minSize                 : 256,
     exclusions              : 'de-video-thumb de-ytube de-file-img html5-main-video vjs-tech',
     icon                    : 'url("' + browser.extension.getURL('bestgirl.png') + '")',

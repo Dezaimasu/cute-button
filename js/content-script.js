@@ -34,13 +34,14 @@ const de_webextApi = {
 };
 
 const de_settings = {
-    originalNames: ['minSize', 'exclusions', 'icon', 'originalNameByDefault', 'hideButton', 'isCute', 'position', 'folders'],
+    originalNames: ['defaultSavePath', 'minSize', 'exclusions', 'icon', 'originalNameByDefault', 'hideButton', 'isCute', 'position', 'folders'],
 
     selectedSavePath: null,
 
     setSettings: function(newSettings){
         this.minSize = newSettings.minSize;
         this.folders = newSettings.folders;
+        this.defaultSavePath = newSettings.defaultSavePath;
         this.exclusions = newSettings.exclusions.split(' ');
         this.originalNameButton = newSettings.originalNameByDefault ? 0 : 2;
         [this.vertical, this.horizontal] = newSettings.position.split('-');
@@ -67,7 +68,7 @@ const de_button = {
             if (!btnElem.classList.contains('click') || !that.downloadRequest.src) {return;}
 
             de_webextApi.download(Object.assign(
-                {path: de_settings.selectedSavePath},
+                {path: de_settings.selectedSavePath || de_settings.defaultSavePath},
                 that.downloadRequest,
                 that.isOriginalNameButton(event) ? {} : {originalName: null}
             ));
