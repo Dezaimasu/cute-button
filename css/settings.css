@@ -2,7 +2,7 @@ table {
 	border-collapse:collapse;
 	border: 1px solid grey;
 }
-table tr:not(#default-path):not(.folder) td {
+table tr:not(#path-description):not(#default-path):not(.folder) td {
 	border-bottom: 1px solid grey;
 }
 td:first-child {
@@ -22,6 +22,9 @@ button#reset {
 	margin: 20px 5px 5px;
 	font-size: 1.25em;
 }
+#path-description {
+	color: #D66;
+}
 #icon-container {
 	vertical-align: bottom;
 	display: inline-block;
@@ -32,24 +35,19 @@ button#reset {
 	display: none;
 }
 
-.folder,
-#default-path {
+.folder {
 	height: 25px;
 }
-.folder td:first-child,
-#default-path td:first-child {
+.folder td:first-child {
 	vertical-align: middle;
 	line-height: 23px;
 }
-.folder td:first-child span,
-#default-path td:first-child span {
+.folder td:first-child span {
 	padding-right: 13px;
 }
-.folder .key-container,
-#default-path .key-container {
+.folder .key-container {
 	float: right;
 }
-
 .folder#blank-folder {
 	display: none;
 }
