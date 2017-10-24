@@ -3,6 +3,7 @@ body de_cbutton#de-cute-id {
 	background: #444 url(moz-extension://__MSG_@@extension_id__/bestgirl.png) center/28px no-repeat;
 	visibility: hidden;
 	position: absolute;
+	display: block !important;
 	z-index: 2147483647;
 	padding: 0;
 	margin: 0;
