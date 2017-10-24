@@ -31,9 +31,6 @@ button#reset {
 	height: 32px;
 	width: 50px;
 }
-#hidden-settings {
-	display: none;
-}
 
 .folder {
 	height: 25px;
@@ -48,7 +45,8 @@ button#reset {
 .folder .key-container {
 	float: right;
 }
-.folder#blank-folder {
+.folder#blank-folder,
+#hidden-settings {
 	display: none;
 }
 .folder td > div {
