@@ -168,11 +168,13 @@ const de_contentscript = {
     srcLocation     : null,
     previousSrc     : null,
     isSeparateTab   : null,
+    dollchanImproved: null,
 
     init: function(){
         this.host = this.getFilteredHost();
         this.isSeparateTab = ['image/', 'video/'].indexOf(document.contentType.substr(0, 6)) > -1;
         this.srcLocation = this.isSeparateTab ? 'baseURI' : 'currentSrc';
+        this.dollchanImproved = !!document.querySelector('#de-main');
 
         de_button.init();
         de_webextApi.listen();
@@ -364,6 +366,10 @@ const de_contentscript = {
                     let container = xpath('(../following-sibling::div[@class="post_file"]|../../preceding-sibling::div[@class="post_file"])/a[@class="post_file_filename"]');
                     return container.title || container.innerHTML;
                 },
+                '8ch.net': () => {
+                    let container = xpath('../preceding-sibling::p[@class="fileinfo"]/span[@class="unimportant"]/a');
+                    return container.title || container.innerHTML;
+                },
             },
             aliases = {'yuki.la': 'boards.4chan.org'},
             getter = getters[this.host] || getters[aliases[this.host]],
@@ -373,10 +379,8 @@ const de_contentscript = {
             return document.evaluate(path, node, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
         }
         function tryFilenameFromDollchanImageByCenter(){
-            let filenameTry,
-                dollchanImproved = ['boards.4chan.org', '2ch.hk', 'iichan.hk'];
-
-            if (dollchanImproved.indexOf(de_contentscript.host) === -1) {return null;}
+            let filenameTry;
+            if (!de_contentscript.dollchanImproved) {return null;}
             filenameTry = xpath('following-sibling::div[@class="de-img-full-info" and not(contains(parent::div/@class, "de-img-wrapper-inpost"))]/a[@class="de-img-full-src" and text() != "Spoiler Image"]');
 
             return filenameTry ? filenameTry.innerHTML : null;
