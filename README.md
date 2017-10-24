@@ -10,7 +10,7 @@ https://addons.mozilla.org/en-US/firefox/addon/cute-save-button/
 * Click on the button or press Space to save the file to default location
 * You can set your custom tiny icon so the button would be even more cuter. Protip: it won't.
 * Always downloads orginal full-sized images (currently supported: vk.com, twitter.com, tumblr.com)
-* Right click (or Ctrl+Space) to save with original filename (currently supported: 4chan.org, 2ch.hk, iichan.hk, boards.fireden.net, yuki.la, exhentai.org)
+* Right click (or Ctrl+Space) to save with original filename (works on most popular imageboards)
 * Middle click to save the file and copy its url to clipboard
 * Alt+Q to hide the button
 * Hold Shift for "deep scan" (checks for background-image and ignores filtering by image size)
