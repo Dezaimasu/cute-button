@@ -36,11 +36,6 @@ const de_webextApi = {
 const de_settings = {
     originalNames: ['minSize', 'exclusions', 'icon', 'originalNameByDefault', 'hideButton', 'isCute', 'position', 'folders'],
 
-    minSize: null,
-    position: null,
-    exclusions: [],
-    originalNameButton: null,
-
     selectedSavePath: null,
 
     setSettings: function(newSettings){
@@ -196,10 +191,10 @@ const de_contentscript = {
                     this.disconnect();
                 });
                 observer.observe(node, {
-                    attributes: true,
-                    childList: false,
-                    characterData: false,
-                    attributeFilter: ['src']
+                    attributes      : true,
+                    childList       : false,
+                    characterData   : false,
+                    attributeFilter : ['src']
                 });
                 observerLifetime = setTimeout(() => observer.disconnect(), 3000);
             }
