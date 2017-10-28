@@ -377,7 +377,7 @@ const de_contentscript = {
         function tryFilenameFromDollchanImageByCenter(){
             let filenameTry;
             if (!de_contentscript.dollchanImproved) {return null;}
-            filenameTry = xpath('following-sibling::div[@class="de-img-full-info" and not(contains(parent::div/@class, "de-img-wrapper-inpost"))]/a[@class="de-img-full-src" and text() != "Spoiler Image"]');
+            filenameTry = xpath('following-sibling::div[@class="de-img-full-info" and ancestor::div[2]/@class="de-img-center"]/a[@class="de-img-full-src" and text() != "Spoiler Image"]');
 
             return filenameTry ? filenameTry.innerHTML : null;
         }
