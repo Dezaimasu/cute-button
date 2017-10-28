@@ -396,11 +396,11 @@ const de_listeners = {
         de_contentscript.nodeHandler(event.target, event.shiftKey, event.ctrlKey);
     },
     keydownListener: function(event){
-        if (de_listeners.isPossibleHotkey(event) && event.keyCode === 32) {event.preventDefault();}
+        if (de_listeners.isHotkeyPossible(event)) {event.preventDefault();}
     },
     keyupListener: function(event){
         if (event.keyCode === 81 && event.altKey) {de_button.hide(); return;}
-        if (!de_listeners.isPossibleHotkey(event)) {return;}
+        if (!de_listeners.isHotkeyPossible(event)) {return;}
 
         if (event.keyCode === 32) {
             de_settings.selectedSavePath = null;
@@ -422,7 +422,7 @@ const de_listeners = {
         }
     },
     
-    isPossibleHotkey: function(event){
+    isHotkeyPossible: function(event){
         return de_button.isVisible() && ['INPUT', 'TEXTAREA'].indexOf(event.target.tagName) === -1;
     },
 
