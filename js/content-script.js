@@ -271,7 +271,7 @@ const de_contentscript = {
             parentRect,
             offset = 6,
             reverseOffset = 38, // offset + button width (32px)
-            position = {};
+            position = {left: null, top: null, right: null, bottom: null};
 
         let sizeGettersRegular = {
             left    : () => Math.max(0, nodeRect.left) + offset,
@@ -280,10 +280,10 @@ const de_contentscript = {
             bottom  : () => Math.min(document.documentElement.clientHeight, nodeRect.bottom) - reverseOffset,
         };
         let sizeGettersInPositioned = {
-            left    : () => nodeRect.left - parentRect.left - Math.min(0, nodeRect.left) + offset,
-            top     : () => nodeRect.top - parentRect.top - Math.min(0, nodeRect.top) + offset,
-            right   : () => parentRect.right - nodeRect.right + Math.max(0, nodeRect.right - document.documentElement.clientWidth) + offset,
-            bottom  : () => parentRect.bottom - nodeRect.bottom + Math.max(0, nodeRect.bottom - document.documentElement.clientHeight) + offset,
+            left    : () => Math.max(0, nodeRect.left - parentRect.left - Math.min(0, nodeRect.left)) + offset,
+            top     : () => Math.max(0, nodeRect.top - parentRect.top - Math.min(0, nodeRect.top)) + offset,
+            right   : () => Math.max(0, parentRect.right - nodeRect.right + Math.max(0, nodeRect.right - document.documentElement.clientWidth)) + offset,
+            bottom  : () => Math.max(0, parentRect.bottom - nodeRect.bottom + Math.max(0, nodeRect.bottom - document.documentElement.clientHeight)) + offset,
         };
 
         if (this.isPositioned(node.offsetParent)) {
