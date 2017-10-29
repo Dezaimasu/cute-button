@@ -281,17 +281,17 @@ const de_contentscript = {
             bottom  : () => Math.min(document.documentElement.clientHeight, nodeRect.bottom) - reverseOffset,
         };
         let sizeGettersInPositioned = {
-            left    : () => Math.max(0, nodeRect.left - parentRect.left - Math.min(0, nodeRect.left)) + offset,
-            top     : () => Math.max(0, nodeRect.top - parentRect.top - Math.min(0, nodeRect.top)) + offset,
-            right   : () => Math.max(0, parentRect.right - nodeRect.right + Math.max(0, nodeRect.right - document.documentElement.clientWidth)) + offset,
-            bottom  : () => Math.max(0, parentRect.bottom - nodeRect.bottom + Math.max(0, nodeRect.bottom - document.documentElement.clientHeight)) + offset,
+            left    : () => nodeRect.left - parentRect.left - Math.min(0, nodeRect.left),
+            top     : () => nodeRect.top - parentRect.top - Math.min(0, nodeRect.top),
+            right   : () => parentRect.right - nodeRect.right + Math.max(0, nodeRect.right - document.documentElement.clientWidth),
+            bottom  : () => parentRect.bottom - nodeRect.bottom + Math.max(0, nodeRect.bottom - document.documentElement.clientHeight),
         };
 
         if (this.isPositioned(node.offsetParent)) {
             parentRect = node.offsetParent.getBoundingClientRect();
             position.container = node.offsetParent;
-            position[de_settings.vertical] = sizeGettersInPositioned[de_settings.vertical]() + 'px';
-            position[de_settings.horizontal] = sizeGettersInPositioned[de_settings.horizontal]() + 'px';
+            position[de_settings.vertical] = Math.max(0, sizeGettersInPositioned[de_settings.vertical]()) + offset + 'px';
+            position[de_settings.horizontal] = Math.max(0, sizeGettersInPositioned[de_settings.horizontal]()) + offset + 'px';
         } else {
             position.container = document.body;
             position.left = sizeGettersRegular[de_settings.horizontal]() + window.scrollX + 'px';
