@@ -41,6 +41,7 @@ const de_settings = {
     setSettings: function(newSettings){
         this.minSize = newSettings.minSize;
         this.folders = newSettings.folders;
+        this.keysList = newSettings.folders.map(x => x.keyCode).concat([32]);
         this.defaultSavePath = newSettings.defaultSavePath;
         this.exclusions = newSettings.exclusions.split(' ');
         this.originalNameButton = newSettings.originalNameByDefault ? 0 : 2;
@@ -423,7 +424,7 @@ const de_listeners = {
     },
     
     isHotkeyPossible: function(event){
-        return de_button.isVisible() && ['INPUT', 'TEXTAREA'].indexOf(event.target.tagName) === -1;
+        return de_button.isVisible() && ['INPUT', 'TEXTAREA'].indexOf(event.target.tagName) === -1 && de_settings.keysList.indexOf(event.keyCode) > -1;
     },
 
     switch: function(turnOn = true){
