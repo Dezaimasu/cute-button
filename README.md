@@ -13,5 +13,5 @@ https://addons.mozilla.org/en-US/firefox/addon/cute-save-button/
 * Right click (or Ctrl+Space) to save with original filename (works on most popular imageboards)
 * Middle click to save the file and copy its url to clipboard
 * Alt+Q to hide the button
-* Hold Shift for "deep scan" (checks for background-image and ignores filtering by image size)
+* Hold Shift for "deep scan" (searches image in closest siblings (twitter.com), checks for background-image and ignores filtering by image size)
 * Hold Ctrl to delay button hiding for 1 second (can be useful if button somehow appeared outside of the image area)

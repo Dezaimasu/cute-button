@@ -162,6 +162,7 @@ const de_button = {
 const de_contentscript = {
     host            : null,
     bgSrc           : null,
+    actualNode      : null,
     srcLocation     : null,
     previousSrc     : null,
     isSeparateTab   : null,
@@ -183,24 +184,6 @@ const de_contentscript = {
     },
 
     nodeTools: {
-        hostCrutches: {
-            'tumblr.com': function(node, modifier){
-                let observer,
-                    observerLifetime;
-                observer = new MutationObserver(function(mutations){
-                    clearTimeout(observerLifetime);
-                    de_contentscript.nodeHandler(mutations[mutations.length - 1].target, modifier);
-                    this.disconnect();
-                });
-                observer.observe(node, {
-                    attributes      : true,
-                    childList       : false,
-                    characterData   : false,
-                    attributeFilter : ['src']
-                });
-                observerLifetime = setTimeout(() => observer.disconnect(), 3000);
-            }
-        },
         checkForBgSrc: function(node, modifier){
             let bgImg;
             if (!modifier) {return false;}
@@ -239,17 +222,47 @@ const de_contentscript = {
             }
             return (node.width < de_settings.minSize || node.height < de_settings.minSize);
         },
+        deepSearchByHost: function(node, modifier){
+            let that = de_contentscript,
+                crutches = {
+                    'twitter.com': () => xpath('self::div[contains(@class, "GalleryNav")]/preceding-sibling::div[@class="Gallery-media"]/img', node)
+                };
+            if (!modifier) {return false;}
+
+            that.actualNode = crutches[that.host] && crutches[that.host]();
+            return !!that.actualNode;
+        },
         processByHost: function(node, modifier){
-            let hostHandler = de_contentscript.nodeTools.hostCrutches[de_contentscript.host];
-            if (hostHandler) {
-                hostHandler(node, modifier);
-            }
-        }
+            let that = de_contentscript,
+                crutches = {
+                    'tumblr.com': () => {
+                        let observer,
+                            observerLifetime;
+                        observer = new MutationObserver(function(mutations){
+                            clearTimeout(observerLifetime);
+                            that.nodeHandler(mutations[mutations.length - 1].target, modifier);
+                            this.disconnect();
+                        });
+                        observer.observe(node, {
+                            attributes      : true,
+                            childList       : false,
+                            characterData   : false,
+                            attributeFilter : ['src']
+                        });
+                        observerLifetime = setTimeout(() => observer.disconnect(), 3000);
+                    }
+                };
+
+            crutches[that.host] && crutches[that.host]();
+        },
     },
 
     isTrash: function(node, modifier){
         let that = de_contentscript;
-        if (that.nodeTools.checkForBgSrc(node, modifier)) {
+        if (
+            that.nodeTools.checkForBgSrc(node, modifier) ||
+            that.nodeTools.deepSearchByHost(node, modifier)
+        ) {
             return false;
         }
         if (
@@ -313,6 +326,7 @@ const de_contentscript = {
             return;
         }
         that.previousSrc = src;
+        currentTarget = that.actualNode || currentTarget;
 
         de_button.show(
             that.getPositionForButton(currentTarget),
@@ -320,6 +334,7 @@ const de_contentscript = {
             that.getOriginalFilename(currentTarget)
         );
         that.bgSrc = null;
+        that.actualNode = null;
     },
 
     getOriginalSrc: function(node){
@@ -349,22 +364,22 @@ const de_contentscript = {
     getOriginalFilename: function(node){
         let getters = {
                 'boards.4chan.org': () => {
-                    let container = xpath('ancestor::div[@class="file"]//*[(@class="fileText" and @title) or self::a]');
+                    let container = xpath('ancestor::div[@class="file"]//*[(@class="fileText" and @title) or self::a]', node);
                     return container.title || container.innerHTML;
                 },
                 '2ch.hk': () => {
-                    let container = xpath('ancestor::figure[@class="image"]/figcaption/a');
+                    let container = xpath('ancestor::figure[@class="image"]/figcaption/a', node);
                     return container.title || container.innerHTML;
                 },
                 'iichan.hk': () => {
-                    return xpath('../preceding-sibling::span[@class="filesize"]/em').innerHTML.match(/([^,]+, ){2}(.+)/)[2];
+                    return xpath('../preceding-sibling::span[@class="filesize"]/em', node).innerHTML.match(/([^,]+, ){2}(.+)/)[2];
                 },
                 'boards.fireden.net': () => {
-                    let container = xpath('(../following-sibling::div[@class="post_file"]|../../preceding-sibling::div[@class="post_file"])/a[@class="post_file_filename"]');
+                    let container = xpath('(../following-sibling::div[@class="post_file"]|../../preceding-sibling::div[@class="post_file"])/a[@class="post_file_filename"]', node);
                     return container.title || container.innerHTML;
                 },
                 '8ch.net': () => {
-                    let container = xpath('../preceding-sibling::p[@class="fileinfo"]/span[@class="unimportant"]/a');
+                    let container = xpath('../preceding-sibling::p[@class="fileinfo"]/span[@class="unimportant"]/a', node);
                     return container.title || container.innerHTML;
                 },
             },
@@ -372,13 +387,10 @@ const de_contentscript = {
             getter = getters[this.host] || getters[aliases[this.host]],
             originalFilename = null;
 
-        function xpath(path){
-            return document.evaluate(path, node, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
-        }
         function tryFilenameFromDollchanImageByCenter(){
             let filenameTry;
             if (!de_contentscript.dollchanImproved) {return null;}
-            filenameTry = xpath('following-sibling::div[@class="de-img-full-info" and ancestor::div[2]/@class="de-img-center"]/a[@class="de-img-full-src" and text() != "Spoiler Image"]');
+            filenameTry = xpath('following-sibling::div[@class="de-img-full-info" and ancestor::div[2]/@class="de-img-center"]/a[@class="de-img-full-src" and text() != "Spoiler Image"]', node);
 
             return filenameTry ? filenameTry.innerHTML : null;
         }
@@ -435,5 +447,9 @@ const de_listeners = {
         window[functionName]('keyup', de_listeners.keyupListener);
     },
 };
+
+function xpath(path, contextNode){
+    return document.evaluate(path, contextNode, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
+}
 
 de_contentscript.init();
