@@ -285,7 +285,8 @@ const de_contentscript = {
             parentRect,
             offset = 6,
             reverseOffset = 38, // offset + button width (32px)
-            position = {left: null, top: null, right: null, bottom: null};
+            position = {left: null, top: null, right: null, bottom: null},
+            getMinOffset = sideSize => sideSize === 0 ? -999999 : 0; //crutch(?) for tumblr for image containers with 0px width/height
 
         let sizeGettersRegular = {
             left    : () => Math.max(0, nodeRect.left) + offset,
@@ -303,15 +304,15 @@ const de_contentscript = {
         if (this.isPositioned(node.offsetParent)) {
             parentRect = node.offsetParent.getBoundingClientRect();
             position.container = node.offsetParent;
-            position[de_settings.vertical] = Math.max(0, sizeGettersInPositioned[de_settings.vertical]()) + offset + 'px';
-            position[de_settings.horizontal] = Math.max(0, sizeGettersInPositioned[de_settings.horizontal]()) + offset + 'px';
+            position[de_settings.horizontal] = Math.max(getMinOffset(parentRect.width), sizeGettersInPositioned[de_settings.horizontal]()) + offset + 'px';
+            position[de_settings.vertical] = Math.max(getMinOffset(parentRect.height), sizeGettersInPositioned[de_settings.vertical]()) + offset + 'px';
         } else {
             position.container = document.body;
             position.left = sizeGettersRegular[de_settings.horizontal]() + window.scrollX + 'px';
             position.top = sizeGettersRegular[de_settings.vertical]() + window.scrollY + 'px';
         }
 
-        return position; // only two position properties are defined at once, other two are undefined on purpose to reset their default values
+        return position; // only two position properties are set at once, other two are null on purpose to reset their default values
     },
 
     nodeHandler: function(currentTarget, shiftKey, ctrlKey){
