@@ -62,7 +62,7 @@ const downloader = {
         }
         if (!this.filename) {
             let contentType = request.getResponseHeader('Content-Type'),
-                extension = contentType ? ('.' + contentType.match(/[\d\w]+\/([\d\w]+)/)[1].replace('jpeg', 'jpg')) : '';
+                extension = contentType ? ('.' + contentType.match(/\w+\/(\w+)/)[1].replace('jpeg', 'jpg')) : '';
 
             this.filename = (this.basename || Date.now()) + extension
         }
@@ -81,7 +81,7 @@ const downloader = {
     */
     getFilename: function(originalUrl){
         let url = decodeURI(originalUrl).replace(/^https?:\/\/([^/]+)\//, '').split(/[?#:]/)[0],
-            filenameTry = url.match(/^([^/]+\/)*([^/]+\.[\w\d]{3,4})([\/][^.]+)?$/);
+            filenameTry = url.match(/^([^/]+\/)*([^/]+\.\w{3,4})([\/][^.]+)?$/);
 
         if (filenameTry) {
             this.filename = filenameTry[2]
@@ -99,7 +99,7 @@ const downloader = {
         browser.downloads.search({
             id: downloadId
         }).then(function(downloadItems){
-            if (/\(\d+\)\.[\w\d]{3,4}$/.test(downloadItems[0].filename) === false) {return;}
+            if (/\(\d+\)\.\w{3,4}$/.test(downloadItems[0].filename) === false) {return;}
             browser.tabs.sendMessage(tabId, 'duplicate_warning');
         });
     },
