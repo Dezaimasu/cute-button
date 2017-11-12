@@ -36,15 +36,14 @@ const downloader = {
         if (this.filename) {
             this.download(downloadRequest.src, tabId);
         } else {
-            let that = this,
-                request = new XMLHttpRequest();
+            let request = new XMLHttpRequest();
             request.open('HEAD', downloadRequest.src);
-            request.onload = function(){
-                that.saveFileWithFilenameFromHeaders(downloadRequest.src, tabId, request);
+            request.onload = () => {
+                this.saveFileWithFilenameFromHeaders(downloadRequest.src, tabId, request);
             };
-            request.onerror = function(){
-                that.filename = downloadRequest.backupName;
-                that.download(downloadRequest.src, tabId);
+            request.onerror = () => {
+                this.filename = downloadRequest.backupName;
+                this.download(downloadRequest.src, tabId);
             };
             request.send();
         }
@@ -91,15 +90,15 @@ const downloader = {
     },
 
     /*
-    * If there's a number between parentheses before extension of the saved file
-    * then it's probably because of 'uniquify' conflict action of WebExt API,
+    * If resulted filename is not the same as the filename, passed to downloads.download function,
+    * then it was modified by 'uniquify' conflict action of WebExt API,
     * and user should be warned that he saved already existing file.
     */
-    checkForDuplicate: function(downloadId, tabId){
+    checkForDuplicate: function(originalFilename, downloadId, tabId){
         browser.downloads.search({
             id: downloadId
-        }).then(function(downloadItems){
-            if (/\(\d+\)\.\w{3,4}$/.test(downloadItems[0].filename) === false) {return;}
+        }).then(downloadItems => {
+            if (downloadItems[0].filename.endsWith(originalFilename)) {return;}
             browser.tabs.sendMessage(tabId, 'duplicate_warning');
         });
     },
@@ -109,15 +108,14 @@ const downloader = {
     },
 
     download: function(src, tabId){
-        let that = this;
+        let finalFilename = this.prepareWinFilename();
         browser.downloads.download({
             url: src,
-            filename: that.savePath + that.prepareWinFilename(),
+            filename: this.savePath + finalFilename,
             conflictAction: 'uniquify'
-        }).then(function(downloadId){
-            that.checkForDuplicate(downloadId, tabId);
-        }, function(error){
-            console.log(error.toString()); ///TODO maybe emit warning
-        });
+        }).then(
+            downloadId  => this.checkForDuplicate(finalFilename, downloadId, tabId),
+            error       => console.log(error.toString()) //TODO maybe emit warning
+        );
     }
 };
