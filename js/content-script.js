@@ -184,6 +184,17 @@ const de_contentscript = {
     },
 
     nodeTools: {
+        observer: new MutationObserver(mutations => de_contentscript.nodeHandler(mutations.pop().target)),
+
+        addSrcObserver: function(node){
+            this.observer.disconnect();
+            this.observer.observe(node, {
+                attributes      : true,
+                childList       : false,
+                characterData   : false,
+                attributeFilter : ['src']
+            });
+        },
         checkForBgSrc: function(node, modifier){
             let bgImg;
             if (!modifier) {return false;}
@@ -231,49 +242,28 @@ const de_contentscript = {
 
             that.actualNode = crutches[that.host] && crutches[that.host]();
             return !!that.actualNode;
-        },
-        processByHost: function(node, modifier){
-            let that = de_contentscript,
-                crutches = {
-                    'tumblr.com': () => {
-                        let observer,
-                            observerLifetime;
-                        observer = new MutationObserver(function(mutations){
-                            clearTimeout(observerLifetime);
-                            that.nodeHandler(mutations[mutations.length - 1].target, modifier);
-                            this.disconnect();
-                        });
-                        observer.observe(node, {
-                            attributes      : true,
-                            childList       : false,
-                            characterData   : false,
-                            attributeFilter : ['src']
-                        });
-                        observerLifetime = setTimeout(() => observer.disconnect(), 3000);
-                    }
-                };
-
-            crutches[that.host] && crutches[that.host]();
-        },
+        }
     },
 
     isTrash: function(node, modifier){
-        let that = de_contentscript;
+        let tools = de_contentscript.nodeTools;
         if (
-            that.nodeTools.checkForBgSrc(node, modifier) ||
-            that.nodeTools.deepSearchByHost(node, modifier)
+            tools.checkForBgSrc(node, modifier) ||
+            tools.deepSearchByHost(node, modifier)
         ) {
             return false;
         }
+        if (tools.filterByTag(node.tagName)) {
+        	return true;
+        }
+        tools.addSrcObserver(node);
         if (
-            that.nodeTools.filterByTag(node.tagName) ||
-            that.nodeTools.filterBySrc(node[that.srcLocation]) ||
-            that.nodeTools.filterByClass(node.classList)
+            tools.filterBySrc(node[de_contentscript.srcLocation]) ||
+            tools.filterByClass(node.classList)
         ) {
             return true;
         }
-        that.nodeTools.processByHost(node, modifier);
-        return that.nodeTools.filterBySize(node, modifier);
+        return tools.filterBySize(node, modifier);
     },
 
     isPositioned: function(node){
