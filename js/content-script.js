@@ -309,7 +309,7 @@ const de_contentscript = {
         let that = de_contentscript,
             src = currentTarget[that.srcLocation];
 
-        if (!currentTarget || ctrlKey || currentTarget.tagName === 'DE_CBUTTON') {return;}
+        if (!currentTarget || ctrlKey) {return;}
         if (!src || src !== that.previousSrc) {
             de_button.hide();
         }
@@ -397,6 +397,7 @@ const de_contentscript = {
 
 const de_listeners = {
     mouseoverListener: function(event){
+        if (event.target.tagName === 'DE_CBUTTON' || event.relatedTarget.tagName === 'DE_CBUTTON') {return;}
         de_contentscript.nodeHandler(event.target, event.shiftKey, event.ctrlKey);
     },
     keydownListener: function(event){
