@@ -401,7 +401,7 @@ const de_contentscript = {
 
 const de_listeners = {
     mouseoverListener: function(event){
-        if (event.target.tagName === 'DE_CBUTTON' || event.relatedTarget.tagName === 'DE_CBUTTON') {return;}
+        if (event.target.tagName === 'DE_CBUTTON' || (event.relatedTarget && event.relatedTarget.tagName === 'DE_CBUTTON')) {return;}
         de_contentscript.nodeHandler(event.target, event.shiftKey, event.ctrlKey);
     },
     keydownListener: function(event){
