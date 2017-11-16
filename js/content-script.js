@@ -184,9 +184,13 @@ const de_contentscript = {
     },
 
     nodeTools: {
-        observer: new MutationObserver(mutations => de_contentscript.nodeHandler(mutations.pop().target)),
+        observer: new MutationObserver(mutations => {
+            let target = mutations.pop().target;
+            target.addEventListener('load', e => de_contentscript.nodeHandler(target), {once: true});
+        }),
 
         addSrcObserver: function(node){
+            if (node.tagName !== 'IMG') {return;}
             this.observer.disconnect();
             this.observer.observe(node, {
                 attributes      : true,
