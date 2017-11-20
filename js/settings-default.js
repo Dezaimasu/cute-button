@@ -8,4 +8,5 @@ const settingsDefault = {
 	isCute					: true,
     position                : 'top-left',
     folders                 : [],
+    placeUnderCursor        : false,
 };

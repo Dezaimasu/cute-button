@@ -42,6 +42,7 @@ const de_settings = {
         this.folders = newSettings.folders;
         this.keysList = newSettings.folders.map(x => x.keyCode).concat([32]);
         this.defaultSavePath = newSettings.defaultSavePath;
+        this.placeUnderCursor = newSettings.placeUnderCursor;
         this.exclusions = newSettings.exclusions.split(' ');
         this.originalNameButton = newSettings.originalNameByDefault ? 0 : 2;
         [this.vertical, this.horizontal] = newSettings.position.split('-');
@@ -273,7 +274,7 @@ const de_contentscript = {
         return window.getComputedStyle(node).position !== 'static';
     },
 
-    getPositionForButton: function(node){
+    getPosition: function(node){
         let nodeRect = node.getBoundingClientRect(),
             parentRect,
             offset = 6,
@@ -308,22 +309,40 @@ const de_contentscript = {
         return position; // only two position properties are set at once, other two are null on purpose to reset their default values
     },
 
-    nodeHandler: function(currentTarget, shiftKey, ctrlKey){
+    getPositionUnderCursor: function(mouseEvent){
+        let position = {left: null, top: null, right: null, bottom: null};
+        if (!mouseEvent.target) {return null;}
+        if (mouseEvent.target.offsetParent && this.isPositioned(mouseEvent.target.offsetParent)) {
+        	position.container = mouseEvent.target.offsetParent;
+        	position.left = mouseEvent.layerX + 'px';
+        	position.top = mouseEvent.layerY + 'px';
+        } else {
+            position.container = document.body;
+            position.left = mouseEvent.clientX + window.scrollX + 'px';
+            position.top = mouseEvent.clientY + window.scrollY + 'px';
+        }
+
+        return position; // only two position properties are set at once, other two are null on purpose to reset their default values
+    },
+
+    nodeHandler: function(currentTarget, event = {}){
         let that = de_contentscript,
             src = currentTarget[that.srcLocation];
 
-        if (!currentTarget || ctrlKey) {return;}
+        // let position = {left: null, top: null, right: null, bottom: null}; //TODO pit position object initial declaration here
+
+        if (!currentTarget || event.ctrlKey) {return;}
         if (!src || src !== that.previousSrc) {
             de_button.hide();
         }
-        if (that.isTrash(currentTarget, shiftKey)) {
+        if (that.isTrash(currentTarget, event.shiftKey)) {
             return;
         }
         that.previousSrc = src;
         currentTarget = that.actualNode || currentTarget;
 
         de_button.show(
-            that.getPositionForButton(currentTarget),
+            (de_settings.placeUnderCursor && that.getPositionUnderCursor(event)) || that.getPosition(currentTarget),
             that.getOriginalSrc(currentTarget) || src || currentTarget.src || that.bgSrc,
             that.getOriginalFilename(currentTarget)
         );
@@ -401,7 +420,7 @@ const de_contentscript = {
 const de_listeners = {
     mouseoverListener: function(event){
         if (event.target.tagName === 'DE_CBUTTON' || (event.relatedTarget && event.relatedTarget.tagName === 'DE_CBUTTON')) {return;}
-        de_contentscript.nodeHandler(event.target, event.shiftKey, event.ctrlKey);
+        de_contentscript.nodeHandler(event.target, event);
     },
     keydownListener: function(event){
         if (de_listeners.isHotkeyPossible(event)) {event.preventDefault();}

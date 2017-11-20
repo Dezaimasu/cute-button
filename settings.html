@@ -7,7 +7,7 @@
 </head>
 <body>
 	<table>
-		<tr id="path-description">
+		<tr id="path-description" class="alarm">
 			<td colspan="2">
 				Save path MUST be relative to your downloads folder (you can check it on Tools -> Options -> General -> Downloads -> Save files to).
 				<br>
@@ -77,7 +77,7 @@
 			<td><input id="hideButton" type="checkbox"></td>
 		</tr>
 		<tr>
-			<td><label for="position">Button position:</label></td>
+			<td><label for="position">Button position (ignored when button placed under cursor):</label></td>
 			<td>
 				<select id="position">
 					<option value="top-left">Top left</option>
@@ -86,6 +86,10 @@
 					<option value="bottom-right">Bottom right</option>
 				</select>
 			</td>
+		</tr>
+		<tr>
+			<td><label for="placeUnderCursor">Place button under cursor (<span class="alarm">EXPERIMENTAL, very clunky</span>):</label></td>
+			<td><input id="placeUnderCursor" type="checkbox"></td>
 		</tr>
 		<tr>
 			<td><label for="file-input">Your custom cute icon:</label></td>
