@@ -15,27 +15,26 @@ const de_webextApi = {
     },
     settings: function(){
         browser.storage.onChanged.addListener(function(changes){
-            let newSettings = {};
+            let newSettings = {},
+                changesList = Object.keys(changes);
 
-            if (Object.keys(changes).toString() === 'isCute') {
+            if (changesList.toString() === 'isCute') {
                 de_listeners.switch(changes.isCute.newValue);
                 return; // click on browser_action button changes only "isCute" setting
             }
 
-            de_settings.originalNames.forEach(function(settingName){
+            changesList.forEach(function(settingName){
                 newSettings[settingName] = changes[settingName].newValue;
             });
             de_settings.setSettings(newSettings);
         });
-        browser.storage.local.get(de_settings.originalNames).then(function(items){
+        browser.storage.local.get().then(function(items){
             de_settings.setSettings(items);
         });
     }
 };
 
 const de_settings = {
-    originalNames: ['defaultSavePath', 'minSize', 'exclusions', 'icon', 'originalNameByDefault', 'hideButton', 'isCute', 'position', 'folders'],
-
     selectedSavePath: null,
 
     setSettings: function(newSettings){
