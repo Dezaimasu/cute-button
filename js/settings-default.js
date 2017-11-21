@@ -9,4 +9,5 @@ const settingsDefault = {
     position                : 'top-left',
     folders                 : [],
     placeUnderCursor        : false,
+    saveOnHover             : false,
 };

@@ -14,6 +14,9 @@ body de_cbutton#de-cute-id {
 	height: 32px;
 	width: 32px;
 }
+body de_cbutton#de-cute-id.visible {
+	visibility: visible;
+}
 body de_cbutton#de-cute-id:hover {
 	background-color: #666;
 }

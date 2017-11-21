@@ -41,6 +41,7 @@ const de_settings = {
         this.minSize = newSettings.minSize;
         this.folders = newSettings.folders;
         this.keysList = newSettings.folders.map(x => x.keyCode).concat([32]);
+        this.saveOnHover = newSettings.saveOnHover;
         this.defaultSavePath = newSettings.defaultSavePath;
         this.placeUnderCursor = newSettings.placeUnderCursor;
         this.exclusions = newSettings.exclusions.split(' ');
@@ -112,16 +113,16 @@ const de_button = {
         btnElem.style.left = position.left;
         btnElem.style.right = position.right;
         position.container.appendChild(btnElem);
-        setTimeout(() => {btnElem.style.visibility = 'visible';}, 32);
+        setTimeout(() => btnElem.classList.add('visible'), 32);
     },
 
     hide: function(){
         this.prepareDL(null, null);
-        this.elem.style.visibility = 'hidden';
+        this.elem.classList.remove('visible');
     },
 
     isVisible: function(){
-        return this.elem.style.visibility === 'visible';
+        return this.elem.classList.contains('visible');
     },
 
     emulateClick: function(buttonCode = 0){
@@ -325,13 +326,26 @@ const de_contentscript = {
         return position; // only two position properties are set at once, other two are null on purpose to reset their default values
     },
 
+    saveOnHover: function(src, originalName){
+        de_button.jerkClass('visible');
+        de_button.prepareDL(src, originalName);
+        de_webextApi.download(Object.assign(
+            {path: de_settings.defaultSavePath},
+            de_button.downloadRequest,
+            de_settings.originalNameButton === 2 ? {} : {originalName: null}
+        ));
+        de_settings.selectedSavePath = null;
+    },
+
     nodeHandler: function(currentTarget, event = {}){
         let that = de_contentscript,
-            src = currentTarget[that.srcLocation];
+            src = currentTarget[that.srcLocation],
+            finalSrc,
+            originalFilename;
 
         // let position = {left: null, top: null, right: null, bottom: null}; //TODO pit position object initial declaration here
 
-        if (!currentTarget || event.ctrlKey) {return;}
+        if (!currentTarget || (event.ctrlKey && !event.altKey)) {return;}
         if (!src || src !== that.previousSrc) {
             de_button.hide();
         }
@@ -341,11 +355,16 @@ const de_contentscript = {
         that.previousSrc = src;
         currentTarget = that.actualNode || currentTarget;
 
-        de_button.show(
-            (de_settings.placeUnderCursor && that.getPositionUnderCursor(event)) || that.getPosition(currentTarget),
-            that.getOriginalSrc(currentTarget) || src || currentTarget.src || that.bgSrc,
-            that.getOriginalFilename(currentTarget)
-        );
+        finalSrc = that.getOriginalSrc(currentTarget) || src || currentTarget.src || that.bgSrc;
+        originalFilename = that.getOriginalFilename(currentTarget);
+
+        if (event.ctrlKey && event.altKey && de_settings.saveOnHover) {
+        	that.saveOnHover(finalSrc, originalFilename);
+        } else {
+            let position = (de_settings.placeUnderCursor && that.getPositionUnderCursor(event)) || that.getPosition(currentTarget);
+            de_button.show(position, finalSrc, originalFilename);
+        }
+
         that.bgSrc = null;
         that.actualNode = null;
     },
