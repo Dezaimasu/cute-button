@@ -91,7 +91,6 @@ const de_button = {
         that.elem = document.createElement('de_cbutton');
         btnElem = that.elem;
         btnElem.id = 'de-cute-id';
-        btnElem.classList.add('de-img-full-src'); // crutch for Dollchan Extension Script for expanded by center images
         btnElem.addEventListener('click', that.disableDefaultClick);
         btnElem.addEventListener('contextmenu', that.disableDefaultClick);
         btnElem.addEventListener('mousedown', mousedownListener);
@@ -396,7 +395,7 @@ const de_contentscript = {
     getOriginalFilename: function(node){
         let getters = {
                 'boards.4chan.org': () => {
-                    let container = xpath('ancestor::div[@class="file"]//*[(@class="fileText" and @title) or self::a]', node);
+                    let container = xpath('ancestor::div[contains(concat(" ", normalize-space(@class), " "), " file ")]//*[(@class="fileText" and @title) or self::a]', node);
                     return container.title || container.innerHTML;
                 },
                 '2ch.hk': () => {
@@ -422,7 +421,7 @@ const de_contentscript = {
         function tryFilenameFromDollchanImageByCenter(){
             let filenameTry;
             if (!de_contentscript.dollchanImproved) {return null;}
-            filenameTry = xpath('following-sibling::div[@class="de-img-full-info" and ancestor::div[2]/@class="de-img-center"]/a[@class="de-img-full-src" and text() != "Spoiler Image"]', node);
+            filenameTry = xpath('following-sibling::div[@class="de-fullimg-info" and contains(ancestor::div[1]/@class, "de-fullimg-wrap-center")]/a[@class="de-fullimg-src" and text() != "Spoiler Image"]', node);
 
             return filenameTry ? filenameTry.innerHTML : null;
         }
