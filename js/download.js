@@ -79,7 +79,7 @@ const downloader = {
     * Cheers pineapple.
     */
     getFilename: function(originalUrl){
-        let url = decodeURI(originalUrl).replace(/^https?:\/\/([^/]+)\/{1,2}/, '').split(/[?#:]/)[0].replace(/\/{2,}/, '/'),
+        let url = decodeURI(originalUrl).replace(/^.*https?:\/\/([^/]+)\/+/, '').split(/[?#:]/)[0].replace(/\/{2,}/, '/'),
             filenameTry = url.match(/^([^/]+\/)*([^/]+\.\w{3,4})([\/][^.]+)?$/);
 
         if (filenameTry) {
