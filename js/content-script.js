@@ -279,7 +279,7 @@ const de_contentscript = {
             parentRect,
             offset = 6,
             reverseOffset = 38, // offset + button width (32px)
-            position = {left: null, top: null, right: null, bottom: null},
+            position = {},
             getMinOffset = sideSize => sideSize === 0 ? -999999 : 0; //crutch(?) for tumblr for image containers with 0px width/height
 
         let sizeGettersRegular = {
@@ -306,27 +306,24 @@ const de_contentscript = {
             position.top = sizeGettersRegular[de_settings.vertical]() + window.scrollY + 'px';
         }
 
-        return position; // only two position properties are set at once, other two are null on purpose to reset their default values
+        return position;
     },
 
     getPositionUnderCursor: function(mouseEvent){
-        let position = {left: null, top: null, right: null, bottom: null};
         if (!mouseEvent.target) {return null;}
-        if (mouseEvent.target.offsetParent && this.isPositioned(mouseEvent.target.offsetParent)) {
-        	position.container = mouseEvent.target.offsetParent;
-        	position.left = mouseEvent.layerX + 'px';
-        	position.top = mouseEvent.layerY + 'px';
-        } else {
-            position.container = document.body;
-            position.left = mouseEvent.clientX + window.scrollX + 'px';
-            position.top = mouseEvent.clientY + window.scrollY + 'px';
-        }
-
-        return position; // only two position properties are set at once, other two are null on purpose to reset their default values
+        return mouseEvent.target.offsetParent && this.isPositioned(mouseEvent.target.offsetParent) ? {
+            container: mouseEvent.target.offsetParent,
+            left: mouseEvent.layerX + 'px',
+            top: mouseEvent.layerY + 'px'
+        } : {
+            container: document.body,
+            left: mouseEvent.clientX + window.scrollX + 'px',
+            top: mouseEvent.clientY + window.scrollY + 'px'
+        };
     },
 
     saveOnHover: function(src, originalName){
-        de_button.jerkClass('visible');
+        de_button.jerkClass('visible'); //TODO set correct button positon before class jerking
         de_button.prepareDL(src, originalName);
         de_webextApi.download(Object.assign(
             {path: de_settings.defaultSavePath},
@@ -341,8 +338,6 @@ const de_contentscript = {
             src = currentTarget[that.srcLocation],
             finalSrc,
             originalFilename;
-
-        // let position = {left: null, top: null, right: null, bottom: null}; //TODO pit position object initial declaration here
 
         if (!currentTarget || (event.ctrlKey && !event.altKey)) {return;}
         if (!src || src !== that.previousSrc) {
@@ -360,7 +355,10 @@ const de_contentscript = {
         if (event.ctrlKey && event.altKey && de_settings.saveOnHover) {
         	that.saveOnHover(finalSrc, originalFilename);
         } else {
-            let position = (de_settings.placeUnderCursor && that.getPositionUnderCursor(event)) || that.getPosition(currentTarget);
+            let position = Object.assign(
+                {left: null, top: null, right: null, bottom: null}, // only two position properties would be set at once, other two are null on purpose to reset their default values
+                (de_settings.placeUnderCursor && that.getPositionUnderCursor(event)) || that.getPosition(currentTarget)
+            );
             de_button.show(position, finalSrc, originalFilename);
         }
 
