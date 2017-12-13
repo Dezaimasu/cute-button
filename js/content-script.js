@@ -170,9 +170,9 @@ const de_contentscript = {
 
     init: function(){
         this.host = this.getFilteredHost();
-        this.isSeparateTab = ['image/', 'video/'].indexOf(document.contentType.substr(0, 6)) > -1;
+        this.isSeparateTab = document.contentType.startsWith('image/') || document.contentType.startsWith('video/');
         this.srcLocation = this.isSeparateTab ? 'baseURI' : 'currentSrc';
-        this.dollchanImproved = !!document.querySelector('#de-main');
+        window.addEventListener('load', e => this.dollchanImproved = !!document.querySelector('#de-main'), {once: true});
 
         de_button.init();
         de_webextApi.listen();
@@ -217,7 +217,7 @@ const de_contentscript = {
             return (tagName !== 'IMG' && tagName !== 'VIDEO');
         },
         filterBySrc: function(src){
-            return (!src || src.indexOf('http') !== 0);
+            return (!src || !src.startsWith('http') || src.startsWith('https://www.google.com/recaptcha/'));
         },
         filterByClass: function(classList){
             return de_settings.exclusions.some(exclusion => classList.contains(exclusion));
