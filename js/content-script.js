@@ -322,22 +322,9 @@ const de_contentscript = {
         };
     },
 
-    saveOnHover: function(src, originalName){
-        de_button.jerkClass('visible'); //TODO set correct button positon before class jerking
-        de_button.prepareDL(src, originalName);
-        de_webextApi.download(Object.assign(
-            {path: de_settings.defaultSavePath},
-            de_button.downloadRequest,
-            de_settings.originalNameButton === 2 ? {} : {originalName: null}
-        ));
-        de_settings.selectedSavePath = null;
-    },
-
     nodeHandler: function(currentTarget, event = {}){
         let that = de_contentscript,
-            src = currentTarget[that.srcLocation],
-            finalSrc,
-            originalFilename;
+            src = currentTarget[that.srcLocation];
 
         if (!currentTarget || (event.ctrlKey && !event.altKey)) {return;}
         if (!src || src !== that.previousSrc) {
@@ -349,17 +336,18 @@ const de_contentscript = {
         that.previousSrc = src;
         currentTarget = that.actualNode || currentTarget;
 
-        finalSrc = that.getOriginalSrc(currentTarget) || src || currentTarget.src || that.bgSrc;
-        originalFilename = that.getOriginalFilename(currentTarget);
-
-        if (event.ctrlKey && event.altKey && de_settings.saveOnHover) {
-        	that.saveOnHover(finalSrc, originalFilename);
-        } else {
-            let position = Object.assign(
+        de_button.show(
+            Object.assign(
                 {left: null, top: null, right: null, bottom: null}, // only two position properties would be set at once, other two are null on purpose to reset their default values
                 (de_settings.placeUnderCursor && that.getPositionUnderCursor(event)) || that.getPosition(currentTarget)
-            );
-            de_button.show(position, finalSrc, originalFilename);
+            ),
+            that.getOriginalSrc(currentTarget) || src || currentTarget.src || that.bgSrc,
+            that.getOriginalFilename(currentTarget)
+        );
+
+        if (event.ctrlKey && event.altKey && de_settings.saveOnHover) {
+            de_button.emulateClick();
+            de_button.jerkClass('visible');
         }
 
         that.bgSrc = null;
