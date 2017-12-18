@@ -42,6 +42,7 @@ const de_settings = {
         this.folders = newSettings.folders;
         this.keysList = newSettings.folders.map(x => x.keyCode).concat([32]);
         this.saveOnHover = newSettings.saveOnHover;
+        this.showSaveDialog = newSettings.showSaveDialog;
         this.defaultSavePath = newSettings.defaultSavePath;
         this.placeUnderCursor = newSettings.placeUnderCursor;
         this.exclusions = newSettings.exclusions.split(' ');
@@ -56,9 +57,10 @@ const de_settings = {
 const de_button = {
     elem: null,
     downloadRequest: {
-        src         : null,
-        originalName: null,
-        backupName  : null
+        src             : null,
+        originalName    : null,
+        backupName      : null,
+        showSaveDialog  : null,
     },
 
     init: function(){
@@ -137,9 +139,10 @@ const de_button = {
 
     prepareDL: function(src, originalName){
         this.downloadRequest = {
-            src: src,
-            originalName: originalName,
-            backupName: (src && de_contentscript.isSeparateTab) ? document.title : null
+            src             : src,
+            originalName    : originalName,
+            backupName      : (src && de_contentscript.isSeparateTab) ? document.title : null,
+            showSaveDialog  : de_settings.showSaveDialog
         };
     },
 

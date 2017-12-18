@@ -34,7 +34,7 @@ const downloader = {
         }
 
         if (this.filename) {
-            this.download(downloadRequest.src, tabId);
+            this.download(downloadRequest.src, tabId, downloadRequest.showSaveDialog);
         } else {
             let request = new XMLHttpRequest();
             request.open('HEAD', downloadRequest.src);
@@ -43,7 +43,7 @@ const downloader = {
             };
             request.onerror = () => {
                 this.filename = downloadRequest.backupName;
-                this.download(downloadRequest.src, tabId);
+                this.download(downloadRequest.src, tabId, downloadRequest.showSaveDialog);
             };
             request.send();
         }
@@ -107,11 +107,12 @@ const downloader = {
         return decodeURIComponent(this.filename).replace(/[/\\:*?"<>|\x09]/g, '');
     },
 
-    download: function(src, tabId){
+    download: function(src, tabId, showSaveDialog){
         let finalFilename = this.prepareWinFilename();
         browser.downloads.download({
             url: src,
             filename: this.savePath + finalFilename,
+            saveAs: showSaveDialog,
             conflictAction: 'uniquify'
         }).then(
             downloadId  => this.checkForDuplicate(finalFilename, downloadId, tabId),

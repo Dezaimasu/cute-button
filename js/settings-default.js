@@ -10,4 +10,5 @@ const settingsDefault = {
     folders                 : [],
     placeUnderCursor        : false,
     saveOnHover             : false,
+    showSaveDialog          : false,
 };
