@@ -31,7 +31,7 @@ const de_webextApi = {
         browser.storage.local.get().then(function(items){
             de_settings.setSettings(items);
         });
-    }
+    },
 };
 
 const de_settings = {
@@ -159,7 +159,7 @@ const de_button = {
         clpbrd.select();
         document.execCommand('copy');
         body.removeChild(clpbrd);
-    }
+    },
 };
 
 const de_contentscript = {
@@ -249,7 +249,7 @@ const de_contentscript = {
 
             that.actualNode = crutches[that.host] && crutches[that.host]();
             return !!that.actualNode;
-        }
+        },
     },
 
     isTrash: function(node, modifier){
@@ -421,7 +421,7 @@ const de_contentscript = {
         } catch (e) {} //tfw still no safe navigation operator
 
         return originalFilename;
-    }
+    },
 };
 
 const de_listeners = {

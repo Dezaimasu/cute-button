@@ -118,5 +118,5 @@ const downloader = {
             downloadId  => this.checkForDuplicate(finalFilename, downloadId, tabId),
             error       => console.log(error.toString()) //TODO maybe emit warning
         );
-    }
+    },
 };
