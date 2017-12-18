@@ -11,4 +11,5 @@ const settingsDefault = {
     placeUnderCursor        : false,
     saveOnHover             : false,
     showSaveDialog          : false,
+    forbidDuplicateFiles    : true,
 };

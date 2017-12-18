@@ -45,6 +45,7 @@ const de_settings = {
         this.showSaveDialog = newSettings.showSaveDialog;
         this.defaultSavePath = newSettings.defaultSavePath;
         this.placeUnderCursor = newSettings.placeUnderCursor;
+        this.forbidDuplicateFiles = newSettings.forbidDuplicateFiles;
         this.exclusions = newSettings.exclusions.split(' ');
         this.originalNameButton = newSettings.originalNameByDefault ? 0 : 2;
         [this.vertical, this.horizontal] = newSettings.position.split('-');
@@ -68,23 +69,26 @@ const de_button = {
             btnElem;
 
         function mouseupListener(event){
+            let downloadRequest = Object.assign(
+                    {path: de_settings.selectedSavePath || de_settings.defaultSavePath},
+                    that.downloadRequest,
+                    that.isOriginalNameButton(event) ? {} : {originalName: null}
+                ),
+                historyEntry = JSON.stringify(downloadRequest);
+
             that.disableDefaultClick(event);
             if (
                 !btnElem.classList.contains('click') ||
                 !that.downloadRequest.src ||
-                de_contentscript.recentUrls.includes(that.downloadRequest.src)
+                de_contentscript.downloadsHistory.includes(historyEntry)
             ) {
                 btnElem.classList.remove('click');
                 return;
             }
 
-            de_webextApi.download(Object.assign(
-                {path: de_settings.selectedSavePath || de_settings.defaultSavePath},
-                that.downloadRequest,
-                that.isOriginalNameButton(event) ? {} : {originalName: null}
-            ));
-            de_contentscript.rememberUrl(that.downloadRequest.src);
+            de_webextApi.download(downloadRequest);
             de_settings.selectedSavePath = null;
+            de_contentscript.rememberDownload(historyEntry);
             if (event.button === 1) {
                 that.copyToClipboard(that.downloadRequest.src);
             }
@@ -178,7 +182,8 @@ const de_contentscript = {
     previousSrc     : null,
     isSeparateTab   : null,
     dollchanImproved: null,
-    recentUrls      : [],
+    historyTimer    : null,
+    downloadsHistory: [],
 
     init: function(){
         this.host = this.getFilteredHost();
@@ -195,9 +200,17 @@ const de_contentscript = {
         return document.location.host.replace(/^www\./, '').replace(/(.*)\.(tumblr\.com)$/, '$2');
     },
 
-    rememberUrl: function(url){
+    rememberDownload: function(url){
         let historyLen = 50;
-        (this.recentUrls = this.recentUrls.slice(-historyLen + 1)).push(url);
+        if (!de_settings.forbidDuplicateFiles) {return;}
+        (this.downloadsHistory = this.downloadsHistory.slice(-historyLen + 1)).push(url);
+        this.refreshHistoryLifetime();
+    },
+
+    refreshHistoryLifetime: function(){
+        let historyLifetime = 300000; // 5 minutes
+        clearTimeout(this.historyTimer);
+        this.historyTimer = setTimeout(() => this.downloadsHistory = [], historyLifetime);
     },
 
     nodeTools: {

@@ -30,7 +30,6 @@ function resetOptions(){
     refreshIcon();
     refreshFolders(settingsDefault.folders);
     enableSave();
-    showMessage('Options resetted to default values.');
 }
 
 function getValue(optionName){
@@ -189,7 +188,7 @@ function init(){
     elem['save'].addEventListener('click', function(){
         if (allSavePathsAreValid()) {
             saveOptions();
-            showMessage('Options saved.');
+            showMessage('Settings saved.');
         } else {
             disableSave();
             showMessage('Absolute path is not allowed. Read the rules above.', 'error');
