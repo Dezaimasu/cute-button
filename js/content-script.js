@@ -69,13 +69,21 @@ const de_button = {
 
         function mouseupListener(event){
             that.disableDefaultClick(event);
-            if (!btnElem.classList.contains('click') || !that.downloadRequest.src) {return;}
+            if (
+                !btnElem.classList.contains('click') ||
+                !that.downloadRequest.src ||
+                de_contentscript.recentUrls.includes(that.downloadRequest.src)
+            ) {
+                btnElem.classList.remove('click');
+                return;
+            }
 
             de_webextApi.download(Object.assign(
                 {path: de_settings.selectedSavePath || de_settings.defaultSavePath},
                 that.downloadRequest,
                 that.isOriginalNameButton(event) ? {} : {originalName: null}
             ));
+            de_contentscript.rememberUrl(that.downloadRequest.src);
             de_settings.selectedSavePath = null;
             if (event.button === 1) {
                 that.copyToClipboard(that.downloadRequest.src);
@@ -170,6 +178,7 @@ const de_contentscript = {
     previousSrc     : null,
     isSeparateTab   : null,
     dollchanImproved: null,
+    recentUrls      : [],
 
     init: function(){
         this.host = this.getFilteredHost();
@@ -184,6 +193,11 @@ const de_contentscript = {
 
     getFilteredHost: function(){
         return document.location.host.replace(/^www\./, '').replace(/(.*)\.(tumblr\.com)$/, '$2');
+    },
+
+    rememberUrl: function(url){
+        let historyLen = 50;
+        (this.recentUrls = this.recentUrls.slice(-historyLen + 1)).push(url);
     },
 
     nodeTools: {
