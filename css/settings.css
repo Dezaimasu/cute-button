@@ -9,7 +9,6 @@ td:first-child {
 	padding: 6px 10px;
 	height: 25px;
 }
-input#defaultSavePath,
 input#exclusions,
 input.path {
 	width: 400px;
@@ -24,6 +23,12 @@ button#reset {
 }
 .alarm {
 	color: #D66;
+}
+.error {
+	color: red;
+}
+.invalid-path {
+	border: 2px solid red;
 }
 #icon-container {
 	vertical-align: bottom;

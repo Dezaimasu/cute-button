@@ -8,27 +8,37 @@ let folders;
 */
 function loadOptions(){
     browser.storage.local.get(settingsDefault).then(function(result){
-        Object.keys(settingsDefault).forEach(key => setting[key][setting[key].dataset.valueLocation] = result[key]);
+        Object.keys(settingsDefault).forEach(optionName => setValue(optionName, result[optionName]));
         refreshIcon();
         refreshFolders(result.folders);
         saveOptions();
+        document.querySelectorAll('.path').forEach(pathElem => checkSavePath(pathElem)); // to check previously saved invalid paths; could be removed later
     });
 }
 
 function saveOptions(){
     let newSettings = {};
     prepareCurrentFoldersForSave();
-    Object.keys(settingsDefault).forEach(key => newSettings[key] = setting[key][setting[key].dataset.valueLocation]);
+    Object.keys(settingsDefault).forEach(optionName => newSettings[optionName] = getValue(optionName));
     newSettings.folders = folders;
     browser.storage.local.set(newSettings);
     disableSave();
 }
 
 function resetOptions(){
-    Object.keys(settingsDefault).forEach(key => setting[key][setting[key].dataset.valueLocation] = settingsDefault[key]);
+    Object.keys(settingsDefault).forEach(optionName => setValue(optionName, settingsDefault[optionName]));
     refreshIcon();
     refreshFolders(settingsDefault.folders);
     enableSave();
+    showMessage('Options resetted to default values.');
+}
+
+function getValue(optionName){
+    return setting[optionName][setting[optionName].dataset.valueLocation];
+}
+
+function setValue(optionName, optionValue){
+    setting[optionName][setting[optionName].dataset.valueLocation] = optionValue;
 }
 
 function disableSave(){
@@ -37,6 +47,15 @@ function disableSave(){
 
 function enableSave(){
     elem['save'].disabled = false;
+}
+
+function showMessage(message, type){
+    elem['message'].innerHTML = message;
+    elem['message'].classList.add(type);
+    setTimeout(function(){
+        elem['message'].innerHTML = '';
+        elem['message'].classList.remove(type);
+    }, 3000);
 }
 
 /*
@@ -51,7 +70,7 @@ function fileInputListener(){
     reader.readAsDataURL(elem['file-input'].files[0]);
     reader.onload = function(){
         if (reader.result.length > 2097152) {
-            console.log(reader.result.length); //TODO add proper error message
+            showMessage('File is too big (~2MB maximum).', 'error');
             return;
         }
         setting['icon'].value = 'url("' + reader.result + '")';
@@ -119,11 +138,29 @@ function buildFolderSettings(folderElem){
 }
 
 /*
+-------------------- Save path --------------------
+*/
+
+function allSavePathsAreValid(){
+    return !document.querySelector('.invalid-path');
+}
+
+function checkSavePath(pathElem){
+    let isValid = isValidPath(pathElem.value);
+    pathElem.classList.toggle('invalid-path', !isValid);
+    return isValid;
+}
+
+function isValidPath(path){
+    return !/^(\s*([A-Z]:)|(\\)|(\/))/i.test(path);
+}
+
+/*
 -------------------- Initialization --------------------
 */
 function initSelectors(){
     let settingsElems = Object.keys(settingsDefault),
-        otherElems = ['blank-folder', 'add-folder', 'add-folder-container', 'save', 'reset', 'file-input', 'de-cute-id'];
+        otherElems = ['blank-folder', 'add-folder', 'add-folder-container', 'save', 'reset', 'file-input', 'message', 'de-cute-id'];
 
     settingsElems.forEach(function(name){
         setting[name] = document.querySelector('#' + name);
@@ -135,15 +172,29 @@ function initSelectors(){
 }
 
 function enableInputListeners(inputsContainer){
-    inputsContainer.querySelectorAll('select, input').forEach(editableElem => editableElem.addEventListener('input', enableSave));
+    inputsContainer.querySelectorAll('select, input').forEach(function(editableElem){
+        editableElem.addEventListener('input', function(event){
+            enableSave();
+            if (!event.target.classList.contains('path')) {return;}
+            checkSavePath(event.target);
+        });
+    });
 }
 
 function init(){
     initSelectors();
 
     elem['file-input'].addEventListener('change', fileInputListener);
-    elem['save'].addEventListener('click', saveOptions);
     elem['reset'].addEventListener('click', resetOptions);
+    elem['save'].addEventListener('click', function(){
+        if (allSavePathsAreValid()) {
+            saveOptions();
+            showMessage('Options saved.');
+        } else {
+            disableSave();
+            showMessage('Absolute path is not allowed. Read the rules above.', 'error');
+        }
+    });
     elem['add-folder'].addEventListener('click', function(event){
         addNewFolder();
         enableSave();
