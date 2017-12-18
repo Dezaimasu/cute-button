@@ -49,10 +49,10 @@ function enableSave(){
 }
 
 function showMessage(message, type){
-    elem['message'].innerHTML = message;
+    elem['message'].textContent = message;
     elem['message'].classList.add(type);
     setTimeout(function(){
-        elem['message'].innerHTML = '';
+        elem['message'].textContent = '';
         elem['message'].classList.remove(type);
     }, 3000);
 }
