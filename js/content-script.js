@@ -412,22 +412,22 @@ const de_contentscript = {
         let getters = {
                 'boards.4chan.org': () => {
                     let container = xpath('ancestor::div[contains(concat(" ", normalize-space(@class), " "), " file ")]//*[(@class="fileText" and @title) or self::a]', node);
-                    return container.title || container.innerHTML;
+                    return container.title || container.textContent;
                 },
                 '2ch.hk': () => {
                     let container = xpath('ancestor::figure[@class="image"]/figcaption/a', node);
-                    return container.title || container.innerHTML;
+                    return container.title || container.textContent;
                 },
                 'iichan.hk': () => {
-                    return xpath('../preceding-sibling::span[@class="filesize"]/em', node).innerHTML.match(/([^,]+, ){2}(.+)/)[2];
+                    return xpath('../preceding-sibling::span[@class="filesize"]/em', node).textContent.split(', ')[2];
                 },
                 'boards.fireden.net': () => {
                     let container = xpath('(../following-sibling::div[@class="post_file"]|../../preceding-sibling::div[@class="post_file"])/a[@class="post_file_filename"]', node);
-                    return container.title || container.innerHTML;
+                    return container.title || container.textContent;
                 },
                 '8ch.net': () => {
                     let container = xpath('../preceding-sibling::p[@class="fileinfo"]/span[@class="unimportant"]/a', node);
-                    return container.title || container.innerHTML;
+                    return container.title || container.textContent;
                 },
             },
             aliases = {'yuki.la': 'boards.4chan.org'},
@@ -439,7 +439,7 @@ const de_contentscript = {
             if (!de_contentscript.dollchanImproved) {return null;}
             filenameTry = xpath('following-sibling::div[@class="de-fullimg-info" and contains(ancestor::div[1]/@class, "de-fullimg-wrap-center")]/a[@class="de-fullimg-src" and text() != "Spoiler Image"]', node);
 
-            return filenameTry ? filenameTry.innerHTML : null;
+            return filenameTry ? filenameTry.textContent : null;
         }
 
         if (!getter || this.isSeparateTab) {return null;}
