@@ -1,15 +1,16 @@
 {
 	"manifest_version": 2,
 	"name": "Cute Save Button",
-	"version": "0.4.9",
-	"description": "Little button to save images and webms in one click or with any hotkey. Praise cute!",
+	"version": "0.5.0pre1",
+	"description": "Little button to save images and webms in one click or with any hotkeys. Praise cute!",
 	"author": "Deil",
 	"icons": {
 		"48": "bestgirl.png"
 	},
 	"permissions": [
 		"downloads",
-		"storage"
+		"storage",
+		"*://*/*"
 	],
 	"background": {
 		"scripts": [

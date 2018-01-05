@@ -42,7 +42,8 @@ const downloader = {
                 this.saveFileWithFilenameFromHeaders(downloadRequest.src, tabId, request);
             };
             request.onerror = () => {
-                this.filename = downloadRequest.backupName;
+                let filenameTry = downloadRequest.backupName.match(/[^\s]+\.(jpg|jpeg|png|gif|bmp|webm|mp4|ogg)/i);
+                this.filename = filenameTry ? filenameTry[0] : downloadRequest.backupName;
                 this.download(downloadRequest.src, tabId, downloadRequest.showSaveDialog);
             };
             request.send();
@@ -74,13 +75,13 @@ const downloader = {
     * Usually filename is located at the end, after last "/" symbol, but sometimes
     * it might be somewhere in the middle between "/" symbols.
     * That's why it's important to extract filename manually by looking at last sub-string
-    * with extension (dot and 3-4 symbols) located between "/" symbols.
+    * with pre-known extension located between "/" symbols.
     * WebExt API is incapable of extracting such filenames.
     * Cheers pineapple.
     */
     getFilename: function(originalUrl){
         let url = decodeURI(originalUrl).replace(/^.*https?:\/\/([^/]+)\/+/, '').split(/[?#:]/)[0].replace(/\/{2,}/, '/'),
-            filenameTry = url.match(/^([^/]+\/)*([^/]+\.\w{3,4})([\/][^.]+)?$/);
+            filenameTry = url.match(/^([^/]+\/)*([^/]+\.(jpg|jpeg|png|gif|bmp|webm|mp4|ogg))([\/][^.]+)?$/i);
 
         if (filenameTry) {
             this.filename = filenameTry[2]

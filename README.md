@@ -2,7 +2,7 @@
 
 # Cute Save Button
 
-**Little button to save images and webms in one click or with any hotkey. Praise cute!**
+**Little button to save images and webms in one click or with any hotkeys. Praise cute!**
 
 https://addons.mozilla.org/en-US/firefox/addon/cute-save-button/
 
