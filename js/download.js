@@ -36,18 +36,26 @@ const downloader = {
         if (this.filename) {
             this.download(downloadRequest.src, tabId, downloadRequest.showSaveDialog);
         } else {
-            let request = new XMLHttpRequest();
-            request.open('HEAD', downloadRequest.src);
-            request.onload = () => {
-                this.saveFileWithFilenameFromHeaders(downloadRequest.src, tabId, request);
-            };
-            request.onerror = () => {
-                let filenameTry = downloadRequest.backupName.match(/[^\s]+\.(jpg|jpeg|png|gif|bmp|webm|mp4|ogg)/i);
-                this.filename = filenameTry ? filenameTry[0] : downloadRequest.backupName;
-                this.download(downloadRequest.src, tabId, downloadRequest.showSaveDialog);
-            };
-            request.send();
+            this.getHeadersAndDownload(downloadRequest, tabId);
         }
+    },
+
+    getHeadersAndDownload: function(downloadRequest, tabId, requestType = 'HEAD'){
+        let request = new XMLHttpRequest();
+        request.open(requestType, downloadRequest.src);
+        request.onload = () => {
+            if (requestType === 'HEAD' && request.status === 501) { // HEAD request method is not implemented by server
+                this.getHeadersAndDownload(downloadRequest, tabId, 'GET');
+                return;
+            }
+            this.saveFileWithFilenameFromHeaders(downloadRequest.src, tabId, request);
+        };
+        request.onerror = () => {
+            let filenameTry = downloadRequest.backupName.match(/[^\s]+\.(jpg|jpeg|png|gif|bmp|webm|mp4|ogg)/i);
+            this.filename = filenameTry ? filenameTry[0] : downloadRequest.backupName;
+            this.download(downloadRequest.src, tabId, downloadRequest.showSaveDialog);
+        };
+        request.send();
     },
 
     saveFileWithFilenameFromHeaders: function(src, tabId, request){
