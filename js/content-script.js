@@ -256,7 +256,7 @@ const de_contentscript = {
             let that = de_contentscript,
                 buttonPlaceholderSize = 50;
 
-            if (node.tagName === 'IMG' && node.width < buttonPlaceholderSize && node.height < buttonPlaceholderSize) {
+            if (node.tagName === 'IMG' && (node.width < buttonPlaceholderSize || node.height < buttonPlaceholderSize)) {
                 return true;
             }
             if (that.isSeparateTab || node.tagName === 'VIDEO' || modifier) {
