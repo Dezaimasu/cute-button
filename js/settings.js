@@ -17,7 +17,7 @@ function loadOptions(){
 }
 
 function saveOptions(){
-    let newSettings = {};
+    const newSettings = {};
     prepareCurrentFoldersForSave();
     Object.keys(settingsDefault).forEach(optionName => newSettings[optionName] = getValue(optionName));
     newSettings.folders = folders;
@@ -65,7 +65,7 @@ function refreshIcon(){
 }
 
 function fileInputListener(){
-    let reader = new FileReader();
+    const reader = new FileReader();
     reader.readAsDataURL(elem['file-input'].files[0]);
     reader.onload = function(){
         if (reader.result.length > 2097152) {
@@ -87,9 +87,9 @@ function refreshFolders(foldersSettings){
 }
 
 function prepareCurrentFoldersForSave(){
-    let currentFoldersList = [];
+    const currentFoldersList = [];
     document.querySelectorAll('.folder').forEach(function(folderElem){
-        let folderSettings = buildFolderSettings(folderElem);
+        const folderSettings = buildFolderSettings(folderElem);
         if (!folderSettings.key || !folderSettings.keyCode) {return;}
         currentFoldersList.push(folderSettings);
     });
@@ -97,7 +97,7 @@ function prepareCurrentFoldersForSave(){
 }
 
 function addNewFolder(folderSettings = null){
-    let newFolder = elem['blank-folder'].cloneNode(true);
+    const newFolder = elem['blank-folder'].cloneNode(true);
 
     newFolder.removeAttribute('id');
     newFolder.querySelector('.key').addEventListener('keyup', keyInputListener);
@@ -145,7 +145,7 @@ function allSavePathsAreValid(){
 }
 
 function checkSavePath(pathElem){
-    let isValid = isValidPath(pathElem.value);
+    const isValid = isValidPath(pathElem.value);
     pathElem.classList.toggle('invalid-path', !isValid);
     return isValid;
 }
@@ -158,7 +158,7 @@ function isValidPath(path){
 -------------------- Initialization --------------------
 */
 function initSelectors(){
-    let settingsElems = Object.keys(settingsDefault),
+    const settingsElems = Object.keys(settingsDefault),
         otherElems = ['blank-folder', 'add-folder', 'add-folder-container', 'save', 'reset', 'file-input', 'message', 'de-cute-id'];
 
     settingsElems.forEach(function(name){

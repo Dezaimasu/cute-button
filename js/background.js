@@ -12,7 +12,7 @@ browser.runtime.onInstalled.addListener(initSettings);
 function initSettings(){
     browser.runtime.onInstalled.removeListener(initSettings);
     browser.storage.local.get().then(function(currentSettings){
-        let actualSettingsNames = Object.keys(settingsDefault),
+        const actualSettingsNames = Object.keys(settingsDefault),
             currentSettingsNames = Object.keys(currentSettings),
             newSettings = {},
             newSettingsList = arrayDiff(actualSettingsNames, currentSettingsNames),
@@ -37,7 +37,7 @@ function arrayDiff(arr1, arr2){
 
 /* Turns on/off content script across all tabs */
 function setCuteState(state){
-    let stateProps = state ? {text: 'on', color: '#6D6'} : {text: 'off', color: '#D66'};
+    const stateProps = state ? {text: 'on', color: '#6D6'} : {text: 'off', color: '#D66'};
 
     isCute = state;
     browser.browserAction.setBadgeText({text: stateProps.text});

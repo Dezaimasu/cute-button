@@ -41,7 +41,7 @@ const downloader = {
     },
 
     getHeadersAndDownload: function(downloadRequest, tabId, requestType = 'HEAD'){
-        let request = new XMLHttpRequest();
+        const request = new XMLHttpRequest();
         request.open(requestType, downloadRequest.src);
         request.onload = () => {
             if (requestType === 'HEAD' && request.status === 501) { // HEAD request method is not implemented by server
@@ -51,7 +51,7 @@ const downloader = {
             this.saveFileWithFilenameFromHeaders(downloadRequest.src, tabId, request);
         };
         request.onerror = () => {
-            let filenameTry = downloadRequest.backupName.match(/[^\s]+\.(jpg|jpeg|png|gif|bmp|webm|mp4|ogg)/i);
+            const filenameTry = downloadRequest.backupName.match(/[^\s]+\.(jpg|jpeg|png|gif|bmp|webm|mp4|ogg)/i);
             this.filename = filenameTry ? filenameTry[0] : downloadRequest.backupName;
             this.download(downloadRequest.src, tabId, downloadRequest.showSaveDialog);
         };
@@ -59,8 +59,8 @@ const downloader = {
     },
 
     saveFileWithFilenameFromHeaders: function(src, tabId, request){
-        let contentDisposition = request.getResponseHeader('Content-Disposition'),
-            tmpFilename;
+        const contentDisposition = request.getResponseHeader('Content-Disposition');
+        let tmpFilename;
 
         if (contentDisposition) {
             tmpFilename = contentDisposition.match(/^.+filename\*?=(.{0,20}')?([^;]*);?$/i);
@@ -69,7 +69,7 @@ const downloader = {
             }
         }
         if (!this.filename) {
-            let contentType = request.getResponseHeader('Content-Type'),
+            const contentType = request.getResponseHeader('Content-Type'),
                 extension = contentType ? ('.' + contentType.match(/\w+\/(\w+)/)[1].replace('jpeg', 'jpg')) : '';
 
             this.filename = (this.basename || Date.now()) + extension
@@ -88,7 +88,7 @@ const downloader = {
     * Cheers pineapple.
     */
     getFilename: function(originalUrl){
-        let url = decodeURI(originalUrl).replace(/^.*https?:\/\/([^/]+)\/+/, '').split(/[?#:]/)[0].replace(/\/{2,}/, '/'),
+        const url = decodeURI(originalUrl).replace(/^.*https?:\/\/([^/]+)\/+/, '').split(/[?#:]/)[0].replace(/\/{2,}/, '/'),
             filenameTry = url.match(/^([^/]+\/)*([^/]+\.(jpg|jpeg|png|gif|bmp|webm|mp4|ogg))([\/][^.]+)?$/i);
 
         if (filenameTry) {
@@ -117,7 +117,7 @@ const downloader = {
     },
 
     download: function(src, tabId, showSaveDialog){
-        let finalFilename = this.prepareWinFilename();
+        const finalFilename = this.prepareWinFilename();
         browser.downloads.download({
             url: src,
             filename: this.savePath + finalFilename,

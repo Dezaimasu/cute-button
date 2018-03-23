@@ -15,7 +15,7 @@ const de_webextApi = {
     },
     settings: function(){
         browser.storage.onChanged.addListener(function(changes){
-            let newSettings = {},
+            const newSettings = {},
                 changesList = Object.keys(changes);
 
             if (changesList.toString() === 'isCute') {
@@ -65,11 +65,11 @@ const de_button = {
     },
 
     init: function(){
-        let that = this,
-            btnElem;
+        const that = this;
+        let btnElem;
 
         function mouseupListener(event){
-            let downloadRequest = Object.assign(
+            const downloadRequest = Object.assign(
                     {path: de_settings.selectedSavePath || de_settings.defaultSavePath},
                     that.downloadRequest,
                     that.isOriginalNameButton(event) ? {} : {originalName: null}
@@ -118,7 +118,7 @@ const de_button = {
     },
 
     show: function(position, src, originalName){
-        let btnElem = this.elem;
+        const btnElem = this.elem;
 
         this.prepareDL(src, originalName);
         btnElem.style.top = position.top;
@@ -144,7 +144,7 @@ const de_button = {
     },
 
     jerkClass: function(...classNames){
-        let buttonClasses = this.elem.classList;
+        const buttonClasses = this.elem.classList;
         buttonClasses.add(...classNames);
         setTimeout(() => buttonClasses.remove(...classNames), 100);
     },
@@ -163,7 +163,7 @@ const de_button = {
     },
 
     copyToClipboard: function(string){
-        let clpbrd = document.createElement('input'),
+        const clpbrd = document.createElement('input'),
             body = document.body;
 
         body.appendChild(clpbrd);
@@ -201,21 +201,21 @@ const de_contentscript = {
     },
 
     rememberDownload: function(url){
-        let historyLen = 50;
+        const historyLen = 50;
         if (!de_settings.forbidDuplicateFiles) {return;}
         (this.downloadsHistory = this.downloadsHistory.slice(-historyLen + 1)).push(url);
         this.refreshHistoryLifetime();
     },
 
     refreshHistoryLifetime: function(){
-        let historyLifetime = 300000; // 5 minutes
+        const historyLifetime = 300000; // 5 minutes
         clearTimeout(this.historyTimer);
         this.historyTimer = setTimeout(() => this.downloadsHistory = [], historyLifetime);
     },
 
     nodeTools: {
         observer: new MutationObserver(mutations => {
-            let target = mutations.pop().target;
+            const target = mutations.pop().target;
             target.addEventListener('load', e => de_contentscript.nodeHandler(target), {once: true});
         }),
 
@@ -235,7 +235,7 @@ const de_contentscript = {
 
             bgImg = getComputedStyle(node).getPropertyValue('background-image');
             if (bgImg) {
-                let bgUrlMatches = bgImg.match(/^url\([\s"']*(https?:\/\/[^\s"']+)[\s"']*\).*/i);
+                const bgUrlMatches = bgImg.match(/^url\([\s"']*(https?:\/\/[^\s"']+)[\s"']*\).*/i);
                 if (bgUrlMatches) {
                     de_contentscript.bgSrc = bgUrlMatches[1];
                     return true;
@@ -253,13 +253,11 @@ const de_contentscript = {
             return de_settings.exclusions.some(exclusion => classList.contains(exclusion));
         },
         filterBySize: function(node, modifier){
-            let that = de_contentscript,
-                buttonPlaceholderSize = 50;
-
+            const buttonPlaceholderSize = 50;
             if (node.tagName === 'IMG' && (node.width < buttonPlaceholderSize || node.height < buttonPlaceholderSize)) {
                 return true;
             }
-            if (that.isSeparateTab || node.tagName === 'VIDEO' || modifier) {
+            if (de_contentscript.isSeparateTab || node.tagName === 'VIDEO' || modifier) {
                 return false;
             }
             if (node.complete && !(node.naturalWidth < de_settings.minSize || node.naturalHeight < de_settings.minSize)) {
@@ -268,7 +266,7 @@ const de_contentscript = {
             return (node.width < de_settings.minSize || node.height < de_settings.minSize);
         },
         deepSearchByHost: function(node, modifier){
-            let that = de_contentscript,
+            const that = de_contentscript,
                 crutches = {
                     'twitter.com': () => xpath('self::div[contains(@class, "GalleryNav")]/preceding-sibling::div[@class="Gallery-media"]/img', node)
                 };
@@ -280,7 +278,7 @@ const de_contentscript = {
     },
 
     isTrash: function(node, modifier){
-        let tools = de_contentscript.nodeTools;
+        const tools = de_contentscript.nodeTools;
         if (
             tools.checkForBgSrc(node, modifier) ||
             tools.deepSearchByHost(node, modifier)
@@ -305,20 +303,20 @@ const de_contentscript = {
     },
 
     getPosition: function(node){
-        let nodeRect = node.getBoundingClientRect(),
-            parentRect,
+        const nodeRect = node.getBoundingClientRect(),
             offset = 6,
             reverseOffset = 38, // offset + button width (32px)
             position = {},
             getMinOffset = sideSize => sideSize === 0 ? -999999 : 0; //crutch(?) for tumblr for image containers with 0px width/height
+        let parentRect;
 
-        let sizeGettersRegular = {
+        const sizeGettersRegular = {
             left    : () => Math.max(0, nodeRect.left) + offset,
             top     : () => Math.max(0, nodeRect.top) + offset,
             right   : () => Math.min(document.documentElement.clientWidth, nodeRect.right) - reverseOffset,
             bottom  : () => Math.min(document.documentElement.clientHeight, nodeRect.bottom) - reverseOffset,
         };
-        let sizeGettersInPositioned = {
+        const sizeGettersInPositioned = {
             left    : () => nodeRect.left - parentRect.left - Math.min(0, nodeRect.left),
             top     : () => nodeRect.top - parentRect.top - Math.min(0, nodeRect.top),
             right   : () => parentRect.right - nodeRect.right + Math.max(0, nodeRect.right - document.documentElement.clientWidth),
@@ -353,7 +351,7 @@ const de_contentscript = {
     },
 
     nodeHandler: function(currentTarget, event = {}){
-        let that = de_contentscript,
+        const that = de_contentscript,
             src = currentTarget[that.srcLocation];
 
         if (!currentTarget || (event.ctrlKey && !event.altKey)) {return;}
@@ -385,9 +383,9 @@ const de_contentscript = {
     },
 
     getOriginalSrc: function(node){
-        let getters = {
+        const getters = {
                 'vk.com': function(){
-                    let info = JSON.parse(node.getAttribute('onclick').match(/^.*"?temp"? *: *({[^{}]+}).*$/)[1]);
+                    const info = JSON.parse(node.getAttribute('onclick').match(/^.*"?temp"? *: *({[^{}]+}).*$/)[1]);
                     return info['base'] + (info['w_'] || info['z_'] || info['y_'])[0] + '.jpg';
                 },
                 'twitter.com': function(){
@@ -397,8 +395,8 @@ const de_contentscript = {
                     return node.currentSrc.replace(/(tumblr_[a-z0-9]+)(_\d{2,3}).(jpg|jpeg|png)$/i, '$1_1280.$3');
                 },
             },
-            getter = getters[this.host],
-            originalSrc = null;
+            getter = getters[this.host];
+        let originalSrc = null;
 
         if (!getter || this.isSeparateTab) {return null;}
         try {
@@ -409,30 +407,30 @@ const de_contentscript = {
     },
 
     getOriginalFilename: function(node){
-        let getters = {
+        const getters = {
                 'boards.4chan.org': () => {
-                    let container = xpath('ancestor::div[contains(concat(" ", normalize-space(@class), " "), " file ")]//*[(@class="fileText" and @title) or self::a]', node);
+                    const container = xpath('ancestor::div[contains(concat(" ", normalize-space(@class), " "), " file ")]//*[(@class="fileText" and @title) or self::a]', node);
                     return container.title || container.textContent;
                 },
                 '2ch.hk': () => {
-                    let container = xpath('ancestor::figure[@class="image"]/figcaption/a', node);
+                    const container = xpath('ancestor::figure[@class="image"]/figcaption/a', node);
                     return container.title || container.textContent;
                 },
                 'iichan.hk': () => {
                     return xpath('../preceding-sibling::span[@class="filesize"]/em', node).textContent.split(', ')[2];
                 },
                 'boards.fireden.net': () => {
-                    let container = xpath('(../following-sibling::div[@class="post_file"]|../../preceding-sibling::div[@class="post_file"])/a[@class="post_file_filename"]', node);
+                    const container = xpath('(../following-sibling::div[@class="post_file"]|../../preceding-sibling::div[@class="post_file"])/a[@class="post_file_filename"]', node);
                     return container.title || container.textContent;
                 },
                 '8ch.net': () => {
-                    let container = xpath('../preceding-sibling::p[@class="fileinfo"]/span[@class="unimportant"]/a', node);
+                    const container = xpath('../preceding-sibling::p[@class="fileinfo"]/span[@class="unimportant"]/a', node);
                     return container.title || container.textContent;
                 },
             },
             aliases = {'yuki.la': 'boards.4chan.org'},
-            getter = getters[this.host] || getters[aliases[this.host]],
-            originalFilename = null;
+            getter = getters[this.host] || getters[aliases[this.host]];
+        let originalFilename = null;
 
         function tryFilenameFromDollchanImageByCenter(){
             let filenameTry;
@@ -488,8 +486,7 @@ const de_listeners = {
     },
 
     switch: function(turnOn = true){
-        let functionName = turnOn ? 'addEventListener' : 'removeEventListener';
-
+        const functionName = turnOn ? 'addEventListener' : 'removeEventListener';
         window[functionName]('mouseover', de_listeners.mouseoverListener);
         window[functionName]('keydown', de_listeners.keydownListener);
         window[functionName]('keyup', de_listeners.keyupListener);
