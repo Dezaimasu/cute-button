@@ -389,7 +389,7 @@ const de_contentscript = {
                     return info['base'] + (info['w_'] || info['z_'] || info['y_'])[0] + '.jpg';
                 },
                 'twitter.com': function(){
-                    return node.currentSrc.replace(/(:[a-z0-9]+)?$/i, ':orig');
+                    return node.currentSrc.replace(/(jpg|jpeg|png)(:[a-z0-9]+)?$/i, '$1:orig');
                 },
                 'tumblr.com': function(){
                     return node.currentSrc.replace(/(tumblr_[a-z0-9]+)(_\d{2,3}).(jpg|jpeg|png)$/i, '$1_1280.$3');
