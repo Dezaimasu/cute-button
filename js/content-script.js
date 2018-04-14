@@ -265,12 +265,11 @@ const de_contentscript = {
             }
             return (node.width < de_settings.minSize || node.height < de_settings.minSize);
         },
-        deepSearchByHost: function(node, modifier){
+        deepSearchByHost: function(node){
             const that = de_contentscript,
                 crutches = {
                     'twitter.com': () => xpath('self::div[contains(@class, "GalleryNav")]/preceding-sibling::div[@class="Gallery-media"]/img', node)
                 };
-            if (!modifier) {return false;}
 
             that.actualNode = crutches[that.host] && crutches[that.host]();
             return !!that.actualNode;
@@ -281,7 +280,7 @@ const de_contentscript = {
         const tools = de_contentscript.nodeTools;
         if (
             tools.checkForBgSrc(node, modifier) ||
-            tools.deepSearchByHost(node, modifier)
+            tools.deepSearchByHost(node)
         ) {
             return false;
         }
