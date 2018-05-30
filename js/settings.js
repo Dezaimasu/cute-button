@@ -72,7 +72,7 @@ function fileInputListener(){
             showMessage('File is too big (~2MB maximum).', 'error');
             return;
         }
-        setting['icon'].value = 'url("' + reader.result + '")';
+        setting['icon'].value = `url("${reader.result}")`;
         refreshIcon();
     };
 }
@@ -162,11 +162,11 @@ function initSelectors(){
         otherElems = ['blank-folder', 'add-folder', 'add-folder-container', 'save', 'reset', 'file-input', 'message', 'de-cute-id'];
 
     settingsElems.forEach(function(name){
-        setting[name] = document.querySelector('#' + name);
+        setting[name] = document.querySelector(`#${name}`);
         setting[name].dataset.valueLocation = setting[name].type === 'checkbox' ? 'checked' : 'value';
     });
     otherElems.forEach(function(name){
-        elem[name] = document.querySelector('#' + name);
+        elem[name] = document.querySelector(`#${name}`);
     });
 }
 

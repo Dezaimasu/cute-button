@@ -22,10 +22,6 @@ function initSettings(){
             newSettings[settingName] = settingsDefault[settingName];
         });
 
-        if (currentSettings.savePath && !currentSettings.defaultSavePath) { //TODO remove this in next version
-            newSettings.defaultSavePath = currentSettings.savePath;
-        }
-
         browser.storage.local.set(newSettings);
         browser.storage.local.remove(obsoleteSettingsList);
     });
