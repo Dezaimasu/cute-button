@@ -128,12 +128,21 @@ function fillFolder(folderElem, folderSettings){
 }
 
 function buildFolderSettings(folderElem){
-    return {
+    const folderSettings = {
         key     : folderElem.querySelector('.key').value,
         keyCode : Number(folderElem.querySelector('.keyCode').value),
         modifier: folderElem.querySelector('.modifier').value,
         path    : folderElem.querySelector('.path').value
     };
+    addHotkeyId(folderSettings);
+
+    return folderSettings;
+}
+
+function addHotkeyId(folder){
+    const pseudoEvent = {keyCode: folder.keyCode};
+    pseudoEvent[folder.modifier] = true;
+    folder.id = `${pseudoEvent.ctrlKey ? 1 : 0}${pseudoEvent.altKey ? 1 : 0}${pseudoEvent.shiftKey ? 1 : 0}${pseudoEvent.keyCode}`;
 }
 
 /*

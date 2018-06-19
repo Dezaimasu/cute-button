@@ -39,8 +39,6 @@ const de_settings = {
 
     setSettings: function(newSettings){
         this.minSize = newSettings.minSize;
-        this.folders = newSettings.folders;
-        this.keysList = newSettings.folders.map(x => x.keyCode).concat([32]);
         this.saveOnHover = newSettings.saveOnHover;
         this.showSaveDialog = newSettings.showSaveDialog;
         this.defaultSavePath = newSettings.defaultSavePath;
@@ -52,6 +50,22 @@ const de_settings = {
         de_button.elem.style.backgroundImage = newSettings.icon;
         de_button.elem.classList.toggle('shy', newSettings.hideButton);
         de_listeners.switch(newSettings.isCute);
+        Object.assign(de_hotkeys.list, this.prepareHotkeysList(newSettings.folders), de_hotkeys.reserved)
+    },
+
+    prepareHotkeysList: function(folders){
+        const hotkeys = {};
+
+        folders.forEach(function(folder){
+            if (!folder.id) { // to generate ids for old hotkeys created before ids existed, remove later
+            	const pseudoEvent = {keyCode: folder.keyCode};
+            	pseudoEvent[folder.modifier] = true;
+            	folder.id = de_hotkeys.buildHotkeyId(pseudoEvent);
+            }
+            hotkeys[folder.id] = folder;
+        });
+
+        return hotkeys;
     },
 };
 
@@ -468,34 +482,23 @@ const de_listeners = {
         de_contentscript.nodeHandler(event.target, event);
     },
     keydownListener: function(event){
-        if (de_listeners.isHotkeyPossible(event)) {event.preventDefault();}
+        if (de_hotkeys.isHotkeyPossible(event) && de_hotkeys.isHotkeyExists(de_hotkeys.buildHotkeyId(event))) {
+            event.preventDefault();
+        }
     },
     keyupListener: function(event){
-        if (event.keyCode === 81 && event.altKey) {de_button.hide(); return;}
-        if (!de_listeners.isHotkeyPossible(event)) {return;}
+        const hotkeyId = de_hotkeys.buildHotkeyId(event);
 
-        if (event.keyCode === 32) {
-            de_settings.selectedSavePath = null;
-            de_button.emulateClick(event.ctrlKey ? 2 : 0);
+        if (hotkeyId === de_hotkeys.hide) {
+            de_button.hide();
             return;
         }
-        for (const folder of de_settings.folders) {
-            if (
-                folder.keyCode !== event.keyCode ||
-                (folder.modifier && !event[folder.modifier]) ||
-                (!folder.modifier && (event.shiftKey || event.ctrlKey || event.altKey))
-            ) {
-                continue;
-            }
-
-            de_settings.selectedSavePath = folder.path;
-            de_button.emulateClick();
-            break;
+        if (!de_hotkeys.isHotkeyPossible(event) || !de_hotkeys.isHotkeyExists(hotkeyId)) {
+        	return;
         }
-    },
-    
-    isHotkeyPossible: function(event){
-        return de_button.isVisible() && ['INPUT', 'TEXTAREA'].indexOf(event.target.tagName) === -1 && de_settings.keysList.indexOf(event.keyCode) > -1;
+
+        de_settings.selectedSavePath = de_hotkeys.list[hotkeyId].path;
+        de_button.emulateClick(hotkeyId === '10032' ? 2 : 0);
     },
 
     switch: function(turnOn = true){
@@ -503,6 +506,29 @@ const de_listeners = {
         window[functionName]('mouseover', de_listeners.mouseoverListener);
         window[functionName]('keydown', de_listeners.keydownListener);
         window[functionName]('keyup', de_listeners.keyupListener);
+    },
+};
+
+const de_hotkeys = {
+    list: {},
+
+    hide: '01081', // Alt+Q, hide button
+
+    reserved: {
+        '00032': {path: null}, // Space, save to default location
+        '10032': {path: null}, // Ctrl+Space, save to default location with original filename
+    },
+
+    buildHotkeyId: function(event){
+        return `${event.ctrlKey ? 1 : 0}${event.altKey ? 1 : 0}${event.shiftKey ? 1 : 0}${event.keyCode}`;
+    },
+
+    isHotkeyPossible: function(event){
+        return de_button.isVisible() && ['INPUT', 'TEXTAREA'].indexOf(event.target.tagName) === -1;
+    },
+
+    isHotkeyExists: function(hotkeyId){
+        return typeof de_hotkeys.list[hotkeyId] !== 'undefined';
     },
 };
 
