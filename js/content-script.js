@@ -57,6 +57,7 @@ const de_settings = {
 
 const de_button = {
     elem: null,
+    name: 'DE_CBUTTON',
     downloadRequest: {
         src             : null,
         originalName    : null,
@@ -66,53 +67,62 @@ const de_button = {
 
     init: function(){
         const that = this;
-        let btnElem;
 
-        function mouseupListener(event){
-            const downloadRequest = Object.assign(
+        that.elem = document.createElement(that.name);
+        that.elem.id = 'de-cute-id';
+        that.elem.addEventListener('contextmenu', that.disableEvent);
+        that.elem.addEventListener('mouseout', that.unclick);
+
+        Object.keys(that.globalEventsHandlers).forEach(function(eventName){
+            document.addEventListener(eventName, that.overrideEvent, {capture: true});
+        });
+    },
+
+    overrideEvent: function(event){
+        let that = de_button;
+        if (event.target.nodeName !== that.name) {return;}
+
+        that.disableEvent(event);
+        that.globalEventsHandlers[event.type](event.button);
+    },
+    
+    globalEventsHandlers: {
+        mouseup: function(eventButton){
+            const that = de_button,
+                btnElem = that.elem,
+                downloadRequest = Object.assign(
                     {path: de_settings.selectedSavePath || de_settings.defaultSavePath},
                     that.downloadRequest,
-                    that.isOriginalNameButton(event) ? {} : {originalName: null}
+                    that.isOriginalNameButton(eventButton) ? {} : {originalName: null}
                 ),
                 historyEntry = JSON.stringify(downloadRequest);
 
-            that.disableDefaultClick(event);
             if (
                 !btnElem.classList.contains('click') ||
                 !that.downloadRequest.src ||
                 de_contentscript.downloadsHistory.includes(historyEntry)
             ) {
-                btnElem.classList.remove('click');
+                that.unclick();
                 return;
             }
 
             de_webextApi.download(downloadRequest);
             de_settings.selectedSavePath = null;
             de_contentscript.rememberDownload(historyEntry);
-            if (event.button === 1) {
+            if (eventButton === 1) {
                 that.copyToClipboard(that.downloadRequest.src);
             }
-            btnElem.classList.remove('click');
-        }
-        function mousedownListener(event){
-            that.disableDefaultClick(event);
-            btnElem.classList.add('click')
-        }
-        function mouseoutListener(event){
-            btnElem.classList.remove('click');
-        }
+            that.unclick();
+        },
 
-        that.elem = document.createElement('de_cbutton');
-        btnElem = that.elem;
-        btnElem.id = 'de-cute-id';
-        btnElem.addEventListener('click', that.disableDefaultClick);
-        btnElem.addEventListener('contextmenu', that.disableDefaultClick);
-        btnElem.addEventListener('mousedown', mousedownListener);
-        btnElem.addEventListener('mouseout', mouseoutListener);
-        btnElem.addEventListener('mouseup', mouseupListener);
+        mousedown: function(){
+            de_button.elem.classList.add('click');
+        },
+        
+        click: function(){},
     },
 
-    disableDefaultClick: function(event){
+    disableEvent: function(event){
         event.stopPropagation();
         event.preventDefault();
     },
@@ -132,6 +142,10 @@ const de_button = {
     hide: function(){
         this.prepareDL(null, null);
         this.elem.classList.remove('visible');
+    },
+
+    unclick: function(){
+        de_button.elem.classList.remove('click');
     },
 
     isVisible: function(){
@@ -158,8 +172,8 @@ const de_button = {
         };
     },
 
-    isOriginalNameButton: function(event){
-        return event.button === de_settings.originalNameButton;
+    isOriginalNameButton: function(eventButton){
+        return eventButton === de_settings.originalNameButton;
     },
 
     copyToClipboard: function(string){
@@ -450,7 +464,7 @@ const de_contentscript = {
 
 const de_listeners = {
     mouseoverListener: function(event){
-        if (event.target.tagName === 'DE_CBUTTON' || (event.relatedTarget && event.relatedTarget.tagName === 'DE_CBUTTON')) {return;}
+        if (event.target.tagName === de_button.name || (event.relatedTarget && event.relatedTarget.tagName === de_button.name)) {return;}
         de_contentscript.nodeHandler(event.target, event);
     },
     keydownListener: function(event){
