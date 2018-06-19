@@ -100,7 +100,7 @@ const de_button = {
             if (
                 !btnElem.classList.contains('click') ||
                 !that.downloadRequest.src ||
-                de_contentscript.downloadsHistory.includes(historyEntry)
+                (de_settings.forbidDuplicateFiles && de_contentscript.downloadsHistory.includes(historyEntry))
             ) {
                 that.unclick();
                 return;
