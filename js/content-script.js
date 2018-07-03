@@ -419,7 +419,7 @@ const de_contentscript = {
                     return node.currentSrc.replace(/(jpg|jpeg|png)(:[a-z0-9]+)?$/i, '$1:orig');
                 },
                 'tumblr.com': function(){
-                    return node.currentSrc.replace(/(tumblr_[a-z0-9_]+)(_\d{2,3}).(jpg|jpeg|png)$/i, '$1_1280.$3');
+                    return node.currentSrc.replace(/^.+\/([a-z0-9]{32}\/tumblr_\w+)(_\d{2,3}).(jpg|jpeg|png)$/i, 'https://s3.amazonaws.com/data.tumblr.com/$1_raw.$3');
                 },
             },
             getter = getters[this.host];
