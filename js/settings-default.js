@@ -12,4 +12,5 @@ const settingsDefault = {
     saveOnHover             : false,
     showSaveDialog          : false,
     forbidDuplicateFiles    : true,
+    saveFullSized           : true,
 };

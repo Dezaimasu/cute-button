@@ -40,6 +40,7 @@ const de_settings = {
     setSettings: function(newSettings){
         this.minSize = newSettings.minSize;
         this.saveOnHover = newSettings.saveOnHover;
+        this.saveFullSized = newSettings.saveFullSized;
         this.showSaveDialog = newSettings.showSaveDialog;
         this.defaultSavePath = newSettings.defaultSavePath;
         this.placeUnderCursor = newSettings.placeUnderCursor;
@@ -293,7 +294,7 @@ const de_contentscript = {
             }
             return (node.width < de_settings.minSize || node.height < de_settings.minSize);
         },
-        deepSearchByHost: function(node){
+        deepSearchHostSpecific: function(node){
             const that = de_contentscript,
                 crutches = {
                     'twitter.com': () => xpath('self::div[contains(@class, "GalleryNav")]/preceding-sibling::div[@class="Gallery-media"]/img', node)
@@ -308,7 +309,7 @@ const de_contentscript = {
         const tools = de_contentscript.nodeTools;
         if (
             tools.checkForBgSrc(node, modifier) ||
-            tools.deepSearchByHost(node)
+            tools.deepSearchHostSpecific(node)
         ) {
             return false;
         }
@@ -425,7 +426,7 @@ const de_contentscript = {
             getter = getters[this.host];
         let originalSrc = null;
 
-        if (!getter) {return null;}
+        if (!de_settings.saveFullSized || !getter) {return null;}
         try {
             originalSrc = getter();
         } catch (e) {} //tfw no safe navigation operator in 2017
