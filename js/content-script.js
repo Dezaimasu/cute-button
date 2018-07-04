@@ -297,7 +297,8 @@ const de_contentscript = {
         deepSearchHostSpecific: function(node){
             const that = de_contentscript,
                 crutches = {
-                    'twitter.com': () => xpath('self::div[contains(@class, "GalleryNav")]/preceding-sibling::div[@class="Gallery-media"]/img', node)
+                    'twitter.com': () => xpath('self::div[contains(@class, "GalleryNav")]/preceding-sibling::div[@class="Gallery-media"]/img', node),
+                    'tumblr.com': () => xpath('self::a/parent::div[@class="photo-wrap"]/img', node),
                 };
 
             that.actualNode = crutches[that.host] && crutches[that.host]();
