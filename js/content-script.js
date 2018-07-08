@@ -2,7 +2,10 @@
 
 const de_webextApi = {
     download: function(downloadRequest){
-        browser.runtime.sendMessage(downloadRequest);
+        browser.runtime.sendMessage(Object.assign(downloadRequest, {type: 'download'}));
+    },
+    style: function(){
+        browser.runtime.sendMessage({type: 'style'});
     },
     listen: function(){
         browser.runtime.onMessage.addListener(function(message){
@@ -221,6 +224,7 @@ const de_contentscript = {
         window.addEventListener('load', e => this.dollchanImproved = !!document.querySelector('#de-main'), {once: true});
 
         de_button.init();
+        de_webextApi.style();
         de_webextApi.listen();
         de_webextApi.settings();
     },

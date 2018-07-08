@@ -2,10 +2,24 @@
 
 let isCute; // used for content scripts enabling/disabling
 
-/* Listens for download request from content script */
+/* Listens for messages from content script */
 browser.runtime.onMessage.addListener(function(message, sender){
-    download(message, sender.tab.id);
+    const tabId = sender.tab.id;
+    switch (message.type) {
+        case 'download' : {download(message, tabId); break;}
+        case 'style'    : {addStyles(tabId); break;}
+    }
 });
+
+/* Adds extension styles */
+function addStyles(tabId){
+    browser.tabs.insertCSS(tabId, {
+        allFrames   : true,
+        cssOrigin   : 'user',
+        runAt       : 'document_start',
+        file        : 'css/button.css',
+    });
+}
 
 /* For options initialization after installation */
 browser.runtime.onInstalled.addListener(initSettings);
