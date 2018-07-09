@@ -23,6 +23,9 @@
 		"js": [
 			"js/content-script.js"
 		],
+		"css": [
+			"css/button.css"
+		],
 		"matches": [
 			"*://*/*"
 		],

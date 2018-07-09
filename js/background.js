@@ -11,14 +11,16 @@ browser.runtime.onMessage.addListener(function(message, sender){
     }
 });
 
-/* Adds extension styles */
+/* To override "user" originated css rules form other extensions */
 function addStyles(tabId){
     browser.tabs.insertCSS(tabId, {
         allFrames   : true,
         cssOrigin   : 'user',
         runAt       : 'document_end',
         file        : 'css/button.css',
-    });
+    }).then(
+        null, e => {}
+    );
 }
 
 /* For options initialization after installation */
