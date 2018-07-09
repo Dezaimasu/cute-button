@@ -16,7 +16,7 @@ function addStyles(tabId){
     browser.tabs.insertCSS(tabId, {
         allFrames   : true,
         cssOrigin   : 'user',
-        runAt       : 'document_start',
+        runAt       : 'document_end',
         file        : 'css/button.css',
     });
 }
