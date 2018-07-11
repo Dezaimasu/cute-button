@@ -16,10 +16,10 @@ function addStyles(tabId){
     browser.tabs.insertCSS(tabId, {
         allFrames   : true,
         cssOrigin   : 'user',
-        runAt       : 'document_end',
+        runAt       : 'document_start',
         file        : 'css/button.css',
     }).then(
-        null, e => {}
+        () => {browser.tabs.sendMessage(tabId, 'css_injected');}
     );
 }
 

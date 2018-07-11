@@ -4,14 +4,15 @@ const de_webextApi = {
     download: function(downloadRequest){
         browser.runtime.sendMessage(Object.assign(downloadRequest, {type: 'download'}));
     },
-    style: function(){
+    getStyle: function(){
         browser.runtime.sendMessage({type: 'style'});
     },
     listen: function(){
         browser.runtime.onMessage.addListener(function(message){
             switch (message) {
-                case 'on': {de_listeners.switch(true); break;}
-                case 'off': {de_listeners.switch(false); break;}
+                case 'on'               : {de_listeners.switch(true); break;}
+                case 'off'              : {de_listeners.switch(false); break;}
+                case 'css_injected'     : {de_button.styled = true; break;}
                 case 'duplicate_warning': {de_button.jerkClass('warning'); break;}
             }
         });
@@ -76,6 +77,7 @@ const de_settings = {
 const de_button = {
     elem: null,
     name: 'DE_CBUTTON',
+    styled: false,
     downloadRequest: {
         src             : null,
         originalName    : null,
@@ -148,6 +150,9 @@ const de_button = {
     show: function(position, src, originalName){
         const btnElem = this.elem;
 
+        if (!this.styled) {
+            de_webextApi.getStyle();
+        }
         this.prepareDL(src, originalName);
         btnElem.style.top = position.top;
         btnElem.style.bottom = position.bottom;
@@ -224,9 +229,9 @@ const de_contentscript = {
         window.addEventListener('load', e => this.dollchanImproved = !!document.querySelector('#de-main'), {once: true});
 
         de_button.init();
-        de_webextApi.style();
         de_webextApi.listen();
         de_webextApi.settings();
+        de_webextApi.getStyle();
     },
 
     getFilteredHost: function(){

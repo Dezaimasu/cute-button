@@ -23,13 +23,10 @@
 		"js": [
 			"js/content-script.js"
 		],
-		"css": [
-			"css/button.css"
-		],
 		"matches": [
 			"*://*/*"
 		],
-		"run_at": "document_end",
+		"run_at": "document_start",
 		"all_frames": true
 	}],
 	"web_accessible_resources": [
