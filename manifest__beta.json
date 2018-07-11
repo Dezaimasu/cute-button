@@ -1,0 +1,52 @@
+{
+	"manifest_version": 2,
+	"name": "Cute Save Button (beta)",
+	"version": "0.5.0",
+	"version_name": "0.5.0 beta1",
+	"description": "Little button to save images and webms in one click or with any hotkeys. Praise cute!",
+	"author": "Deil",
+	"icons": {
+		"48": "bestgirl.png"
+	},
+	"permissions": [
+		"downloads",
+		"storage",
+		"*://*/*"
+	],
+	"background": {
+		"scripts": [
+			"js/settings-default.js",
+			"js/background.js",
+			"js/download.js"
+		]
+	},
+	"content_scripts": [{
+		"js": [
+			"js/content-script.js"
+		],
+		"matches": [
+			"*://*/*"
+		],
+		"run_at": "document_start",
+		"all_frames": true
+	}],
+	"web_accessible_resources": [
+		"bestgirl.png"
+	],
+	"options_ui": {
+		"page": "settings.html",
+		"browser_style": true
+	},
+	"browser_action": {
+		"default_icon": {
+			"48": "bestgirl.png"
+		},
+		"browser_style": true
+	},
+	"applications": {
+		"gecko": {
+			"id": "ochecuteextension@betaplaza.ink",
+			"strict_min_version": "53.0"
+		}
+	}
+}
