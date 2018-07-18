@@ -1,6 +1,6 @@
 body de_cbutton#de-cute-id {
 	border-radius: 4px !important;
-	background: #444 url(moz-extension://__MSG_@@extension_id__/bestgirl.png) center/28px no-repeat !important;
+	background: #444 url(moz-extension://__MSG_@@extension_id__/bestgirl.png) center/28px no-repeat;
 	visibility: hidden !important;
 	position: absolute !important;
 	display: block !important;
