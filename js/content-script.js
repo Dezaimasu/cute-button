@@ -235,7 +235,9 @@ const de_contentscript = {
     },
 
     getFilteredHost: function(){
-        return document.location.host.replace(/^www\./, '').replace(/(.*)\.(tumblr\.com)$/, '$2');
+        return document.location.host.replace(/^www\./, '')
+            .replace(/^(.*)\.(tumblr\.com)$/, '*.tumblr.com')
+            .replace(/^yandex\.[a-z]{2,3}$/, 'yandex.*');
     },
 
     rememberDownload: function(url){
@@ -306,11 +308,13 @@ const de_contentscript = {
         deepSearchHostSpecific: function(node){
             const that = de_contentscript,
                 crutches = {
-                    'twitter.com': () => xpath('self::div[contains(@class, "GalleryNav")]/preceding-sibling::div[@class="Gallery-media"]/img', node),
-                    'tumblr.com': () => xpath('self::a/parent::div[@class="photo-wrap"]/img', node),
+                    'twitter.com'   : 'self::div[contains(@class, "GalleryNav")]/preceding-sibling::div[@class="Gallery-media"]/img',
+                    '*.tumblr.com'  : 'self::a/parent::div[@class="photo-wrap"]/img',
+                    'yandex.*'      : 'self::div[contains(@class, "preview2__arrow")]/preceding-sibling::div[contains(@class, "preview2__wrapper")]/div[@class="preview2__thumb-wrapper"]/img | self::div[contains(@class, "preview2__control")]/../preceding-sibling::div[contains(@class, "preview2__wrapper")]/div[@class="preview2__thumb-wrapper"]/img',
+                    'instagram.com' : 'self::div/preceding-sibling::div/img | self::a[@role="button"]/preceding-sibling::div//video | self::ul/parent::div/preceding-sibling::div[@role="button"]/div/img',
                 };
 
-            that.actualNode = crutches[that.host] && crutches[that.host]();
+            that.actualNode = crutches[that.host] && xpath(crutches[that.host], node);
             return !!that.actualNode;
         },
     },
@@ -422,15 +426,23 @@ const de_contentscript = {
 
     getOriginalSrc: function(node){
         const getters = {
-                'vk.com': function(){
+                'vk.com': () => {
                     const info = JSON.parse(node.getAttribute('onclick').match(/^.*"?temp"? *: *({[^{}]+}).*$/)[1]);
                     return info['base'] + (info['w_'] || info['z_'] || info['y_'])[0] + '.jpg';
                 },
-                'twitter.com': function(){
+                'twitter.com': () => {
                     return node.currentSrc.replace(/(jpg|jpeg|png)(:[a-z0-9]+)?$/i, '$1:orig');
                 },
-                'tumblr.com': function(){
+                '*.tumblr.com': () => {
                     return node.currentSrc.replace(/^.+\/([a-z0-9]{32}\/tumblr_\w+)(_\d{2,4}).(jpg|jpeg|png)$/i, 'https://s3.amazonaws.com/data.tumblr.com/$1_raw.$3');
+                },
+                'instagram.com': () => {
+                    function getWidth(str){
+                        return Number(str.trim().match(/^.+ (\d+)w$/)[1]);
+                    }
+                    return node.getAttribute('srcset').split(',').reduce((a, b) => {
+                        return getWidth(a) > getWidth(b) ? a : b;
+                    }).split(' ')[0]
                 },
             },
             getter = getters[this.host];
