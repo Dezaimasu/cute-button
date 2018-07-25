@@ -236,7 +236,7 @@ const de_contentscript = {
 
     getFilteredHost: function(){
         return document.location.host.replace(/^www\./, '')
-            .replace(/^(.*)\.(tumblr\.com)$/, '*.tumblr.com')
+            .replace(/^((.*)\.)?(tumblr\.com)$/, '*.tumblr.com')
             .replace(/^yandex\.[a-z]{2,3}$/, 'yandex.*');
     },
 
