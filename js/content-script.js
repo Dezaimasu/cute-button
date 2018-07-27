@@ -8,7 +8,7 @@ const de_webextApi = {
         chrome.runtime.sendMessage({type: 'style'});
     },
     listen: function(){
-        chrome.runtime.onMessage.addListener(function(message){
+        chrome.runtime.onMessage.addListener(message => {
             switch (message) {
                 case 'on'               : {de_listeners.switch(true); break;}
                 case 'off'              : {de_listeners.switch(false); break;}
@@ -18,7 +18,7 @@ const de_webextApi = {
         });
     },
     settings: function(){
-        chrome.storage.onChanged.addListener(function(changes){
+        chrome.storage.onChanged.addListener(changes => {
             const newSettings = {},
                 changesList = Object.keys(changes);
 
@@ -27,14 +27,12 @@ const de_webextApi = {
                 return; // click on browser_action button changes only "isCute" setting
             }
 
-            changesList.forEach(function(settingName){
-                newSettings[settingName] = changes[settingName].newValue;
-            });
+            changesList.forEach(
+                settingName => newSettings[settingName] = changes[settingName].newValue
+            );
             de_settings.setSettings(newSettings);
         });
-        chrome.storage.local.get(null, function(items){
-            de_settings.setSettings(items);
-        });
+        chrome.storage.local.get(null, items => de_settings.setSettings(items));
     },
 };
 
@@ -61,7 +59,7 @@ const de_settings = {
     prepareHotkeysList: function(folders){
         const hotkeys = {};
 
-        folders.forEach(function(folder){
+        folders.forEach(folder => {
             if (!folder.id) { // to generate ids for old hotkeys created before ids existed, remove later
             	const pseudoEvent = {keyCode: folder.keyCode};
             	pseudoEvent[folder.modifier] = true;
@@ -93,9 +91,9 @@ const de_button = {
         that.elem.addEventListener('contextmenu', that.disableEvent);
         that.elem.addEventListener('mouseout', that.unclick);
 
-        Object.keys(that.globalEventsHandlers).forEach(function(eventName){
-            document.addEventListener(eventName, that.overrideEvent, {capture: true});
-        });
+        Object.keys(that.globalEventsHandlers).forEach(
+            eventName => document.addEventListener(eventName, that.overrideEvent, {capture: true})
+        );
     },
 
     overrideEvent: function(event){

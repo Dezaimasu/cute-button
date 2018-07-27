@@ -7,7 +7,7 @@ let folders;
 -------------------- Generic functions --------------------
 */
 function loadOptions(){
-    chrome.storage.local.get(settingsDefault, function(result){
+    chrome.storage.local.get(settingsDefault, result => {
         Object.keys(settingsDefault).forEach(optionName => setValue(optionName, result[optionName]));
         refreshIcon();
         refreshFolders(result.folders);
@@ -51,7 +51,7 @@ function enableSave(){
 function showMessage(message, type){
     elem['message'].textContent = message;
     elem['message'].classList.add(type);
-    setTimeout(function(){
+    setTimeout(() => {
         elem['message'].textContent = '';
         elem['message'].classList.remove(type);
     }, 3000);
@@ -88,7 +88,7 @@ function refreshFolders(foldersSettings){
 
 function prepareCurrentFoldersForSave(){
     const currentFoldersList = [];
-    document.querySelectorAll('.folder').forEach(function(folderElem){
+    document.querySelectorAll('.folder').forEach(folderElem => {
         const folderSettings = buildFolderSettings(folderElem);
         if (!folderSettings.key || !folderSettings.keyCode) {return;}
         currentFoldersList.push(folderSettings);
@@ -170,18 +170,18 @@ function initSelectors(){
     const settingsElems = Object.keys(settingsDefault),
         otherElems = ['blank-folder', 'add-folder', 'add-folder-container', 'save', 'reset', 'file-input', 'message', 'de-cute-id'];
 
-    settingsElems.forEach(function(name){
+    settingsElems.forEach(name => {
         setting[name] = document.querySelector(`#${name}`);
         setting[name].dataset.valueLocation = setting[name].type === 'checkbox' ? 'checked' : 'value';
     });
-    otherElems.forEach(function(name){
+    otherElems.forEach(name => {
         elem[name] = document.querySelector(`#${name}`);
     });
 }
 
 function enableInputListeners(inputsContainer){
-    inputsContainer.querySelectorAll('select, input').forEach(function(editableElem){
-        editableElem.addEventListener('input', function(event){
+    inputsContainer.querySelectorAll('select, input').forEach(editableElem => {
+        editableElem.addEventListener('input', event => {
             enableSave();
             if (!event.target.classList.contains('path')) {return;}
             checkSavePath(event.target);
@@ -194,7 +194,7 @@ function init(){
 
     elem['file-input'].addEventListener('change', fileInputListener);
     elem['reset'].addEventListener('click', resetOptions);
-    elem['save'].addEventListener('click', function(){
+    elem['save'].addEventListener('click', event => {
         if (allSavePathsAreValid()) {
             saveOptions();
             showMessage('Settings saved.');
@@ -203,7 +203,7 @@ function init(){
             showMessage('Absolute path is not allowed. Read the rules above.', 'error');
         }
     });
-    elem['add-folder'].addEventListener('click', function(event){
+    elem['add-folder'].addEventListener('click', event => {
         addNewFolder();
         enableSave();
     });

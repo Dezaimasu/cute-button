@@ -3,7 +3,7 @@
 let isCute; // used for content scripts enabling/disabling
 
 /* Listens for messages from content script */
-chrome.runtime.onMessage.addListener(function(message, sender){
+chrome.runtime.onMessage.addListener((message, sender) => {
     const tabId = sender.tab.id;
     switch (message.type) {
         case 'download' : {download(message, tabId); break;}
@@ -19,7 +19,7 @@ function addStyles(tabId){
         runAt       : 'document_start',
         file        : 'css/button.css',
     },
-        () => {chrome.tabs.sendMessage(tabId, 'css_injected');}
+        () => chrome.tabs.sendMessage(tabId, 'css_injected')
     );
 }
 
@@ -27,16 +27,16 @@ function addStyles(tabId){
 chrome.runtime.onInstalled.addListener(initSettings);
 function initSettings(){
     chrome.runtime.onInstalled.removeListener(initSettings);
-    chrome.storage.local.get(null, function(currentSettings){
+    chrome.storage.local.get(null, currentSettings => {
         const actualSettingsNames = Object.keys(settingsDefault),
             currentSettingsNames = Object.keys(currentSettings),
             newSettings = {},
             newSettingsList = arrayDiff(actualSettingsNames, currentSettingsNames),
             obsoleteSettingsList = arrayDiff(currentSettingsNames, actualSettingsNames);
 
-        newSettingsList.forEach(function(settingName){
-            newSettings[settingName] = settingsDefault[settingName];
-        });
+        newSettingsList.forEach(
+            settingName => newSettings[settingName] = settingsDefault[settingName]
+        );
 
         chrome.storage.local.set(newSettings);
         chrome.storage.local.remove(obsoleteSettingsList);
@@ -56,15 +56,13 @@ function setCuteState(state){
     chrome.browserAction.setBadgeBackgroundColor({color: stateProps.color});
 }
 
-chrome.browserAction.onClicked.addListener(function(){
+chrome.browserAction.onClicked.addListener(() => {
     isCute = !isCute;
     chrome.storage.local.set({'isCute': isCute});
 });
 
-chrome.storage.onChanged.addListener(function(changes){
+chrome.storage.onChanged.addListener(changes => {
     if (typeof changes.isCute === 'undefined') {return;}
     setCuteState(changes.isCute.newValue);
 });
-chrome.storage.local.get('isCute', function(items){
-    setCuteState(items.isCute);
-});
+chrome.storage.local.get('isCute', items => setCuteState(items.isCute));
