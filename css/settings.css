@@ -1,3 +1,6 @@
+body {
+	min-width: 900px;
+}
 table {
 	border-collapse:collapse;
 	border: 1px solid grey;

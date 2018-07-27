@@ -3,7 +3,7 @@
 let isCute; // used for content scripts enabling/disabling
 
 /* Listens for messages from content script */
-browser.runtime.onMessage.addListener(function(message, sender){
+chrome.runtime.onMessage.addListener(function(message, sender){
     const tabId = sender.tab.id;
     switch (message.type) {
         case 'download' : {download(message, tabId); break;}
@@ -13,21 +13,21 @@ browser.runtime.onMessage.addListener(function(message, sender){
 
 /* To override "user" originated css rules form other extensions */
 function addStyles(tabId){
-    browser.tabs.insertCSS(tabId, {
+    chrome.tabs.insertCSS(tabId, {
         allFrames   : true,
         cssOrigin   : 'user',
         runAt       : 'document_start',
         file        : 'css/button.css',
-    }).then(
-        () => {browser.tabs.sendMessage(tabId, 'css_injected');}
+    },
+        () => {chrome.tabs.sendMessage(tabId, 'css_injected');}
     );
 }
 
 /* For options initialization after installation */
-browser.runtime.onInstalled.addListener(initSettings);
+chrome.runtime.onInstalled.addListener(initSettings);
 function initSettings(){
-    browser.runtime.onInstalled.removeListener(initSettings);
-    browser.storage.local.get().then(function(currentSettings){
+    chrome.runtime.onInstalled.removeListener(initSettings);
+    chrome.storage.local.get(null, function(currentSettings){
         const actualSettingsNames = Object.keys(settingsDefault),
             currentSettingsNames = Object.keys(currentSettings),
             newSettings = {},
@@ -38,8 +38,8 @@ function initSettings(){
             newSettings[settingName] = settingsDefault[settingName];
         });
 
-        browser.storage.local.set(newSettings);
-        browser.storage.local.remove(obsoleteSettingsList);
+        chrome.storage.local.set(newSettings);
+        chrome.storage.local.remove(obsoleteSettingsList);
     });
 }
 
@@ -52,19 +52,19 @@ function setCuteState(state){
     const stateProps = state ? {text: 'on', color: '#6D6'} : {text: 'off', color: '#D66'};
 
     isCute = state;
-    browser.browserAction.setBadgeText({text: stateProps.text});
-    browser.browserAction.setBadgeBackgroundColor({color: stateProps.color});
+    chrome.browserAction.setBadgeText({text: stateProps.text});
+    chrome.browserAction.setBadgeBackgroundColor({color: stateProps.color});
 }
 
-browser.browserAction.onClicked.addListener(function(){
+chrome.browserAction.onClicked.addListener(function(){
     isCute = !isCute;
-    browser.storage.local.set({'isCute': isCute});
+    chrome.storage.local.set({'isCute': isCute});
 });
 
-browser.storage.onChanged.addListener(function(changes){
+chrome.storage.onChanged.addListener(function(changes){
     if (typeof changes.isCute === 'undefined') {return;}
     setCuteState(changes.isCute.newValue);
 });
-browser.storage.local.get('isCute').then(function(items){
+chrome.storage.local.get('isCute', function(items){
     setCuteState(items.isCute);
 });

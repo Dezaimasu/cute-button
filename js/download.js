@@ -82,7 +82,7 @@ const downloader = {
     * Decodes url, cuts possible GET parameters, extracts filename from the url.
     * Usually filename is located at the end, after last "/" symbol, but sometimes
     * it might be somewhere in the middle between "/" symbols.
-    * That's why it's important to extract filename manually by looking at last sub-string
+    * That's why it's important to extract filename manually by looking for the last sub-string
     * with pre-known extension located between "/" symbols.
     * WebExt API is incapable of extracting such filenames.
     * Cheers pineapple.
@@ -104,11 +104,11 @@ const downloader = {
     * and user should be warned that he saved already existing file.
     */
     checkForDuplicate: function(originalFilename, downloadId, tabId){
-        browser.downloads.search({
+        chrome.downloads.search({
             id: downloadId
-        }).then(downloadItems => {
-            if (downloadItems[0].filename.endsWith(originalFilename)) {return;}
-            browser.tabs.sendMessage(tabId, 'duplicate_warning');
+        }, downloadItems => {
+            if (!downloadItems[0].filename || downloadItems[0].filename.endsWith(originalFilename)) {return;}
+            chrome.tabs.sendMessage(tabId, 'duplicate_warning');
         });
     },
 
@@ -118,14 +118,13 @@ const downloader = {
 
     download: function(src, tabId, showSaveDialog){
         const finalFilename = this.prepareWinFilename();
-        browser.downloads.download({
+        chrome.downloads.download({
             url: src,
             filename: this.savePath + finalFilename,
             saveAs: showSaveDialog,
             conflictAction: 'uniquify'
-        }).then(
-            downloadId  => this.checkForDuplicate(finalFilename, downloadId, tabId),
-            error       => console.log(error.toString()) //TODO maybe emit warning
+        },
+            downloadId  => this.checkForDuplicate(finalFilename, downloadId, tabId)
         );
     },
 };

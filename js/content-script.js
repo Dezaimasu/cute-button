@@ -2,13 +2,13 @@
 
 const de_webextApi = {
     download: function(downloadRequest){
-        browser.runtime.sendMessage(Object.assign(downloadRequest, {type: 'download'}));
+        chrome.runtime.sendMessage(Object.assign(downloadRequest, {type: 'download'}));
     },
     getStyle: function(){
-        browser.runtime.sendMessage({type: 'style'});
+        chrome.runtime.sendMessage({type: 'style'});
     },
     listen: function(){
-        browser.runtime.onMessage.addListener(function(message){
+        chrome.runtime.onMessage.addListener(function(message){
             switch (message) {
                 case 'on'               : {de_listeners.switch(true); break;}
                 case 'off'              : {de_listeners.switch(false); break;}
@@ -18,7 +18,7 @@ const de_webextApi = {
         });
     },
     settings: function(){
-        browser.storage.onChanged.addListener(function(changes){
+        chrome.storage.onChanged.addListener(function(changes){
             const newSettings = {},
                 changesList = Object.keys(changes);
 
@@ -32,7 +32,7 @@ const de_webextApi = {
             });
             de_settings.setSettings(newSettings);
         });
-        browser.storage.local.get().then(function(items){
+        chrome.storage.local.get(null, function(items){
             de_settings.setSettings(items);
         });
     },
@@ -396,7 +396,7 @@ const de_contentscript = {
         const that = de_contentscript,
             src = currentTarget[that.srcLocation];
 
-        if (!currentTarget || (event.ctrlKey && !event.altKey)) {return;}
+        if (!currentTarget || (!that.isSeparateTab && event.ctrlKey && !event.altKey)) {return;}
         if (!src || src !== that.previousSrc) {
             de_button.hide();
         }

@@ -7,7 +7,7 @@ let folders;
 -------------------- Generic functions --------------------
 */
 function loadOptions(){
-    browser.storage.local.get(settingsDefault).then(function(result){
+    chrome.storage.local.get(settingsDefault, function(result){
         Object.keys(settingsDefault).forEach(optionName => setValue(optionName, result[optionName]));
         refreshIcon();
         refreshFolders(result.folders);
@@ -21,7 +21,7 @@ function saveOptions(){
     prepareCurrentFoldersForSave();
     Object.keys(settingsDefault).forEach(optionName => newSettings[optionName] = getValue(optionName));
     newSettings.folders = folders;
-    browser.storage.local.set(newSettings);
+    chrome.storage.local.set(newSettings);
     disableSave();
 }
 
