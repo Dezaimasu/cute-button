@@ -18,9 +18,10 @@ function addStyles(tabId){
         cssOrigin   : 'user',
         runAt       : 'document_start',
         file        : 'css/button.css',
-    },
-        () => chrome.tabs.sendMessage(tabId, 'css_injected')
-    );
+    }, () => {
+        if (chrome.extension.lastError) {return;}
+        chrome.tabs.sendMessage(tabId, 'css_injected');
+    });
 }
 
 /* For options initialization after installation */
