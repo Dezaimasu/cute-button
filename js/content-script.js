@@ -434,6 +434,7 @@ const de_contentscript = {
                     return node.currentSrc.replace(/(jpg|jpeg|png)(:[a-z0-9]+)?$/i, '$1:orig');
                 },
                 'tumblr.com': () => {
+                    return null; // TODO: find a new way to download raws
                     return node.currentSrc.replace(/^.+\/([a-z0-9]{32}\/tumblr_\w+)(_\d{2,4}).(jpg|jpeg|png)$/i, 'https://s3.amazonaws.com/data.tumblr.com/$1_raw.$3');
                 },
                 'instagram.com': () => {
