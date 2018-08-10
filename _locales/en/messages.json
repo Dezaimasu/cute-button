@@ -1,0 +1,101 @@
+{
+	"extensionDescription": {
+		"message": "Little button to save images and webms in one click or with any hotkeys. Praise cute!"
+	},
+	"settings_pathRestrictions_1": {
+		"message": "Save path MUST be relative to your downloads folder (you can check it on Tools -> Options -> General -> Downloads -> Save files to)."
+	},
+	"settings_pathRestrictions_2": {
+		"message": "E.g. if your downloads folder is \"D:\\Pictures\", and you want this extension to save files in \"D:\\Pictures\\happy-cute-time\\dank-memes\","
+	},
+	"settings_pathRestrictions_3": {
+		"message": "you just need to specify \"happy-cute-time\\dank-memes\"."
+	},
+	"settings_pathRestrictions_4": {
+		"message": "Unfortunately, extensions can't save files outside of your downloads folder (\"D:\\Pictures\" in your case)."
+	},
+	"settings_pathRestrictions_5": {
+		"message": "If you REALLY want to do that, look for \"symbolic links\"."
+	},
+	"settings_pathRestrictions_6": {
+		"message": "Also make sure your hotkeys won't overlap with browser hotkeys and with each other."
+	},
+	"settings_defaultSavePath": {
+		"message": "Save files to (default location, mouse clicks and Space button save files here):"
+	},
+	"settings_defaultSavePathPlaceholder": {
+		"message": "default save path"
+	},
+	"settings_hotkey": {
+		"message": "hotkey"
+	},
+	"settings_modifier": {
+		"message": "modifier"
+	},
+	"settings_addHotkey": {
+		"message": "Add hotkey for another location"
+	},
+	"settings_savePathPlaceholder": {
+		"message": "Save files to"
+	},
+	"settings_minSize": {
+		"message": "Minimum image width/height (px):"
+	},
+	"settings_exclusions": {
+		"message": "Classes of elements exluded from scanning (split by spaces):"
+	},
+	"settings_showSaveDialog": {
+		"message": "Show \"Save as\" dialog:"
+	},
+	"settings_originalNameByDefault": {
+		"message": "Save with original name by default if available (swaps LMB and RMB actions):"
+	},
+	"settings_saveFullSized": {
+		"message": "Always save full-sized images (works on twitter, tumblr, vk, instagram):"
+	},
+	"settings_saveOnHover": {
+		"message": "Save on Ctrl+Alt+hover instead of click (recommended to use with \"No duplicates\" enabled):"
+	},
+	"settings_forbidDuplicateFiles": {
+		"message": "No duplicates (prevent saving of the same file multiple times):"
+	},
+	"settings_hideButton": {
+		"message": "Hide the button when not hovered:"
+	},
+	"settings_position": {
+		"message": "Button position (ignored when button placed under cursor):"
+	},
+	"settings_positionTopLeft": {
+		"message": "Top left"
+	},
+	"settings_positionTopRight": {
+		"message": "Top right"
+	},
+	"settings_positionBottomLeft": {
+		"message": "Bottom left"
+	},
+	"settings_positionBottomRight": {
+		"message": "Bottom right"
+	},
+	"settings_placeUnderCursor": {
+		"message": "Place button under cursor"
+	},
+	"settings_placeUnderCursorWarning": {
+		"message": "EXPERIMENTAL, very clunky"
+	},
+	"settings_icon": {
+		"message": "Your custom cute icon:"
+	},
+	"settings_save": {
+		"message": "Save"
+	},
+	"settings_reset": {
+		"message": "Reset"
+	},
+	"settings_messageSuccess": {
+		"message": "Settings saved."
+	},
+	"settings_messageInvalidPath": {
+		"message": "Absolute paths are not allowed. Read the rules above."
+	}
+}

@@ -4,6 +4,21 @@ const setting = {}, elem = {};
 let folders;
 
 /*
+-------------------- Localization --------------------
+*/
+function i18n(){
+    document.querySelectorAll('i18n').forEach(
+        elem => elem.textContent = chrome.i18n.getMessage(elem.textContent)
+    );
+    document.querySelectorAll('*[data-i18n]').forEach(
+        elem => elem.textContent = chrome.i18n.getMessage(elem.dataset.i18n)
+    );
+    document.querySelectorAll('*[data-i18n-placeholder]').forEach(
+        elem => elem.placeholder = chrome.i18n.getMessage(elem.dataset.i18nPlaceholder)
+    );
+}
+
+/*
 -------------------- Generic functions --------------------
 */
 function loadOptions(){
@@ -190,6 +205,12 @@ function enableInputListeners(inputsContainer){
 }
 
 function init(){
+    const messages = {
+        success: chrome.i18n.getMessage('settings_messageSuccess'),
+        invalidPath: chrome.i18n.getMessage('settings_messageInvalidPath'),
+    };
+
+    i18n();
     initSelectors();
 
     elem['file-input'].addEventListener('change', fileInputListener);
@@ -197,10 +218,10 @@ function init(){
     elem['save'].addEventListener('click', event => {
         if (allSavePathsAreValid()) {
             saveOptions();
-            showMessage('Settings saved.');
+            showMessage(messages.success);
         } else {
             disableSave();
-            showMessage('Absolute path is not allowed. Read the rules above.', 'error');
+            showMessage(messages.invalidPath, 'error');
         }
     });
     elem['add-folder'].addEventListener('click', event => {

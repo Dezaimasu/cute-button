@@ -7,41 +7,41 @@
 </head>
 <body>
 	<table>
-		<tr id="path-description" class="alarm">
+		<tr id="path-restrictions" class="alarm">
 			<td colspan="2">
-				Save path MUST be relative to your downloads folder (you can check it on Tools -> Options -> General -> Downloads -> Save files to).
+				<i18n>settings_pathRestrictions_1</i18n>
 				<br>
-				E.g. if your downloads folder is "D:\Pictures", and you want this extension to save files in "D:\Pictures\happy-cute-time\dank-memes",
+				<i18n>settings_pathRestrictions_2</i18n>
 				<br>
-				you just need to specify "happy-cute-time\dank-memes".
-				<br>
-				<br>
-				Unfortunately, extensions can't save files outside of your downloads folder ("D:\Pictures" in your case).
-				<br>
-				If you REALLY want to do that, look for "symbolic links".
+				<i18n>settings_pathRestrictions_3</i18n>
 				<br>
 				<br>
-				Also make sure your hotkeys won't overlap with browser hotkeys and with each other.
+				<i18n>settings_pathRestrictions_4</i18n>
+				<br>
+				<i18n>settings_pathRestrictions_5</i18n>
+				<br>
+				<br>
+				<i18n>settings_pathRestrictions_6</i18n>
 				<br>
 				<br>
 			</td>
 		</tr>
 		<tr id="default-path">
-			<td><label for="defaultSavePath">Save files to (default location, mouse clicks and Space button save files here):</label></td>
-			<td><input id="defaultSavePath" class="path" placeholder="default save path"></td>
+			<td><label for="defaultSavePath"><i18n>settings_defaultSavePath</i18n></label></td>
+			<td><input id="defaultSavePath" class="path" data-i18n-placeholder="settings_defaultSavePathPlaceholder"></td>
 		</tr>
 		<tr class="folder" id="blank-folder">
 			<td>
 				<span class="key-container">
 					<label>
-						hotkey
+						<i18n>settings_hotkey</i18n>
 						<input class="key" size="1" maxlength="1">
 						<input class="keyCode" type="hidden">
 					</label>
 					<label>
-						modifier
+						<i18n>settings_modifier</i18n>
 						<select class="modifier">
-							<option value="" selected>none</option>
+							<option value="" selected>-</option>
 							<option value="ctrlKey">Ctrl</option>
 							<option value="shiftKey">Shift</option>
 							<option value="altKey">Alt</option>
@@ -50,65 +50,65 @@
 				</span>
 			</td>
 			<td>
-				<label><input class="path" placeholder="Save files to"></label>
+				<label><input class="path" data-i18n-placeholder="settings_savePathPlaceholder"></label>
 				<button class="delete-folder">X</button>
 			</td>
 		</tr>
 		<tr id="add-folder-container">
 			<td></td>
 			<td>
-				<button id="add-folder">Add hotkey for another location</button>
+				<button id="add-folder"><i18n>settings_addHotkey</i18n></button>
 			</td>
 		</tr>
 		<tr>
-			<td><label for="minSize">Minimum image width/height (px):</label></td>
+			<td><label for="minSize"><i18n>settings_minSize</i18n></label></td>
 			<td><input id="minSize" type="number" min="0"></td>
 		</tr>
 		<tr>
-			<td><label for="exclusions">Classes of elements exluded from scanning (split by spaces):</label></td>
+			<td><label for="exclusions"><i18n>settings_exclusions</i18n></label></td>
 			<td><input id="exclusions"></td>
 		</tr>
 		<tr>
-			<td><label for="showSaveDialog">Show "Save as" dialog:</label></td>
+			<td><label for="showSaveDialog"><i18n>settings_showSaveDialog</i18n></label></td>
 			<td><input id="showSaveDialog" type="checkbox"></td>
 		</tr>
 		<tr>
-			<td><label for="originalNameByDefault">Save with original name by default if available (swaps LMB and RMB actions):</label></td>
+			<td><label for="originalNameByDefault"><i18n>settings_originalNameByDefault</i18n></label></td>
 			<td><input id="originalNameByDefault" type="checkbox"></td>
 		</tr>
 		<tr>
-			<td><label for="saveFullSized">Always save full-sized images (works on twitter, tumblr, vk, instagram):</label></td>
+			<td><label for="saveFullSized"><i18n>settings_saveFullSized</i18n></label></td>
 			<td><input id="saveFullSized" type="checkbox"></td>
 		</tr>
 		<tr>
-			<td><label for="saveOnHover">Save on Ctrl+Alt+hover instead of click (recommended to use with "No duplicates" enabled):</label></td>
+			<td><label for="saveOnHover"><i18n>settings_saveOnHover</i18n></label></td>
 			<td><input id="saveOnHover" type="checkbox"></td>
 		</tr>
 		<tr>
-			<td><label for="forbidDuplicateFiles">No duplicates (prevent saving of the same file multiple times):</label></td>
+			<td><label for="forbidDuplicateFiles"><i18n>settings_forbidDuplicateFiles</i18n></label></td>
 			<td><input id="forbidDuplicateFiles" type="checkbox"></td>
 		</tr>
 		<tr>
-			<td><label for="hideButton">Hide the button when not hovered:</label></td>
+			<td><label for="hideButton"><i18n>settings_hideButton</i18n></label></td>
 			<td><input id="hideButton" type="checkbox"></td>
 		</tr>
 		<tr>
-			<td><label for="position">Button position (ignored when button placed under cursor):</label></td>
+			<td><label for="position"><i18n>settings_position</i18n></label></td>
 			<td>
 				<select id="position">
-					<option value="top-left">Top left</option>
-					<option value="top-right">Top right</option>
-					<option value="bottom-left">Bottom left</option>
-					<option value="bottom-right">Bottom right</option>
+					<option value="top-left" data-i18n="settings_positionTopLeft"></option>
+					<option value="top-right" data-i18n="settings_positionTopRight"></option>
+					<option value="bottom-left" data-i18n="settings_positionBottomLeft"></option>
+					<option value="bottom-right" data-i18n="settings_positionBottomRight"></option>
 				</select>
 			</td>
 		</tr>
 		<tr>
-			<td><label for="placeUnderCursor">Place button under cursor (<span class="alarm">EXPERIMENTAL, very clunky</span>):</label></td>
+			<td><label for="placeUnderCursor"><i18n>settings_placeUnderCursor</i18n> (<span class="alarm"><i18n>settings_placeUnderCursorWarning</i18n></span>):</label></td>
 			<td><input id="placeUnderCursor" type="checkbox"></td>
 		</tr>
 		<tr>
-			<td><label for="file-input">Your custom cute icon:</label></td>
+			<td><label for="file-input"><i18n>settings_icon</i18n></label></td>
 			<td>
 				<div id="icon-container">
 					<de_cbutton id="de-cute-id" class="visible"></de_cbutton>
@@ -119,8 +119,8 @@
 		</tr>
 		<tr>
 			<td>
-				<button id="save">Save</button>
-				<button id="reset">Reset</button>
+				<button id="save"><i18n>settings_save</i18n></button>
+				<button id="reset"><i18n>settings_reset</i18n></button>
 			</td>
 			<td id="message"></td>
 		</tr>

@@ -5,7 +5,7 @@ table {
 	border-collapse:collapse;
 	border: 1px solid grey;
 }
-table tr:not(#path-description):not(#default-path):not(.folder) td {
+table tr:not(#path-restrictions):not(#default-path):not(.folder) td {
 	border-bottom: 1px solid grey;
 }
 td:first-child {
@@ -47,10 +47,8 @@ button#reset {
 	vertical-align: middle;
 	line-height: 23px;
 }
-.folder td:first-child span {
-	padding-right: 13px;
-}
 .folder .key-container {
+	padding-right: 13px;
 	float: right;
 }
 .folder#blank-folder,
