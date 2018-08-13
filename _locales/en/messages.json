@@ -12,7 +12,7 @@
 		"message": "you just need to specify \"happy-cute-time\\dank-memes\"."
 	},
 	"settings_pathRestrictions_4": {
-		"message": "Unfortunately, extensions can't save files outside of your downloads folder (\"D:\\Pictures\" in your case)."
+		"message": "Unfortunately, extensions can't save files outside of your downloads folder (\"D:\\Pictures\" in our case)."
 	},
 	"settings_pathRestrictions_5": {
 		"message": "If you REALLY want to do that, look for \"symbolic links\"."
@@ -42,7 +42,7 @@
 		"message": "Minimum image width/height (px):"
 	},
 	"settings_exclusions": {
-		"message": "Classes of elements exluded from scanning (split by spaces):"
+		"message": "Classes of elements excluded from scanning (split by spaces):"
 	},
 	"settings_showSaveDialog": {
 		"message": "Show \"Save as\" dialog:"

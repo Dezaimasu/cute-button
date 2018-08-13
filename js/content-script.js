@@ -433,6 +433,9 @@ const de_contentscript = {
                 'twitter.com': () => {
                     return node.currentSrc.replace(/(jpg|jpeg|png)(:[a-z0-9]+)?$/i, '$1:orig');
                 },
+                'tumblr.com': function(){
+                    return node.currentSrc.replace(/(\/[a-z0-9]{32}\/tumblr_\w+)(_\d{2,4}).(jpg|jpeg|png)$/i, '$1_1280.$3');
+                },
                 'instagram.com': () => {
                     function getWidth(str){
                         return Number(str.trim().match(/^.+ (\d+)w$/)[1]);
