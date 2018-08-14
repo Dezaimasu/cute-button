@@ -6,16 +6,16 @@
 		"message": "Save path MUST be relative to your downloads folder (you can check it on Tools -> Options -> General -> Downloads -> Save files to)."
 	},
 	"settings_pathRestrictions_2": {
-		"message": "E.g. if your downloads folder is \"D:\\Pictures\", and you want this extension to save files in \"D:\\Pictures\\happy-cute-time\\dank-memes\","
+		"message": "E.g. if your downloads folder is \"D:\\Downloads\", and you want this extension to save files in \"D:\\Downloads\\pictures\\dank-memes\","
 	},
 	"settings_pathRestrictions_3": {
-		"message": "you just need to specify \"happy-cute-time\\dank-memes\"."
+		"message": "you just need to specify \"pictures\\dank-memes\"."
 	},
 	"settings_pathRestrictions_4": {
-		"message": "Unfortunately, extensions can't save files outside of your downloads folder (\"D:\\Pictures\" in our case)."
+		"message": "Unfortunately, extensions can't save files outside of your downloads folder (\"D:\\Downloads\" in our case)."
 	},
 	"settings_pathRestrictions_5": {
-		"message": "If you REALLY want to do that, look for \"symbolic links\"."
+		"message": "If you REALLY want to do that, look for \"Symbolic links\"."
 	},
 	"settings_pathRestrictions_6": {
 		"message": "Also make sure your hotkeys won't overlap with browser hotkeys and with each other."
@@ -36,7 +36,7 @@
 		"message": "Add hotkey for another location"
 	},
 	"settings_savePathPlaceholder": {
-		"message": "Save files to"
+		"message": "save files to"
 	},
 	"settings_minSize": {
 		"message": "Minimum image width/height (px):"
@@ -90,7 +90,7 @@
 		"message": "Save"
 	},
 	"settings_reset": {
-		"message": "Reset"
+		"message": "Reset all"
 	},
 	"settings_messageSuccess": {
 		"message": "Settings saved."

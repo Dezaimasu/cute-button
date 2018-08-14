@@ -1,0 +1,101 @@
+{
+	"extensionDescription": {
+		"message": "Маленькая кнопка для сохранения изображений и видео в один клик."
+	},
+	"settings_pathRestrictions_1": {
+		"message": "Выбранный путь для загрузок ДОЛЖЕН быть относительным к вашей папке для загрузок (вы можете посмотреть текущую папку в Инструменты -> Настройки -> Основные -> Загрузки -> Путь для сохранения файлов)."
+	},
+	"settings_pathRestrictions_2": {
+		"message": "Допустим ваш путь для сохранения файлов \"D:\\Downloads\", и вы хотите чтобы расширение сохраняло изображения в \"D:\\Downloads\\pictures\\dank-memes\","
+	},
+	"settings_pathRestrictions_3": {
+		"message": "тогда вам нужно указать только \"pictures\\dank-memes\"."
+	},
+	"settings_pathRestrictions_4": {
+		"message": "К сожалению, расширения не могут сохранять файлы за пределами вашей директории для файлов (\"D:\\Downloads\" в нашем случае)."
+	},
+	"settings_pathRestrictions_5": {
+		"message": "Если вы ОЧЕНЬ хотите сохранять файлы за её пределами, ищите \"Символьные ссылки\"."
+	},
+	"settings_pathRestrictions_6": {
+		"message": "Также убедитесь что ваши хоткеи не пересекаются с хоткеями браузера и друг с другом."
+	},
+	"settings_defaultSavePath": {
+		"message": "Путь для сохранения файлов (директория по-умолчанию, клики мышью и кнопка пробел сохраняют файлы сюда):"
+	},
+	"settings_defaultSavePathPlaceholder": {
+		"message": "директория по-умолчанию"
+	},
+	"settings_hotkey": {
+		"message": "горячая клавиша"
+	},
+	"settings_modifier": {
+		"message": "модификатор"
+	},
+	"settings_addHotkey": {
+		"message": "Добавить хоткей для другой директории"
+	},
+	"settings_savePathPlaceholder": {
+		"message": "путь для сохранения файлов"
+	},
+	"settings_minSize": {
+		"message": "Минимальная ширина/высота изображения (в пикселях):"
+	},
+	"settings_exclusions": {
+		"message": "CSS классы элементов, которые будут исключены из сканирования (разделены пробелами):"
+	},
+	"settings_showSaveDialog": {
+		"message": "Показывать окно \"Сохранить как\":"
+	},
+	"settings_originalNameByDefault": {
+		"message": "Сохранять по-умолчанию с оригинальным именем, если оно доступно (меняет местами действия правой и левой кнопок мыши):"
+	},
+	"settings_saveFullSized": {
+		"message": "Всегда сохранять полноразмерные версии изображений (работает в twitter, tumblr, vk, instagram):"
+	},
+	"settings_saveOnHover": {
+		"message": "Сохранять по наведению мыши с зажатыми Ctrl+Alt вместо клика (рекомендуется использовать с включенной опцией \"Без дубликатов\"):"
+	},
+	"settings_forbidDuplicateFiles": {
+		"message": "Без дубликатов (предотвращать сохранение одного и того же файла несколько раз):"
+	},
+	"settings_hideButton": {
+		"message": "Скрывать кнопку если на неё не наведён курсор мыши:"
+	},
+	"settings_position": {
+		"message": "Позиция кнопки (игнорируется если кнопка размещается под курсором):"
+	},
+	"settings_positionTopLeft": {
+		"message": "Сверху слева"
+	},
+	"settings_positionTopRight": {
+		"message": "Сверху справа"
+	},
+	"settings_positionBottomLeft": {
+		"message": "Снизу слева"
+	},
+	"settings_positionBottomRight": {
+		"message": "Снизу справа"
+	},
+	"settings_placeUnderCursor": {
+		"message": "Размещать кнопку под курсором"
+	},
+	"settings_placeUnderCursorWarning": {
+		"message": "ЭКСПЕРИМЕНТАЛЬНАЯ ФУНКЦИЯ, очень кривая"
+	},
+	"settings_icon": {
+		"message": "Икока на кнопке:"
+	},
+	"settings_save": {
+		"message": "Сохранить"
+	},
+	"settings_reset": {
+		"message": "Сбросить всё"
+	},
+	"settings_messageSuccess": {
+		"message": "Настройки сохранены."
+	},
+	"settings_messageInvalidPath": {
+		"message": "Нельзя указывать абсолютные пути для сохранения. Прочитайте правила выше."
+	}
+}

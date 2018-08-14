@@ -9,12 +9,16 @@ table tr:not(#path-restrictions):not(#default-path):not(.folder) td {
 	border-bottom: 1px solid grey;
 }
 td:first-child {
+	max-width: 666px;
 	padding: 6px 10px;
 	height: 25px;
 }
 input#exclusions,
-input.path {
+input.default-path {
 	width: 400px;
+}
+input.path {
+	width: 366px;
 }
 input[type=file] {
 	width: 350px;
