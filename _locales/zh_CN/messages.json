@@ -1,0 +1,101 @@
+{
+	"extensionDescription": {
+		"message": "一个小按钮来一键保存图像或 Webm 视频，也可用快捷键操作。"
+	},
+	"settings_pathRestrictions_1": {
+		"message": "保存路径必须是相对于您的“下载”文件夹的相对路径。您的“下载”文件夹请查阅 工具 -> 选项 -> 常规 -> 下载 -> 保存文件至。"
+	},
+	"settings_pathRestrictions_2": {
+		"message": "例如，如果您的下载文件夹为“D:\\Downloads”，并且您希望本扩展将文件保存到“D:\\Downloads\\pictures\\dank-memes”，"
+	},
+	"settings_pathRestrictions_3": {
+		"message": "则将此栏设定为“pictures\\dank-memes”。"
+	},
+	"settings_pathRestrictions_4": {
+		"message": "很遗憾，本扩展不能将文件保存到您的“下载”文件夹以外的地方。"
+	},
+	"settings_pathRestrictions_5": {
+		"message": "如果您坚持要那样做，请搜索了解“符号链接”的设置方法。"
+	},
+	"settings_pathRestrictions_6": {
+		"message": "也请注意，您的热键不要与浏览器中已有的热键冲突。"
+	},
+	"settings_defaultSavePath": {
+		"message": "保存文件至（默认路径，当对按钮单击或按空格键）："
+	},
+	"settings_defaultSavePathPlaceholder": {
+		"message": "默认保存路径"
+	},
+	"settings_hotkey": {
+		"message": "快捷键"
+	},
+	"settings_modifier": {
+		"message": "修饰键"
+	},
+	"settings_addHotkey": {
+		"message": "添加另一个位置的快捷键"
+	},
+	"settings_savePathPlaceholder": {
+		"message": "保存文件至"
+	},
+	"settings_minSize": {
+		"message": "图像最小宽度/高度（像素）："
+	},
+	"settings_exclusions": {
+		"message": "扫描时排除的元素 class（以空格分隔）："
+	},
+	"settings_showSaveDialog": {
+		"message": "显示“另存为”对话框："
+	},
+	"settings_originalNameByDefault": {
+		"message": "默认保存原文件名（如果存在）（此选项交换左击与右击的操作）："
+	},
+	"settings_saveFullSized": {
+		"message": "始终保存全尺寸图像（适用于 Twitter、Tumblr、vk 和 Instagram）："
+	},
+	"settings_saveOnHover": {
+		"message": "Ctrl+Alt+悬停 即保存，无需点击（推荐配合“避免重复”选项）："
+	},
+	"settings_forbidDuplicateFiles": {
+		"message": "避免重复（避免多次保存同一文件）："
+	},
+	"settings_hideButton": {
+		"message": "非悬停时隐藏按钮："
+	},
+	"settings_position": {
+		"message": "按钮位置（“放在光标下”时忽略）："
+	},
+	"settings_positionTopLeft": {
+		"message": "左上"
+	},
+	"settings_positionTopRight": {
+		"message": "右上"
+	},
+	"settings_positionBottomLeft": {
+		"message": "左下"
+	},
+	"settings_positionBottomRight": {
+		"message": "右下"
+	},
+	"settings_placeUnderCursor": {
+		"message": "按钮放在鼠标光标下"
+	},
+	"settings_placeUnderCursorWarning": {
+		"message": "实验性功能，极易卡顿"
+	},
+	"settings_icon": {
+		"message": "自定义按钮图标："
+	},
+	"settings_save": {
+		"message": "保存"
+	},
+	"settings_reset": {
+		"message": "全部重置"
+	},
+	"settings_messageSuccess": {
+		"message": "已保存设置。"
+	},
+	"settings_messageInvalidPath": {
+		"message": "不支持绝对路径。请阅读上方的说明。"
+	}
+}
