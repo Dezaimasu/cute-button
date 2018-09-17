@@ -40,7 +40,7 @@ const de_settings = {
         minSize                 : (newValue) => de_settings.minSize = newValue,
         exclusions              : (newValue) => de_settings.exclusions = newValue.split(' '),
         icon                    : (newValue) => de_button.elem.style.backgroundImage = newValue,
-        originalNameByDefault   : (newValue) => de_button.originalNameButton = newValue ? 0 : 2,
+        originalNameByDefault   : (newValue) => de_settings.originalNameButton = newValue ? 0 : 2,
         hideButton              : (newValue) => de_button.elem.classList.toggle('shy', newValue),
         isCute					: (newValue) => de_listeners.switch(newValue),
         position                : (newValue) => [de_settings.vertical, de_settings.horizontal] = newValue.split('-'),
@@ -483,16 +483,13 @@ const de_contentscript = {
         let originalFilename = null;
 
         function tryFilenameFromDollchanImageByCenter(){
-            let filenameTry;
-            if (!de_contentscript.dollchanImproved) {return null;}
-            filenameTry = xpath('following-sibling::div[@class="de-fullimg-info" and contains(ancestor::div[1]/@class, "de-fullimg-wrap-center")]/a[@class="de-fullimg-src" and text() != "Spoiler Image"]', node);
-
+            const filenameTry = xpath('following-sibling::div[@class="de-fullimg-info" and contains(ancestor::div[1]/@class, "de-fullimg-wrap-center")]/a[@class="de-fullimg-src" and text() != "Spoiler Image"]', node);
             return filenameTry ? filenameTry.textContent : null;
         }
 
         if (!getter || this.isSeparateTab) {return null;}
         try {
-            originalFilename = tryFilenameFromDollchanImageByCenter() || getter();
+            originalFilename = de_contentscript.dollchanImproved ? tryFilenameFromDollchanImageByCenter() : getter();
         } catch (e) {} //tfw still no safe navigation operator
 
         return originalFilename;
