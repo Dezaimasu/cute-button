@@ -1,10 +1,11 @@
 {
 	"manifest_version": 2,
 	"name": "Cute Save Button (beta)",
-	"version": "0.5.0",
-	"version_name": "0.5.0 beta1",
-	"description": "Little button to save images and webms in one click or with any hotkeys. Praise cute!",
+	"version": "0.5.7",
+	"version_name": "0.5.7 beta1",
+	"description": "__MSG_extensionDescription__",
 	"author": "Deil",
+	"default_locale": "en",
 	"icons": {
 		"48": "bestgirl.png"
 	},
@@ -34,14 +35,12 @@
 		"bestgirl.png"
 	],
 	"options_ui": {
-		"page": "settings.html",
-		"browser_style": true
+		"page": "settings.html"
 	},
 	"browser_action": {
 		"default_icon": {
 			"48": "bestgirl.png"
-		},
-		"browser_style": true
+		}
 	},
 	"applications": {
 		"gecko": {

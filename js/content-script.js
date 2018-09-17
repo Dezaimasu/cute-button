@@ -18,42 +18,38 @@ const de_webextApi = {
         });
     },
     settings: function(){
-        chrome.storage.onChanged.addListener(changes => {
-            const newSettings = {},
-                changesList = Object.keys(changes);
+        function setSettings(settings, isChanges = false){
+            Object.keys(settings).forEach(settingName => {
+                const setting = settings[settingName],
+                    settingValue = isChanges ? setting.newValue : setting;
 
-            if (changesList.toString() === 'isCute') {
-                de_listeners.switch(changes.isCute.newValue);
-                return; // click on browser_action button changes only "isCute" setting
-            }
+                de_settings.setters[settingName](settingValue);
+            });
+        }
 
-            changesList.forEach(
-                settingName => newSettings[settingName] = changes[settingName].newValue
-            );
-            de_settings.setSettings(newSettings);
-        });
-        chrome.storage.local.get(null, items => de_settings.setSettings(items));
+        chrome.storage.onChanged.addListener(settings => setSettings(settings, true));
+        chrome.storage.local.get(null, setSettings);
     },
 };
 
 const de_settings = {
     selectedSavePath: null,
 
-    setSettings: function(newSettings){
-        this.minSize = newSettings.minSize;
-        this.saveOnHover = newSettings.saveOnHover;
-        this.saveFullSized = newSettings.saveFullSized;
-        this.showSaveDialog = newSettings.showSaveDialog;
-        this.defaultSavePath = newSettings.defaultSavePath;
-        this.placeUnderCursor = newSettings.placeUnderCursor;
-        this.forbidDuplicateFiles = newSettings.forbidDuplicateFiles;
-        this.exclusions = newSettings.exclusions.split(' ');
-        this.originalNameButton = newSettings.originalNameByDefault ? 0 : 2;
-        [this.vertical, this.horizontal] = newSettings.position.split('-');
-        de_button.elem.style.backgroundImage = newSettings.icon;
-        de_button.elem.classList.toggle('shy', newSettings.hideButton);
-        de_listeners.switch(newSettings.isCute);
-        Object.assign(de_hotkeys.list, this.prepareHotkeysList(newSettings.folders), de_hotkeys.reserved)
+    setters: {
+        defaultSavePath         : (newValue) => de_settings.defaultSavePath = newValue,
+        minSize                 : (newValue) => de_settings.minSize = newValue,
+        exclusions              : (newValue) => de_settings.exclusions = newValue.split(' '),
+        icon                    : (newValue) => de_button.elem.style.backgroundImage = newValue,
+        originalNameByDefault   : (newValue) => de_button.originalNameButton = newValue ? 0 : 2,
+        hideButton              : (newValue) => de_button.elem.classList.toggle('shy', newValue),
+        isCute					: (newValue) => de_listeners.switch(newValue),
+        position                : (newValue) => [de_settings.vertical, de_settings.horizontal] = newValue.split('-'),
+        folders                 : (newValue) => Object.assign(de_hotkeys.list, de_settings.prepareHotkeysList(newValue), de_hotkeys.reserved),
+        placeUnderCursor        : (newValue) => de_settings.placeUnderCursor = newValue,
+        saveOnHover             : (newValue) => de_settings.saveOnHover = newValue,
+        showSaveDialog          : (newValue) => de_settings.showSaveDialog = newValue,
+        forbidDuplicateFiles    : (newValue) => de_settings.forbidDuplicateFiles = newValue,
+        saveFullSized           : (newValue) => de_settings.saveFullSized = newValue,
     },
 
     prepareHotkeysList: function(folders){

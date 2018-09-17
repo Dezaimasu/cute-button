@@ -34,14 +34,12 @@
 		"bestgirl.png"
 	],
 	"options_ui": {
-		"page": "settings.html",
-		"browser_style": true
+		"page": "settings.html"
 	},
 	"browser_action": {
 		"default_icon": {
 			"48": "bestgirl.png"
-		},
-		"browser_style": true
+		}
 	},
 	"applications": {
 		"gecko": {
