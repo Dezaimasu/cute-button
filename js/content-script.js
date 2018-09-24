@@ -36,20 +36,20 @@ const de_settings = {
     selectedSavePath: null,
 
     setters: {
-        defaultSavePath         : (newValue) => de_settings.defaultSavePath = newValue,
-        minSize                 : (newValue) => de_settings.minSize = newValue,
-        exclusions              : (newValue) => de_settings.exclusions = newValue.split(' '),
-        icon                    : (newValue) => de_button.elem.style.backgroundImage = newValue,
-        originalNameByDefault   : (newValue) => de_settings.originalNameButton = newValue ? 0 : 2,
-        hideButton              : (newValue) => de_button.elem.classList.toggle('shy', newValue),
-        isCute					: (newValue) => de_listeners.switch(newValue),
-        position                : (newValue) => [de_settings.vertical, de_settings.horizontal] = newValue.split('-'),
-        folders                 : (newValue) => Object.assign(de_hotkeys.list, de_settings.prepareHotkeysList(newValue), de_hotkeys.reserved),
-        placeUnderCursor        : (newValue) => de_settings.placeUnderCursor = newValue,
-        saveOnHover             : (newValue) => de_settings.saveOnHover = newValue,
-        showSaveDialog          : (newValue) => de_settings.showSaveDialog = newValue,
-        forbidDuplicateFiles    : (newValue) => de_settings.forbidDuplicateFiles = newValue,
-        saveFullSized           : (newValue) => de_settings.saveFullSized = newValue,
+        defaultSavePath         : newValue => de_settings.defaultSavePath = newValue,
+        minSize                 : newValue => de_settings.minSize = newValue,
+        exclusions              : newValue => de_settings.exclusions = newValue.split(' '),
+        icon                    : newValue => de_button.elem.style.backgroundImage = newValue,
+        originalNameByDefault   : newValue => de_settings.originalNameButton = newValue ? 0 : 2,
+        hideButton              : newValue => de_button.elem.classList.toggle('shy', newValue),
+        isCute					: newValue => de_listeners.switch(newValue),
+        position                : newValue => [de_settings.vertical, de_settings.horizontal] = newValue.split('-'),
+        folders                 : newValue => Object.assign(de_hotkeys.list, de_settings.prepareHotkeysList(newValue), de_hotkeys.reserved),
+        placeUnderCursor        : newValue => de_settings.placeUnderCursor = newValue,
+        saveOnHover             : newValue => de_settings.saveOnHover = newValue,
+        showSaveDialog          : newValue => de_settings.showSaveDialog = newValue,
+        forbidDuplicateFiles    : newValue => de_settings.forbidDuplicateFiles = newValue,
+        saveFullSized           : newValue => de_settings.saveFullSized = newValue,
     },
 
     prepareHotkeysList: function(folders){
@@ -306,7 +306,7 @@ const de_contentscript = {
                     'twitter.com'   : 'self::div[contains(@class, "GalleryNav")]/preceding-sibling::div[@class="Gallery-media"]/img',
                     'tumblr.com'    : 'self::a/parent::div[@class="photo-wrap"]/img',
                     'yandex.*'      : 'self::div[contains(@class, "preview2__arrow")]/preceding-sibling::div[contains(@class, "preview2__wrapper")]/div[@class="preview2__thumb-wrapper"]/img[contains(@class, "visible")] | self::div[contains(@class, "preview2__control")]/../preceding-sibling::div[contains(@class, "preview2__wrapper")]/div[@class="preview2__thumb-wrapper"]/img[contains(@class, "visible")]',
-                    'instagram.com' : 'self::div/preceding-sibling::div/img | self::a[@role="button"]/preceding-sibling::div//video | self::ul/parent::div/preceding-sibling::div[@role="button"]/div/img',
+                    'instagram.com' : 'self::div/preceding-sibling::div/img | self::a[@role="button"]/preceding-sibling::div//video | self::ul/parent::div/preceding-sibling::div/div/img',
                     'iwara.tv'      : 'self::div[@class="vjs-poster"]/preceding-sibling::video[@class="vjs-tech"]',
                     'vk.com'        : 'self::a[contains(@class, "image_cover") and contains(@onclick, "showPhoto")]',
                 };
@@ -483,13 +483,16 @@ const de_contentscript = {
         let originalFilename = null;
 
         function tryFilenameFromDollchanImageByCenter(){
-            const filenameTry = xpath('following-sibling::div[@class="de-fullimg-info" and contains(ancestor::div[1]/@class, "de-fullimg-wrap-center")]/a[@class="de-fullimg-src" and text() != "Spoiler Image"]', node);
+            let filenameTry;
+            if (!de_contentscript.dollchanImproved) {return null;}
+            filenameTry = xpath('following-sibling::div[@class="de-fullimg-info" and contains(ancestor::div[1]/@class, "de-fullimg-wrap-center")]/a[@class="de-fullimg-src" and text() != "Spoiler Image"]', node);
+
             return filenameTry ? filenameTry.textContent : null;
         }
 
         if (!getter || this.isSeparateTab) {return null;}
         try {
-            originalFilename = de_contentscript.dollchanImproved ? tryFilenameFromDollchanImageByCenter() : getter();
+            originalFilename = tryFilenameFromDollchanImageByCenter() || getter();
         } catch (e) {} //tfw still no safe navigation operator
 
         return originalFilename;
