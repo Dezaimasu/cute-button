@@ -1,7 +1,7 @@
 {
 	"manifest_version": 2,
 	"name": "Cute Save Button",
-	"version": "0.5.7",
+	"version": "0.5.8",
 	"description": "__MSG_extensionDescription__",
 	"author": "Deil",
 	"default_locale": "en",

@@ -4,7 +4,8 @@
 
 **Little button to save images and webms in one click or with any hotkeys. Praise cute!**
 
-https://addons.mozilla.org/en-US/firefox/addon/cute-save-button/
+https://addons.mozilla.org/en-US/firefox/addon/cute-save-button/  
+https://chrome.google.com/webstore/detail/cute-save-button/foblnmhpgiilabdcbnfgoheplajhompg
 
 * You can set any amount of save locations accessible via customizable hotkeys. Make sure your hotkey won't interfere with browser reserved hotkeys.
 * Click on the button or press Space to save the file to default location
