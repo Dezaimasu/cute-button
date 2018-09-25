@@ -290,15 +290,18 @@ const de_contentscript = {
         filterBySize: function(node, modifier){
             const buttonPlaceholderSize = 50;
             if (node.tagName === 'IMG' && (node.width < buttonPlaceholderSize || node.height < buttonPlaceholderSize)) {
-                return true;
+                return true; // never show on too small images
+            }
+            if (node.tagName === 'VIDEO' && !modifier && (!node.videoHeight || !node.videoWidth)) {
+                return true; // never show on video tags with only audio content (unless modifier pressed)
             }
             if (de_contentscript.isSeparateTab || node.tagName === 'VIDEO' || modifier) {
-                return false;
+                return false; // always show if it's a separate tab or if it's video  or if modifier is pressed
             }
-            if (node.complete && !(node.naturalWidth < de_settings.minSize || node.naturalHeight < de_settings.minSize)) {
-                return false;
+            if (node.complete && node.naturalWidth >= de_settings.minSize && node.naturalHeight >= de_settings.minSize) {
+                return false; // show if image is fully loaded and its actual sizes bigger than minSize
             }
-            return (node.width < de_settings.minSize || node.height < de_settings.minSize);
+            return node.width < de_settings.minSize || node.height < de_settings.minSize; // otherwise hide if its sizes on the page smaller than minSize
         },
         deepSearchHostSpecific: function(node){
             const that = de_contentscript,
