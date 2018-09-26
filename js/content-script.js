@@ -251,7 +251,7 @@ const de_contentscript = {
     nodeTools: {
         observer: new MutationObserver(mutations => {
             const target = mutations.pop().target;
-            target.addEventListener('load', e => de_contentscript.nodeHandler(target), {once: true});
+            de_contentscript.nodeTools.handleAgainOn('load', target);
         }),
 
         addSrcObserver: function(node){
@@ -263,6 +263,9 @@ const de_contentscript = {
                 characterData   : false,
                 attributeFilter : ['src']
             });
+        },
+        handleAgainOn: function(eventName, node){
+            node.addEventListener(eventName, () => de_contentscript.nodeHandler(node), {once: true});
         },
         checkForBgSrc: function(node, modifier){
             let bgImg;
@@ -278,6 +281,13 @@ const de_contentscript = {
             }
             return false;
         },
+        isSmallVideo: function(node){
+            if (node.tagName !== 'VIDEO' || node.videoHeight || node.videoWidth) {
+                return false;
+            }
+            de_contentscript.nodeTools.handleAgainOn('loadeddata', node);
+            return true;
+        },
         filterByTag: function(tagName){
             return !['IMG', 'VIDEO', 'AUDIO'].includes(tagName);
         },
@@ -292,8 +302,8 @@ const de_contentscript = {
             if (node.tagName === 'IMG' && (node.width < buttonPlaceholderSize || node.height < buttonPlaceholderSize)) {
                 return true; // never show on too small images
             }
-            if (!modifier && (node.tagName === 'AUDIO' || (node.tagName === 'VIDEO' && (!node.videoHeight || !node.videoWidth)))) {
-                return true; // never show on video tags with only audio content or audio tags unless modifier pressed
+            if (!modifier && (node.tagName === 'AUDIO' || de_contentscript.nodeTools.isSmallVideo(node))) {
+                return true; // don't show on audiotags or video tags with small height (would block play button) unless modifier pressed
             }
             if (de_contentscript.isSeparateTab || ['VIDEO', 'AUDIO'].includes(node.tagName) || modifier) {
                 return false; // always show if it's a separate tab or if it's audio/video or if modifier is pressed
