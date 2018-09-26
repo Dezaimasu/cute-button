@@ -218,7 +218,7 @@ const de_contentscript = {
 
     init: function(){
         this.host = this.getFilteredHost();
-        this.isSeparateTab = document.contentType.startsWith('image/') || document.contentType.startsWith('video/');
+        this.isSeparateTab = ['image/', 'video/', 'audio/'].includes(document.contentType.substr(0, 6));
         this.srcLocation = this.isSeparateTab ? 'baseURI' : 'currentSrc';
         window.addEventListener('load', e => this.dollchanImproved = !!document.querySelector('#de-main'), {once: true});
 
@@ -279,7 +279,7 @@ const de_contentscript = {
             return false;
         },
         filterByTag: function(tagName){
-            return (tagName !== 'IMG' && tagName !== 'VIDEO');
+            return !['IMG', 'VIDEO', 'AUDIO'].includes(tagName);
         },
         filterBySrc: function(src){
             return (!src || !src.startsWith('http') || src.startsWith('https://www.google.com/recaptcha/'));
@@ -292,11 +292,11 @@ const de_contentscript = {
             if (node.tagName === 'IMG' && (node.width < buttonPlaceholderSize || node.height < buttonPlaceholderSize)) {
                 return true; // never show on too small images
             }
-            if (node.tagName === 'VIDEO' && !modifier && (!node.videoHeight || !node.videoWidth)) {
-                return true; // never show on video tags with only audio content (unless modifier pressed)
+            if (!modifier && (node.tagName === 'AUDIO' || (node.tagName === 'VIDEO' && (!node.videoHeight || !node.videoWidth)))) {
+                return true; // never show on video tags with only audio content or audio tags unless modifier pressed
             }
-            if (de_contentscript.isSeparateTab || node.tagName === 'VIDEO' || modifier) {
-                return false; // always show if it's a separate tab or if it's video  or if modifier is pressed
+            if (de_contentscript.isSeparateTab || ['VIDEO', 'AUDIO'].includes(node.tagName) || modifier) {
+                return false; // always show if it's a separate tab or if it's audio/video or if modifier is pressed
             }
             if (node.complete && node.naturalWidth >= de_settings.minSize && node.naturalHeight >= de_settings.minSize) {
                 return false; // show if image is fully loaded and its actual sizes bigger than minSize

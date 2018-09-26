@@ -51,7 +51,7 @@ const downloader = {
             this.saveFileWithFilenameFromHeaders(downloadRequest.src, tabId, request);
         };
         request.onerror = () => {
-            const filenameTry = downloadRequest.backupName.match(/[^\s]+\.(jpg|jpeg|png|gif|bmp|webm|mp4|ogg)/i);
+            const filenameTry = downloadRequest.backupName.match(/[^\s]+\.(jpg|jpeg|png|gif|bmp|webm|mp4|ogg|mp3)/i);
             this.filename = filenameTry ? filenameTry[0] : downloadRequest.backupName;
             this.download(downloadRequest.src, tabId, downloadRequest.showSaveDialog);
         };
@@ -89,7 +89,7 @@ const downloader = {
     */
     getFilename: function(originalUrl){
         const url = decodeURI(originalUrl).replace(/^.*https?:\/\/([^/]+)\/+/, '').split(/[?#]/)[0].replace(/:\w+$/, '').replace(/\/{2,}/, '/'),
-            filenameTry = url.match(/^([^/]+\/)*([^/]+\.(jpg|jpeg|png|gif|bmp|webm|mp4|ogg))([\/][^.]+)?$/i);
+            filenameTry = url.match(/^([^/]+\/)*([^/]+\.(jpg|jpeg|png|gif|bmp|webm|mp4|ogg|mp3))([\/][^.]+)?$/i);
 
         if (filenameTry) {
             this.filename = filenameTry[2]
