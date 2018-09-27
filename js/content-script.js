@@ -515,7 +515,12 @@ const de_contentscript = {
 const de_listeners = {
     mouseoverListener: function(event){
         if (event.target.tagName === de_button.name || (event.relatedTarget && event.relatedTarget.tagName === de_button.name)) {return;}
-        de_contentscript.nodeHandler(event.target, event);
+        try {
+            de_contentscript.nodeHandler(event.target, event);
+        } catch (e) {
+            if (!e.message.includes('de_settings')) {return;} // settings are not initialized yet
+            setTimeout(() => {de_contentscript.nodeHandler(event.target, event);}, 100);
+        }
     },
     keydownListener: function(event){
         if (de_hotkeys.isHotkeyPossible(event) && de_hotkeys.isHotkeyExists(de_hotkeys.buildHotkeyId(event))) {
@@ -572,4 +577,5 @@ function xpath(path, contextNode){
     return document.evaluate(path, contextNode, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
 }
 
+window.addEventListener('mouseover', de_listeners.mouseoverListener); // asap
 de_contentscript.init();
