@@ -44,6 +44,9 @@
 	"settings_exclusions": {
 		"message": "Classes of elements excluded from scanning (split by spaces):"
 	},
+	"settings_domainExclusions": {
+		"message": "Newer show button on these sites (split by spaces):"
+	},
 	"settings_showSaveDialog": {
 		"message": "Show \"Save as\" dialog:"
 	},

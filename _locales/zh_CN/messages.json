@@ -44,6 +44,9 @@
 	"settings_exclusions": {
 		"message": "扫描时排除的元素 class（以空格分隔）："
 	},
+	"settings_domainExclusions": {
+		"message": "??? translation required ???"
+	},
 	"settings_showSaveDialog": {
 		"message": "显示“另存为”对话框："
 	},

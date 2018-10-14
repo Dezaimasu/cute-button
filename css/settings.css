@@ -14,6 +14,7 @@ td:first-child {
 	height: 25px;
 }
 input#exclusions,
+input#domainExclusions,
 input.default-path {
 	width: 400px;
 }

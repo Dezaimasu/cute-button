@@ -13,4 +13,5 @@ const settingsDefault = {
     showSaveDialog          : false,
     forbidDuplicateFiles    : true,
     saveFullSized           : true,
+    domainExclusions        : '',
 };

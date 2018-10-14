@@ -50,6 +50,10 @@ const de_settings = {
         showSaveDialog          : newValue => de_settings.showSaveDialog = newValue,
         forbidDuplicateFiles    : newValue => de_settings.forbidDuplicateFiles = newValue,
         saveFullSized           : newValue => de_settings.saveFullSized = newValue,
+        domainExclusions        : newValue => {
+            de_settings.domainExcluded = newValue.split(' ').includes(document.location.host);
+            de_listeners.switch(!de_settings.domainExcluded);
+        },
     },
 
     prepareHotkeysList: function(folders){
@@ -217,6 +221,8 @@ const de_contentscript = {
     downloadsHistory: [],
 
     init: function(){
+        window.addEventListener('mouseover', de_listeners.mouseoverListener); // asap
+
         this.host = this.getFilteredHost();
         this.isSeparateTab = ['image/', 'video/', 'audio/'].includes(document.contentType.substr(0, 6));
         this.srcLocation = this.isSeparateTab ? 'baseURI' : 'currentSrc';
@@ -543,7 +549,7 @@ const de_listeners = {
     },
 
     switch: function(turnOn = true){
-        const functionName = turnOn ? 'addEventListener' : 'removeEventListener';
+        const functionName = turnOn && !de_settings.domainExcluded ? 'addEventListener' : 'removeEventListener';
         window[functionName]('mouseover', de_listeners.mouseoverListener);
         window[functionName]('keydown', de_listeners.keydownListener);
         window[functionName]('keyup', de_listeners.keyupListener);
@@ -577,5 +583,4 @@ function xpath(path, contextNode){
     return document.evaluate(path, contextNode, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
 }
 
-window.addEventListener('mouseover', de_listeners.mouseoverListener); // asap
 de_contentscript.init();

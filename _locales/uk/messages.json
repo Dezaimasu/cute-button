@@ -44,6 +44,9 @@
 	"settings_exclusions": {
 		"message": "CSS класи елементів, виключених зі сканування (розділені пробілами):"
 	},
+	"settings_domainExclusions": {
+		"message": "Ніколи не показувати кнопку на цих сайтах (розділені пробілами):"
+	},
 	"settings_showSaveDialog": {
 		"message": "Показувати вікно \"Зберегти як\":"
 	},
