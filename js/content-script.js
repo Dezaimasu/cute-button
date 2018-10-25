@@ -309,7 +309,7 @@ const de_contentscript = {
                 return true; // never show on too small images
             }
             if (!modifier && (node.tagName === 'AUDIO' || de_contentscript.nodeTools.isSmallVideo(node))) {
-                return true; // don't show on audiotags or video tags with small height (would block play button) unless modifier pressed
+                return true; // don't show on audio tags or video tags with small height (would block play button) unless modifier pressed
             }
             if (de_contentscript.isSeparateTab || ['VIDEO', 'AUDIO'].includes(node.tagName) || modifier) {
                 return false; // always show if it's a separate tab or if it's audio/video or if modifier is pressed
@@ -321,16 +321,18 @@ const de_contentscript = {
         },
         deepSearchHostSpecific: function(node){
             const that = de_contentscript,
-                crutches = {
+                dollchanHack = 'self::div[@class="de-fullimg-video-hack"]/following-sibling::video',
+                hostHacks = {
                     'twitter.com'   : 'self::div[contains(@class, "GalleryNav")]/preceding-sibling::div[@class="Gallery-media"]/img',
                     'tumblr.com'    : 'self::a/parent::div[@class="photo-wrap"]/img',
                     'yandex.*'      : 'self::div[contains(@class, "preview2__arrow")]/preceding-sibling::div[contains(@class, "preview2__wrapper")]/div[@class="preview2__thumb-wrapper"]/img[contains(@class, "visible")] | self::div[contains(@class, "preview2__control")]/../preceding-sibling::div[contains(@class, "preview2__wrapper")]/div[@class="preview2__thumb-wrapper"]/img[contains(@class, "visible")]',
                     'instagram.com' : 'self::div/preceding-sibling::div/img | self::a[@role="button"]/preceding-sibling::div//video | self::ul/parent::div/preceding-sibling::div/div/img',
                     'iwara.tv'      : 'self::div[@class="vjs-poster"]/preceding-sibling::video[@class="vjs-tech"]',
                     'vk.com'        : 'self::a[contains(@class, "image_cover") and contains(@onclick, "showPhoto")]',
-                };
+                },
+                selectedXpath = (that.dollchanImproved && dollchanHack) || hostHacks[that.host];
 
-            that.actualNode = crutches[that.host] && xpath(crutches[that.host], node);
+            that.actualNode = xpath(selectedXpath, node);
             return !!that.actualNode;
         },
     },
@@ -365,7 +367,7 @@ const de_contentscript = {
             offset = 6,
             reverseOffset = 38, // offset + button width (32px)
             position = {},
-            getMinOffset = sideSize => sideSize === 0 ? -999999 : 0; //crutch(?) for tumblr for image containers with 0px width/height
+            getMinOffset = sideSize => sideSize === 0 ? -999999 : 0; //hack(?) for tumblr for image containers with 0px width/height
         let parentRect;
 
         const sizeGettersRegular = {
@@ -504,7 +506,7 @@ const de_contentscript = {
         function tryFilenameFromDollchanImageByCenter(){
             let filenameTry;
             if (!de_contentscript.dollchanImproved) {return null;}
-            filenameTry = xpath('following-sibling::div[@class="de-fullimg-info" and contains(ancestor::div[1]/@class, "de-fullimg-wrap-center")]/a[@class="de-fullimg-src" and text() != "Spoiler Image"]', node);
+            filenameTry = xpath('following-sibling::div[@class="de-fullimg-info" and contains(ancestor::div[1]/@class, "de-fullimg-wrap-center")]/a[@class="de-fullimg-link" and text() != "Spoiler Image"]', node);
 
             return filenameTry ? filenameTry.textContent : null;
         }
@@ -525,7 +527,7 @@ const de_listeners = {
             de_contentscript.nodeHandler(event.target, event);
         } catch (e) {
             if (!e.message.includes('de_settings')) {return;} // settings are not initialized yet
-            setTimeout(() => {de_contentscript.nodeHandler(event.target, event);}, 100);
+            setTimeout(() => de_contentscript.nodeHandler(event.target, event), 100);
         }
     },
     keydownListener: function(event){
