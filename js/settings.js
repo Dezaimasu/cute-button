@@ -26,6 +26,7 @@ function loadOptions(){
         Object.keys(settingsDefault).forEach(optionName => setValue(optionName, result[optionName]));
         refreshIcon();
         refreshFolders(result.folders);
+        setPrefixSelector(result.filenamePrefix);
         saveOptions();
         document.querySelectorAll('.path').forEach(pathElem => checkSavePath(pathElem)); // to check previously saved invalid paths; could be removed later
     });
@@ -44,6 +45,7 @@ function resetOptions(){
     Object.keys(settingsDefault).forEach(optionName => setValue(optionName, settingsDefault[optionName]));
     refreshIcon();
     refreshFolders(settingsDefault.folders);
+    setPrefixSelector(settingsDefault.filenamePrefix);
     enableSave();
 }
 
@@ -183,12 +185,27 @@ function isValidPath(path){
 */
 
 function prefixSelectorListener(){
-    setting['filenamePrefix'].disabled = true;
-    switch (elem['prefix-selector'].value) {
-        case 'none': {setValue('filenamePrefix', ''); break;}
-        case 'text': {setValue('filenamePrefix', ''); setting['filenamePrefix'].disabled = false; break;}
-        case 'date': {setValue('filenamePrefix', '::date::'); break;}
+    if (isTextPrefix(elem['prefix-selector'].value)) {
+        setValue('filenamePrefix', '');
+        setting['filenamePrefix'].disabled = false;
+    } else {
+        setValue('filenamePrefix', elem['prefix-selector'].value);
+        setting['filenamePrefix'].disabled = true;
     }
+}
+
+function setPrefixSelector(prefix){
+    if (isTextPrefix(prefix)) {
+        elem['prefix-selector'].value = 'text';
+        setting['filenamePrefix'].disabled = false;
+    } else {
+        elem['prefix-selector'].value = prefix;
+        setting['filenamePrefix'].disabled = true;
+    }
+}
+
+function isTextPrefix(value){
+    return !['', '::date::', '::time::'].includes(value);
 }
 
 /*

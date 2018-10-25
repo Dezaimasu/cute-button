@@ -86,6 +86,21 @@
 	"settings_placeUnderCursorWarning": {
 		"message": "ЕКСПЕРИМЕНТАЛЬНА ФУНКЦІЯ, дуже незграбна"
 	},
+	"settings_filenamePrefix": {
+		"message": "Префікс імені файлу:"
+	},
+	"settings_filenamePrefixNone": {
+		"message": "без префікса"
+	},
+	"settings_filenamePrefixText": {
+		"message": "текст"
+	},
+	"settings_filenamePrefixDate": {
+		"message": "дата та час"
+	},
+	"settings_filenamePrefixTime": {
+		"message": "таймстамп"
+	},
 	"settings_icon": {
 		"message": "Іконка на кнопці:"
 	},

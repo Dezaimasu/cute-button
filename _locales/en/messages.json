@@ -86,6 +86,21 @@
 	"settings_placeUnderCursorWarning": {
 		"message": "EXPERIMENTAL, very clunky"
 	},
+	"settings_filenamePrefix": {
+		"message": "Filename prefix:"
+	},
+	"settings_filenamePrefixNone": {
+		"message": "no prefix"
+	},
+	"settings_filenamePrefixText": {
+		"message": "custom text"
+	},
+	"settings_filenamePrefixDate": {
+		"message": "datetime"
+	},
+	"settings_filenamePrefixTime": {
+		"message": "timestamp"
+	},
 	"settings_icon": {
 		"message": "Your custom cute icon:"
 	},

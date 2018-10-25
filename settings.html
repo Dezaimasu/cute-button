@@ -114,12 +114,13 @@
 		<tr>
 			<td><label for="filenamePrefix"><i18n>settings_filenamePrefix</i18n></label></td>
 			<td>
-				<select id="prefix-selector" disabled>
-					<option value="none" data-i18n="settings_filenamePrefixNone">no prefix</option>
-					<option value="text" data-i18n="settings_filenamePrefixText">custom text</option>
-					<option value="date" data-i18n="settings_filenamePrefixDate">date</option>
+				<select id="prefix-selector">
+					<option value="" data-i18n="settings_filenamePrefixNone"></option>
+					<option value="text" data-i18n="settings_filenamePrefixText"></option>
+					<option value="::date::" data-i18n="settings_filenamePrefixDate"></option>
+					<option value="::time::" data-i18n="settings_filenamePrefixTime"></option>
 				</select>
-				<input id="filenamePrefix">
+				<input id="filenamePrefix" disabled>
 			</td>
 		</tr>
 		<tr>

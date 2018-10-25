@@ -82,6 +82,7 @@ const de_button = {
         originalName    : null,
         backupName      : null,
         showSaveDialog  : null,
+        filenamePrefix  : null,
     },
 
     init: function(){
@@ -112,7 +113,7 @@ const de_button = {
                 downloadRequest = Object.assign(
                     {path: de_settings.selectedSavePath || de_settings.defaultSavePath},
                     that.downloadRequest,
-                    that.isOriginalNameButton(eventButton) ? {} : {originalName: null}
+                    that.isOriginalNameButton(eventButton) ? {} : {originalName: null},
                 ),
                 historyEntry = JSON.stringify(downloadRequest);
 
@@ -190,7 +191,8 @@ const de_button = {
             src             : src,
             originalName    : originalName,
             backupName      : (src && de_contentscript.isSeparateTab) ? document.title : null,
-            showSaveDialog  : de_settings.showSaveDialog
+            showSaveDialog  : de_settings.showSaveDialog,
+            filenamePrefix  : de_settings.filenamePrefix,
         };
     },
 

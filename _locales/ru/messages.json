@@ -86,6 +86,21 @@
 	"settings_placeUnderCursorWarning": {
 		"message": "ЭКСПЕРИМЕНТАЛЬНАЯ ФУНКЦИЯ, очень кривая"
 	},
+	"settings_filenamePrefix": {
+		"message": "Префикс имени файла:"
+	},
+	"settings_filenamePrefixNone": {
+		"message": "без префикса"
+	},
+	"settings_filenamePrefixText": {
+		"message": "текст"
+	},
+	"settings_filenamePrefixDate": {
+		"message": "дата и время"
+	},
+	"settings_filenamePrefixTime": {
+		"message": "таймстамп"
+	},
 	"settings_icon": {
 		"message": "Иконка на кнопке:"
 	},

@@ -8,6 +8,7 @@ const downloader = {
     savePath: '',
     filename: '',
     basename: '',
+    prefix  : '',
 
     resetFileName: function(){
         this.filename = '';
@@ -23,9 +24,18 @@ const downloader = {
         return rawPath && (rawPath.replace(/^\\+|^\/+|\\+$|\/+$/, '') + '/');
     },
 
+    preparePrefix: function(prefix){
+        switch (prefix) {
+            case '::date::' : {return new Date().toISOString().replace('T', '_').replace(/\..+/g, '').replace(/[^\d_]/g, '');}
+            case '::time::' : {return new Date().getTime();}
+            default         : {return prefix;}
+        }
+    },
+
     saveFile: function(downloadRequest, tabId){
         this.resetFileName();
         this.savePath = this.prepareSavePath(downloadRequest.path);
+        this.prefix = this.preparePrefix(downloadRequest.filenamePrefix);
 
         if (downloadRequest.originalName) {
             this.filename = downloadRequest.originalName;
@@ -112,19 +122,24 @@ const downloader = {
         });
     },
 
-    prepareWinFilename: function(){
-        return decodeURIComponent(this.filename).replace(/[/\\:*?"<>|\x09]/g, '');
+    trimForbiddenWinChars: function(string){
+        return string.replace(/[/\\:*?"<>|\x09]/g, '');
+    },
+
+    prepareFilename: function(){
+        const prefix = this.prefix ? `${this.prefix}__` : '';
+        return this.trimForbiddenWinChars(prefix + decodeURIComponent(this.filename));
     },
 
     download: function(src, tabId, showSaveDialog){
-        const finalFilename = this.prepareWinFilename();
+        const finalFilename = this.prepareFilename();
         chrome.downloads.download({
-            url: src,
-            filename: this.savePath + finalFilename,
-            saveAs: showSaveDialog,
-            conflictAction: 'uniquify'
+            url             : src,
+            filename        : this.savePath + finalFilename,
+            saveAs          : showSaveDialog,
+            conflictAction  : 'uniquify'
         },
-            downloadId  => this.checkForDuplicate(finalFilename, downloadId, tabId)
+            downloadId => this.checkForDuplicate(finalFilename, downloadId, tabId)
         );
     },
 };

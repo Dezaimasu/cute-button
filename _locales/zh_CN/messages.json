@@ -86,6 +86,21 @@
 	"settings_placeUnderCursorWarning": {
 		"message": "实验性功能，极易卡顿"
 	},
+	"settings_filenamePrefix": {
+		"message": "Filename prefix:"
+	},
+	"settings_filenamePrefixNone": {
+		"message": "no prefix"
+	},
+	"settings_filenamePrefixText": {
+		"message": "custom string"
+	},
+	"settings_filenamePrefixDate": {
+		"message": "datetime"
+	},
+	"settings_filenamePrefixTime": {
+		"message": "timestamp"
+	},
 	"settings_icon": {
 		"message": "自定义按钮图标："
 	},
