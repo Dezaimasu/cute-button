@@ -50,6 +50,7 @@ const de_settings = {
         showSaveDialog          : newValue => de_settings.showSaveDialog = newValue,
         forbidDuplicateFiles    : newValue => de_settings.forbidDuplicateFiles = newValue,
         saveFullSized           : newValue => de_settings.saveFullSized = newValue,
+        filenamePrefix          : newValue => de_settings.filenamePrefix = newValue,
         domainExclusions        : newValue => {
             de_settings.domainExcluded = newValue.split(' ').includes(document.location.host);
             de_listeners.switch(!de_settings.domainExcluded);

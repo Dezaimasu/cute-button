@@ -14,4 +14,5 @@ const settingsDefault = {
     forbidDuplicateFiles    : true,
     saveFullSized           : true,
     domainExclusions        : '',
+    filenamePrefix          : '',
 };

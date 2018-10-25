@@ -179,11 +179,24 @@ function isValidPath(path){
 }
 
 /*
+-------------------- Prefix --------------------
+*/
+
+function prefixSelectorListener(){
+    setting['filenamePrefix'].disabled = true;
+    switch (elem['prefix-selector'].value) {
+        case 'none': {setValue('filenamePrefix', ''); break;}
+        case 'text': {setValue('filenamePrefix', ''); setting['filenamePrefix'].disabled = false; break;}
+        case 'date': {setValue('filenamePrefix', '::date::'); break;}
+    }
+}
+
+/*
 -------------------- Initialization --------------------
 */
 function initSelectors(){
     const settingsElems = Object.keys(settingsDefault),
-        otherElems = ['blank-folder', 'add-folder', 'add-folder-container', 'save', 'reset', 'file-input', 'message', 'de-cute-id'];
+        otherElems = ['blank-folder', 'add-folder', 'add-folder-container', 'prefix-selector', 'save', 'reset', 'file-input', 'message', 'de-cute-id'];
 
     settingsElems.forEach(name => {
         setting[name] = document.querySelector(`#${name}`);
@@ -213,6 +226,7 @@ function init(){
     i18n();
     initSelectors();
 
+    elem['prefix-selector'].addEventListener('change', prefixSelectorListener);
     elem['file-input'].addEventListener('change', fileInputListener);
     elem['reset'].addEventListener('click', resetOptions);
     elem['save'].addEventListener('click', event => {

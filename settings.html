@@ -112,6 +112,17 @@
 			<td><input id="placeUnderCursor" type="checkbox"></td>
 		</tr>
 		<tr>
+			<td><label for="filenamePrefix"><i18n>settings_filenamePrefix</i18n></label></td>
+			<td>
+				<select id="prefix-selector" disabled>
+					<option value="none" data-i18n="settings_filenamePrefixNone">no prefix</option>
+					<option value="text" data-i18n="settings_filenamePrefixText">custom text</option>
+					<option value="date" data-i18n="settings_filenamePrefixDate">date</option>
+				</select>
+				<input id="filenamePrefix">
+			</td>
+		</tr>
+		<tr>
 			<td><label for="file-input"><i18n>settings_icon</i18n></label></td>
 			<td>
 				<div id="icon-container">
