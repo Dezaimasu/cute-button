@@ -172,7 +172,7 @@ const de_button = {
     },
 
     isVisible: function(){
-        return this.elem.classList.contains('visible');
+        return this.elem.classList.contains('visible') && !this.elem.matches('.shy:not(:hover)');
     },
 
     emulateClick: function(buttonCode = 0){

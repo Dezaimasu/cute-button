@@ -54,7 +54,7 @@ const downloader = {
         const request = new XMLHttpRequest();
         request.open(requestType, downloadRequest.src);
         request.onload = () => {
-            if (requestType === 'HEAD' && request.status === 501) { // HEAD request method is not implemented by server
+            if (requestType === 'HEAD' && [405, 501].includes(request.status)) { // HEAD request method is not allowed / not implemented by server
                 this.getHeadersAndDownload(downloadRequest, tabId, 'GET');
                 return;
             }
