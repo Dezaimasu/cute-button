@@ -1,3 +1,5 @@
+'use strict';
+
 const settingsDefault = {
     defaultSavePath         : '',
     minSize                 : 256,

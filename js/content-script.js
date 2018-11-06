@@ -172,7 +172,7 @@ const de_button = {
     },
 
     isVisible: function(){
-        return this.elem.classList.contains('visible') && !this.elem.matches('.shy:not(:hover)');
+        return de_button.elem.matches('.visible:not(.shy), .shy:hover');
     },
 
     emulateClick: function(buttonCode = 0){
@@ -304,7 +304,7 @@ const de_contentscript = {
             return (!src || !src.startsWith('http') || src.startsWith('https://www.google.com/recaptcha/'));
         },
         filterByClass: function(classList){
-            return de_settings.exclusions.some(exclusion => classList.contains(exclusion));
+            return de_settings.exclusions.some(exclusion => classList.contains(exclusion)); // TODO: replace with Element.matches(), change stored setting value to css selector
         },
         filterBySize: function(node, modifier){
             const buttonPlaceholderSize = 50;
