@@ -38,7 +38,7 @@ const de_settings = {
     setters: {
         defaultSavePath         : newValue => de_settings.defaultSavePath = newValue,
         minSize                 : newValue => de_settings.minSize = newValue,
-        exclusions              : newValue => de_settings.exclusions = newValue.split(' '),
+        exclusions              : newValue => de_settings.exclusions = newValue,
         icon                    : newValue => de_button.elem.style.backgroundImage = newValue,
         originalNameByDefault   : newValue => de_settings.originalNameButton = newValue ? 0 : 2,
         hideButton              : newValue => de_button.elem.classList.toggle('shy', newValue),
@@ -59,16 +59,7 @@ const de_settings = {
 
     prepareHotkeysList: function(folders){
         const hotkeys = {};
-
-        folders.forEach(folder => {
-            if (!folder.id) { // to generate ids for old hotkeys created before ids existed, remove later
-            	const pseudoEvent = {keyCode: folder.keyCode};
-            	pseudoEvent[folder.modifier] = true;
-            	folder.id = de_hotkeys.buildHotkeyId(pseudoEvent);
-            }
-            hotkeys[folder.id] = folder;
-        });
-
+        folders.forEach(folder => hotkeys[folder.id] = folder);
         return hotkeys;
     },
 };
@@ -303,8 +294,8 @@ const de_contentscript = {
         filterBySrc: function(src){
             return (!src || !src.startsWith('http') || src.startsWith('https://www.google.com/recaptcha/'));
         },
-        filterByClass: function(classList){
-            return de_settings.exclusions.some(exclusion => classList.contains(exclusion)); // TODO: replace with Element.matches(), change stored setting value to css selector
+        filterByExclusions: function(node){
+            return node.matches(de_settings.exclusions);
         },
         filterBySize: function(node, modifier){
             const buttonPlaceholderSize = 50;
@@ -354,7 +345,7 @@ const de_contentscript = {
         tools.addSrcObserver(node);
         if (
             tools.filterBySrc(node[de_contentscript.srcLocation]) ||
-            tools.filterByClass(node.classList)
+            tools.filterByExclusions(node)
         ) {
             return true;
         }

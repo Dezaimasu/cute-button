@@ -42,7 +42,7 @@
 		"message": "图像最小宽度/高度（像素）："
 	},
 	"settings_exclusions": {
-		"message": "扫描时排除的元素 class（以空格分隔）："
+		"message": "CSS selectors for elements excluded from scanning (split by comma):"
 	},
 	"settings_domainExclusions": {
 		"message": "Newer show button on these sites (split by spaces):"

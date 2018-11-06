@@ -26,7 +26,7 @@ function addStyles(tabId){
 
 /* For options initialization after installation */
 chrome.runtime.onInstalled.addListener(initSettings);
-function initSettings(){
+function initSettings(details){
     chrome.runtime.onInstalled.removeListener(initSettings);
     chrome.storage.local.get(null, currentSettings => {
         const actualSettingsNames = Object.keys(settingsDefault),
@@ -35,17 +35,25 @@ function initSettings(){
             newSettingsList = arrayDiff(actualSettingsNames, currentSettingsNames),
             obsoleteSettingsList = arrayDiff(currentSettingsNames, actualSettingsNames);
 
+        function arrayDiff(arr1, arr2){
+            return arr1.filter(x => arr2.indexOf(x) === -1);
+        }
+
         newSettingsList.forEach(
             settingName => newSettings[settingName] = settingsDefault[settingName]
         );
 
+        /* START for converting pre-0.6.2 exclusions TODO: remove later */
+        const previousVersion = details.reason === 'update' ? Number(details.previousVersion.replace(/\./g, '')) : null,
+            previousExclusions = currentSettings['exclusions'];
+        if (previousVersion && previousVersion < 62 && !/[.#]/.test(previousExclusions)) {
+            newSettings['exclusions'] = previousExclusions.split(' ').map(x => `.${x}`).join(', ');
+        }
+        /* END TODO: remove later */
+
         chrome.storage.local.set(newSettings);
         chrome.storage.local.remove(obsoleteSettingsList);
     });
-}
-
-function arrayDiff(arr1, arr2){
-    return arr1.filter(x => arr2.indexOf(x) === -1);
 }
 
 /* Turns on/off content script across all tabs */
