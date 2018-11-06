@@ -567,7 +567,10 @@ const de_hotkeys = {
     },
 
     isHotkeyPossible: function(event){
-        return de_button.isVisible() && ['INPUT', 'TEXTAREA'].indexOf(event.target.tagName) === -1;
+        return (
+            (de_contentscript.isSeparateTab && document.body.scrollHeight === document.body.clientHeight) ||
+            (de_button.isVisible() && !['INPUT', 'TEXTAREA'].includes(event.target.tagName))
+        );
     },
 
     isHotkeyExists: function(hotkeyId){
