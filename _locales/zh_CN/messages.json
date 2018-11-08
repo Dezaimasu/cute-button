@@ -50,11 +50,14 @@
 	"settings_showSaveDialog": {
 		"message": "显示“另存为”对话框："
 	},
+	"settings_disableSpacebarHotkey": {
+		"message": "Disable saving with Spacebar hotkey:"
+	},
 	"settings_originalNameByDefault": {
 		"message": "默认保存原文件名（如果存在）（此选项交换左击与右击的操作）："
 	},
 	"settings_saveFullSized": {
-		"message": "始终保存全尺寸图像（适用于 Twitter、Tumblr、vk 和 Instagram）："
+		"message": "始终保存全尺寸图像（适用于 Twitter、Tumblr、vk、iwara 和 Instagram）："
 	},
 	"settings_saveOnHover": {
 		"message": "Ctrl+Alt+悬停 即保存，无需点击（推荐配合“避免重复”选项）："

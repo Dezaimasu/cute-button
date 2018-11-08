@@ -21,7 +21,7 @@
 		"message": "Also make sure your hotkeys won't overlap with browser hotkeys and with each other."
 	},
 	"settings_defaultSavePath": {
-		"message": "Save files to (default location, mouse clicks and Space button save files here):"
+		"message": "Save files to (default location, mouse clicks and Spacebar save files here):"
 	},
 	"settings_defaultSavePathPlaceholder": {
 		"message": "default save path"
@@ -50,11 +50,14 @@
 	"settings_showSaveDialog": {
 		"message": "Show \"Save as\" dialog:"
 	},
+	"settings_disableSpacebarHotkey": {
+		"message": "Disable saving with Spacebar hotkey:"
+	},
 	"settings_originalNameByDefault": {
 		"message": "Save with original name by default if available (swaps LMB and RMB actions):"
 	},
 	"settings_saveFullSized": {
-		"message": "Always save full-sized images (works on twitter, tumblr, vk, instagram):"
+		"message": "Always save full-sized images (works on twitter, tumblr, vk, instagram, iwara):"
 	},
 	"settings_saveOnHover": {
 		"message": "Save on Ctrl+Alt+hover instead of click (recommended to use with \"No duplicates\" enabled):"

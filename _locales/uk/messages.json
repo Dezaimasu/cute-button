@@ -50,11 +50,14 @@
 	"settings_showSaveDialog": {
 		"message": "Показувати вікно \"Зберегти як\":"
 	},
+	"settings_disableSpacebarHotkey": {
+		"message": "Відключити завантаження після натискання пробілу:"
+	},
 	"settings_originalNameByDefault": {
 		"message": "Зберігати з оригінальним іменем, якщо воно є (міняє місцями дії правої та лівої кнопкок миші):"
 	},
 	"settings_saveFullSized": {
-		"message": "Завжди зберігати повнорозмірну версію зображення (працює на twitter, tumblr, vk, instagram):"
+		"message": "Завжди зберігати повнорозмірну версію зображення (працює на twitter, tumblr, vk, instagram, iwara):"
 	},
 	"settings_saveOnHover": {
 		"message": "Зберігати при наведенні курсору з натиснутими Ctrl+Alt (рекомендовано використовувати з увімкненою \"Без дублікатів\"):"

@@ -17,4 +17,5 @@ const settingsDefault = {
     saveFullSized           : true,
     domainExclusions        : '',
     filenamePrefix          : '',
+    disableSpacebarHotkey   : false,
 };

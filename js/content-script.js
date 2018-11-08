@@ -19,6 +19,10 @@ const de_webextApi = {
     },
     settings: function(){
         function setSettings(settings, isChanges = false){
+            if (isSet(settings, 'folders') && isSet(settings, 'disableSpacebarHotkey')) { // implied they always changes together
+                de_hotkeys.list = {};
+            }
+
             Object.keys(settings).forEach(settingName => {
                 const setting = settings[settingName],
                     settingValue = isChanges ? setting.newValue : setting;
@@ -44,23 +48,26 @@ const de_settings = {
         hideButton              : newValue => de_button.elem.classList.toggle('shy', newValue),
         isCute					: newValue => de_listeners.switch(newValue),
         position                : newValue => [de_settings.vertical, de_settings.horizontal] = newValue.split('-'),
-        folders                 : newValue => Object.assign(de_hotkeys.list, de_settings.prepareHotkeysList(newValue), de_hotkeys.reserved),
+        folders                 : newValue => Object.assign(de_hotkeys.list, de_settings.prepareHotkeysList(newValue)),
         placeUnderCursor        : newValue => de_settings.placeUnderCursor = newValue,
         saveOnHover             : newValue => de_settings.saveOnHover = newValue,
         showSaveDialog          : newValue => de_settings.showSaveDialog = newValue,
         forbidDuplicateFiles    : newValue => de_settings.forbidDuplicateFiles = newValue,
         saveFullSized           : newValue => de_settings.saveFullSized = newValue,
         filenamePrefix          : newValue => de_settings.filenamePrefix = newValue,
-        domainExclusions        : newValue => {
-            de_settings.domainExcluded = newValue.split(' ').includes(document.location.host);
-            de_listeners.switch(!de_settings.domainExcluded);
-        },
+        disableSpacebarHotkey   : newValue => Object.assign(de_hotkeys.list, newValue ? {} : de_hotkeys.reserved),
+        domainExclusions        : newValue => de_settings.disableIfExcluded(newValue),
     },
 
     prepareHotkeysList: function(folders){
         const hotkeys = {};
         folders.forEach(folder => hotkeys[folder.id] = folder);
         return hotkeys;
+    },
+
+    disableIfExcluded: function(excludedDomains){
+        de_settings.domainExcluded = excludedDomains.split(' ').includes(document.location.host);
+        de_listeners.switch(!de_settings.domainExcluded);
     },
 };
 
@@ -163,7 +170,7 @@ const de_button = {
     },
 
     isVisible: function(){
-        return de_button.elem.matches('.visible:not(.shy), .shy:hover');
+        return de_button.elem.classList.contains('visible');
     },
 
     emulateClick: function(buttonCode = 0){
@@ -574,12 +581,16 @@ const de_hotkeys = {
     },
 
     isHotkeyExists: function(hotkeyId){
-        return typeof de_hotkeys.list[hotkeyId] !== 'undefined';
+        return isSet(de_hotkeys.list, hotkeyId);
     },
 };
 
 function xpath(path, contextNode){
     return document.evaluate(path, contextNode, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
+}
+
+function isSet(object, key){
+    return typeof object[key] !== 'undefined';
 }
 
 de_contentscript.init();
