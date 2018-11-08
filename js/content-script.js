@@ -547,6 +547,10 @@ const de_listeners = {
         	return;
         }
 
+        if (de_contentscript.isSeparateTab && !de_button.isVisible()) {
+            de_contentscript.nodeHandler(document.body.childNodes[0]);
+        }
+
         de_settings.selectedSavePath = de_hotkeys.list[hotkeyId].path;
         de_button.emulateClick(hotkeyId === '10032' ? 2 : 0);
     },
@@ -575,7 +579,7 @@ const de_hotkeys = {
 
     isHotkeyPossible: function(event){
         return (
-            (de_contentscript.isSeparateTab && document.body.scrollHeight === document.body.clientHeight) ||
+            (de_contentscript.isSeparateTab && de_hotkeys.isNoScroll()) ||
             (de_button.isVisible() && !['INPUT', 'TEXTAREA'].includes(event.target.tagName))
         );
     },
@@ -583,6 +587,10 @@ const de_hotkeys = {
     isHotkeyExists: function(hotkeyId){
         return isSet(de_hotkeys.list, hotkeyId);
     },
+
+    isNoScroll: function(){
+        return document.body.scrollHeight === document.body.clientHeight;
+    }
 };
 
 function xpath(path, contextNode){
