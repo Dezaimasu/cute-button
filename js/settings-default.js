@@ -7,7 +7,7 @@ const settingsDefault = {
     icon                    : `url("${chrome.extension.getURL('bestgirl.png')}")`,
     originalNameByDefault   : false,
     hideButton              : false,
-	isCute					: true,
+    isCute                  : true,
     position                : 'top-left',
     folders                 : [],
     placeUnderCursor        : false,

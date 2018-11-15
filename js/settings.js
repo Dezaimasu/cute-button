@@ -121,7 +121,7 @@ function addNewFolder(folderSettings = null){
     newFolder.querySelector('.delete-folder').addEventListener('click', deleteFolder);
     enableInputListeners(newFolder);
     if (folderSettings) {
-    	fillFolder(newFolder, folderSettings);
+        fillFolder(newFolder, folderSettings);
     }
     elem['add-folder-container'].parentNode.insertBefore(newFolder, elem['add-folder-container']);
 }

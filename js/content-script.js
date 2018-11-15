@@ -46,7 +46,7 @@ const de_settings = {
         icon                    : newValue => de_button.elem.style.backgroundImage = newValue,
         originalNameByDefault   : newValue => de_settings.originalNameButton = newValue ? 0 : 2,
         hideButton              : newValue => de_button.elem.classList.toggle('shy', newValue),
-        isCute					: newValue => de_listeners.switch(newValue),
+        isCute                  : newValue => de_listeners.switch(newValue),
         position                : newValue => [de_settings.vertical, de_settings.horizontal] = newValue.split('-'),
         folders                 : newValue => Object.assign(de_hotkeys.list, de_settings.prepareHotkeysList(newValue)),
         placeUnderCursor        : newValue => de_settings.placeUnderCursor = newValue,
@@ -325,7 +325,7 @@ const de_contentscript = {
                 dollchanHack = 'self::div[@class="de-fullimg-video-hack"]/following-sibling::video',
                 hostHacks = {
                     'twitter.com'   : 'self::div[contains(@class, "GalleryNav")]/preceding-sibling::div[@class="Gallery-media"]/img',
-                    'tumblr.com'    : 'self::a/parent::div[@class="photo-wrap"]/img',
+                    'tumblr.com'    : 'self::a/parent::div[@class="photo-wrap"]/img | self::a[@target="_blank"]/parent::div/preceding-sibling::div[@class="post_content"]/div/div[@data-imageurl] | self::span/parent::div/parent::a[@target="_blank"]/parent::div/preceding-sibling::div[@class="post_content"]/div/div[@data-imageurl]',
                     'yandex.*'      : 'self::div[contains(@class, "preview2__arrow")]/preceding-sibling::div[contains(@class, "preview2__wrapper")]/div[@class="preview2__thumb-wrapper"]/img[contains(@class, "visible")] | self::div[contains(@class, "preview2__control")]/../preceding-sibling::div[contains(@class, "preview2__wrapper")]/div[@class="preview2__thumb-wrapper"]/img[contains(@class, "visible")]',
                     'instagram.com' : 'self::div/preceding-sibling::div/img | self::a[@role="button"]/preceding-sibling::div//video | self::ul/parent::div/preceding-sibling::div/div/img',
                     'iwara.tv'      : 'self::div[@class="vjs-poster"]/preceding-sibling::video[@class="vjs-tech"]',
@@ -347,7 +347,7 @@ const de_contentscript = {
             return false;
         }
         if (tools.filterByTag(node.tagName)) {
-        	return true;
+            return true;
         }
         tools.addSrcObserver(node);
         if (
@@ -453,7 +453,7 @@ const de_contentscript = {
                     return node.currentSrc.replace(/(jpg|jpeg|png)(:[a-z0-9]+)?$/i, '$1:orig');
                 },
                 'tumblr.com': function(){
-                    return node.currentSrc.replace(/(\/[a-z0-9]{32}\/tumblr_\w+)(_\d{2,4}).(jpg|jpeg|png)$/i, '$1_1280.$3');
+                    return (node.dataset['imageurl'] || node.currentSrc).replace(/(\/[a-z0-9]{32}\/tumblr_\w+)(_\d{2,4}).(jpg|jpeg|png|gif)$/i, '$1_1280.$3');
                 },
                 'instagram.com': () => {
                     function getWidth(str){
@@ -544,7 +544,7 @@ const de_listeners = {
             return;
         }
         if (!de_hotkeys.isHotkeyPossible(event) || !de_hotkeys.isHotkeyExists(hotkeyId)) {
-        	return;
+            return;
         }
 
         if (de_contentscript.isSeparateTab && !de_button.isVisible()) {
