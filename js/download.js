@@ -54,7 +54,7 @@ const downloader = {
         const request = new XMLHttpRequest();
         request.open(requestType, downloadRequest.src);
         request.onload = () => {
-            if (requestType === 'HEAD' && [405, 501].includes(request.status)) { // HEAD request method is not allowed / not implemented by server
+            if (requestType === 'HEAD' && [404, 405, 501].includes(request.status)) { // HEAD request method is not supported / allowed / implemented by server
                 this.getHeadersAndDownload(downloadRequest, tabId, 'GET');
                 return;
             }
@@ -69,14 +69,11 @@ const downloader = {
     },
 
     saveFileWithFilenameFromHeaders: function(src, tabId, request){
-        const contentDisposition = request.getResponseHeader('Content-Disposition');
-        let tmpFilename;
+        const contentDisposition = request.getResponseHeader('Content-Disposition'),
+            tmpFilename = contentDisposition && contentDisposition.match(/^.+filename\*?=(.{0,20}')?([^;]*);?$/i);
 
-        if (contentDisposition) {
-            tmpFilename = contentDisposition.match(/^.+filename\*?=(.{0,20}')?([^;]*);?$/i);
-            if (tmpFilename) {
-                this.filename = decodeURI(tmpFilename[2]).replace(/"/g, '');
-            }
+        if (tmpFilename) {
+            this.filename = decodeURI(tmpFilename[2]).replace(/"/g, '');
         }
         if (!this.filename) {
             const contentType = request.getResponseHeader('Content-Type'),
@@ -104,7 +101,7 @@ const downloader = {
         if (filenameTry) {
             this.filename = filenameTry[2]
         } else {
-            this.basename = url.split('/').pop();
+            this.basename = url.replace(/\/480$/, '').split('/').pop(); // '/480' removal is a hack for tumblr videos
         }
     },
 
