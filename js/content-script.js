@@ -500,7 +500,10 @@ const de_contentscript = {
                     return container.title || container.textContent;
                 },
             },
-            aliases = {'yuki.la': 'boards.4chan.org'},
+            aliases = {
+                'boards.4channel.org': 'boards.4chan.org',
+                'yuki.la': 'boards.4chan.org',
+            },
             getter = getters[this.host] || getters[aliases[this.host]];
         let originalFilename = null;
 
