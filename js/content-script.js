@@ -256,9 +256,11 @@ const de_contentscript = {
     },
 
     nodeTools: {
+        absoluteMinSize: 50,
+
         observer: new MutationObserver(mutations => {
             const target = mutations.pop().target;
-            de_contentscript.nodeTools.handleAgainOn('load', target);
+            this.handleAgainOn('load', target);
         }),
 
         addSrcObserver: function(node){
@@ -289,10 +291,10 @@ const de_contentscript = {
             return false;
         },
         isSmallVideo: function(node){
-            if (node.tagName !== 'VIDEO' || node.videoHeight || node.videoWidth) {
+            if (node.tagName !== 'VIDEO' || node.videoHeight || node.clientHeight > this.absoluteMinSize) {
                 return false;
             }
-            de_contentscript.nodeTools.handleAgainOn('loadeddata', node);
+            this.handleAgainOn('loadeddata', node);
             return true;
         },
         filterByTag: function(tagName){
@@ -305,11 +307,10 @@ const de_contentscript = {
             return node.matches(de_settings.exclusions);
         },
         filterBySize: function(node, modifier){
-            const buttonPlaceholderSize = 50;
-            if (node.tagName === 'IMG' && (node.width < buttonPlaceholderSize || node.height < buttonPlaceholderSize)) {
+            if (node.tagName === 'IMG' && (node.width < this.absoluteMinSize || node.height < this.absoluteMinSize)) {
                 return true; // never show on too small images
             }
-            if (!modifier && (node.tagName === 'AUDIO' || de_contentscript.nodeTools.isSmallVideo(node))) {
+            if (!modifier && (node.tagName === 'AUDIO' || this.isSmallVideo(node))) {
                 return true; // don't show on audio tags or video tags with small height (would block play button) unless modifier pressed
             }
             if (de_contentscript.isSeparateTab || ['VIDEO', 'AUDIO'].includes(node.tagName) || modifier) {
