@@ -510,7 +510,7 @@ const de_contentscript = {
         function tryFilenameFromDollchanImageByCenter(){
             let filenameTry;
             if (!de_contentscript.dollchanImproved) {return null;}
-            filenameTry = xpath('following-sibling::div[@class="de-fullimg-info" and contains(ancestor::div[1]/@class, "de-fullimg-wrap-center")]/a[@class="de-fullimg-link" and text() != "Spoiler Image"]', node);
+            filenameTry = xpath('(. | self::img/..)/parent::div[contains(@class, "de-fullimg-wrap-center")]//a[@class="de-fullimg-link" and text() != "Spoiler Image"]', node);
 
             return filenameTry ? filenameTry.textContent : null;
         }

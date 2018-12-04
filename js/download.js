@@ -1,10 +1,10 @@
 'use strict';
 
 function download(downloadRequest, tabId){
-    new CurrentDownload(downloadRequest, tabId).downloadFile();
+    new Download(downloadRequest, tabId).process();
 }
 
-function CurrentDownload(downloadRequest, tabId){
+function Download(downloadRequest, tabId){
     this.downloadRequest    = downloadRequest;
     this.tabId              = tabId;
     this.savePath           = '';
@@ -13,8 +13,8 @@ function CurrentDownload(downloadRequest, tabId){
     this.prefix             = '';
 }
 
-CurrentDownload.prototype = {
-    downloadFile: function(){
+Download.prototype = {
+    process: function(){
         this.savePath = filenameTools.prepareSavePath(this.downloadRequest.path);
         this.prefix = filenameTools.preparePrefix(this.downloadRequest.filenamePrefix);
 
@@ -25,7 +25,7 @@ CurrentDownload.prototype = {
         }
 
         if (this.filename) {
-            this.webextDownload();
+            this.download();
         } else {
             this.getHeadersAndDownload();
         }
@@ -39,12 +39,12 @@ CurrentDownload.prototype = {
                 this.getHeadersAndDownload('GET');
             } else {
                 this.setFilenameFromHeaders(xhr);
-                this.webextDownload();
+                this.download();
             }
         };
         xhr.onerror = () => {
             this.setFallbackFilename();
-            this.webextDownload();
+            this.download();
         };
         xhr.send();
     },
@@ -69,7 +69,7 @@ CurrentDownload.prototype = {
         this.filename = filenameTry ? filenameTry[0] : this.downloadRequest.backupName;
     },
 
-    webextDownload: function(){
+    download: function(){
         const finalFilename = filenameTools.prepareFilename(this.filename, this.prefix);
         chrome.downloads.download({
                 url             : this.downloadRequest.src,
