@@ -57,6 +57,7 @@ const de_settings = {
         filenamePrefix          : newValue => de_settings.filenamePrefix = newValue,
         disableSpacebarHotkey   : newValue => Object.assign(de_hotkeys.list, newValue ? {} : de_hotkeys.reserved),
         domainExclusions        : newValue => de_settings.disableIfExcluded(newValue),
+        markSavedImages         : newValue => de_settings.refreshSaveMarkStyle(newValue),
     },
 
     prepareHotkeysList: function(folders){
@@ -68,6 +69,14 @@ const de_settings = {
     disableIfExcluded: function(excludedDomains){
         de_settings.domainExcluded = excludedDomains.split(' ').includes(document.location.host);
         de_listeners.switch(!de_settings.domainExcluded);
+    },
+
+    refreshSaveMarkStyle: function(value){
+        de_settings.markSavedImages = value;
+        document.styleSheets.deleteRule(de_contentscript.insertedRuleIndex);
+        if (de_settings.markSavedImages) {
+            de_contentscript.insertedRuleIndex = document.styleSheets.insertRule('.cute-and-save {opacity: 0.4 !important}');
+        }
     },
 };
 
@@ -131,6 +140,7 @@ const de_button = {
                 that.copyToClipboard(that.downloadRequest.src);
             }
             that.unclick();
+            de_contentscript.addSaveMark();
         },
 
         mousedown: function(){
@@ -211,15 +221,17 @@ const de_button = {
 };
 
 const de_contentscript = {
-    host            : null,
-    bgSrc           : null,
-    actualNode      : null,
-    srcLocation     : null,
-    previousSrc     : null,
-    isSeparateTab   : null,
-    dollchanImproved: null,
-    historyTimer    : null,
-    downloadsHistory: [],
+    host                : null,
+    bgSrc               : null,
+    actualNode          : null,
+    srcLocation         : null,
+    previousSrc         : null,
+    isSeparateTab       : null,
+    dollchanImproved    : null,
+    historyTimer        : null,
+    currentNode         : null,
+    insertedRuleIndex   : null,
+    downloadsHistory    : [],
 
     init: function(){
         window.addEventListener('mouseover', de_listeners.mouseoverListener); // asap
@@ -253,6 +265,11 @@ const de_contentscript = {
         const historyLifetime = 300000; // 5 minutes
         clearTimeout(this.historyTimer);
         this.historyTimer = setTimeout(() => this.downloadsHistory = [], historyLifetime);
+    },
+
+    addSaveMark: function(){
+        if (!de_settings.markSavedImages) {return;}
+        this.currentNode.classList.add('cute-and-saved');
     },
 
     nodeTools: {
@@ -322,20 +339,8 @@ const de_contentscript = {
             return node.width < de_settings.minSize || node.height < de_settings.minSize; // otherwise hide if its sizes on the page smaller than minSize
         },
         deepSearchHostSpecific: function(node){
-            const that = de_contentscript,
-                dollchanHack = 'self::div[@class="de-fullimg-video-hack"]/following-sibling::video',
-                hostHacks = {
-                    'twitter.com'   : 'self::div[contains(@class, "GalleryNav")]/preceding-sibling::div[@class="Gallery-media"]/img',
-                    'tumblr.com'    : 'self::a/parent::div[@class="photo-wrap"]/img | self::a[@target="_blank"]/parent::div/preceding-sibling::div[@class="post_content"]/div/div[@data-imageurl] | self::span/parent::div/parent::a[@target="_blank"]/parent::div/preceding-sibling::div[@class="post_content"]/div/div[@data-imageurl] | self::div[@class="vjs-big-play-button"]/preceding-sibling::video',
-                    'yandex.*'      : 'self::div[contains(@class, "preview2__arrow")]/preceding-sibling::div[contains(@class, "preview2__wrapper")]/div[@class="preview2__thumb-wrapper"]/img[contains(@class, "visible")] | self::div[contains(@class, "preview2__control")]/../preceding-sibling::div[contains(@class, "preview2__wrapper")]/div[@class="preview2__thumb-wrapper"]/img[contains(@class, "visible")]',
-                    'instagram.com' : 'self::div/preceding-sibling::div/img | self::a[@role="button"]/preceding-sibling::div//video | self::ul/parent::div/preceding-sibling::div/div/img',
-                    'iwara.tv'      : 'self::div[@class="vjs-poster"]/preceding-sibling::video[@class="vjs-tech"]',
-                    'vk.com'        : 'self::a[contains(@class, "image_cover") and contains(@onclick, "showPhoto")]',
-                },
-                selectedXpath = (that.dollchanImproved && dollchanHack) || hostHacks[that.host];
-
-            that.actualNode = xpath(selectedXpath, node);
-            return !!that.actualNode;
+            de_contentscript.actualNode = de_siteParsers.getActualNode(node);
+            return !!de_contentscript.actualNode;
         },
     },
 
@@ -424,15 +429,15 @@ const de_contentscript = {
             return;
         }
         that.previousSrc = src;
-        currentTarget = that.actualNode || currentTarget;
+        that.currentNode = that.actualNode || currentTarget;
 
         de_button.show(
             Object.assign(
                 {left: null, top: null, right: null, bottom: null}, // only two position properties would be set at once, other two are null on purpose to reset their default values
-                (de_settings.placeUnderCursor && that.getPositionUnderCursor(event)) || that.getPosition(currentTarget)
+                (de_settings.placeUnderCursor && that.getPositionUnderCursor(event)) || that.getPosition(that.currentNode)
             ),
-            that.getOriginalSrc(currentTarget) || src || currentTarget.src || that.bgSrc,
-            that.getOriginalFilename(currentTarget)
+            de_siteParsers.getOriginalSrc(that.currentNode) || src || that.currentNode.src || that.bgSrc,
+            de_siteParsers.getOriginalFilename(that.currentNode)
         );
 
         if (event.ctrlKey && event.altKey && de_settings.saveOnHover) {
@@ -442,6 +447,23 @@ const de_contentscript = {
 
         that.bgSrc = null;
         that.actualNode = null;
+    },
+};
+
+const de_siteParsers = {
+    getActualNode: function(node){
+        const dollchanHack = 'self::div[@class="de-fullimg-video-hack"]/following-sibling::video',
+            hostHacks = {
+                'twitter.com'   : 'self::div[contains(@class, "GalleryNav")]/preceding-sibling::div[@class="Gallery-media"]/img',
+                'tumblr.com'    : 'self::a/parent::div[@class="photo-wrap"]/img | self::a[@target="_blank"]/parent::div/preceding-sibling::div[@class="post_content"]/div/div[@data-imageurl] | self::span/parent::div/parent::a[@target="_blank"]/parent::div/preceding-sibling::div[@class="post_content"]/div/div[@data-imageurl] | self::div[@class="vjs-big-play-button"]/preceding-sibling::video',
+                'yandex.*'      : 'self::div[contains(@class, "preview2__arrow")]/preceding-sibling::div[contains(@class, "preview2__wrapper")]/div[@class="preview2__thumb-wrapper"]/img[contains(@class, "visible")] | self::div[contains(@class, "preview2__control")]/../preceding-sibling::div[contains(@class, "preview2__wrapper")]/div[@class="preview2__thumb-wrapper"]/img[contains(@class, "visible")]',
+                'instagram.com' : 'self::div/preceding-sibling::div/img | self::a[@role="button"]/preceding-sibling::div//video | self::ul/parent::div/preceding-sibling::div/div/img',
+                'iwara.tv'      : 'self::div[@class="vjs-poster"]/preceding-sibling::video[@class="vjs-tech"]',
+                'vk.com'        : 'self::a[contains(@class, "image_cover") and contains(@onclick, "showPhoto")]',
+            },
+            selectedXpath = (de_contentscript.dollchanImproved && dollchanHack) || hostHacks[de_contentscript.host];
+
+        return xpath(selectedXpath, node);
     },
 
     getOriginalSrc: function(node){
@@ -468,7 +490,7 @@ const de_contentscript = {
                     return node.parentNode.href;
                 },
             },
-            getter = getters[this.host];
+            getter = getters[de_contentscript.host];
         let originalSrc = null;
 
         if (!de_settings.saveFullSized || !getter) {return null;}
@@ -480,7 +502,8 @@ const de_contentscript = {
     },
 
     getOriginalFilename: function(node){
-        const getters = {
+        const dollchanXpath = '(. | self::img/..)/parent::div[contains(@class, "de-fullimg-wrap-center")]//a[@class="de-fullimg-link" and text() != "Spoiler Image"]',
+            getters = {
                 'boards.4chan.org': () => {
                     const container = xpath('ancestor::div[contains(concat(" ", normalize-space(@class), " "), " file ")]//*[(@class="fileText" and @title) or self::a]', node);
                     return container.title || container.textContent;
@@ -505,18 +528,18 @@ const de_contentscript = {
                 'boards.4channel.org': 'boards.4chan.org',
                 'yuki.la': 'boards.4chan.org',
             },
-            getter = getters[this.host] || getters[aliases[this.host]];
+            getter = getters[de_contentscript.host] || getters[aliases[de_contentscript.host]];
         let originalFilename = null;
 
         function tryFilenameFromDollchanImageByCenter(){
             let filenameTry;
             if (!de_contentscript.dollchanImproved) {return null;}
-            filenameTry = xpath('(. | self::img/..)/parent::div[contains(@class, "de-fullimg-wrap-center")]//a[@class="de-fullimg-link" and text() != "Spoiler Image"]', node);
+            filenameTry = xpath(dollchanXpath, node);
 
             return filenameTry ? filenameTry.textContent : null;
         }
 
-        if (!getter || this.isSeparateTab) {return null;}
+        if (!getter || de_contentscript.isSeparateTab) {return null;}
         try {
             originalFilename = tryFilenameFromDollchanImageByCenter() || getter();
         } catch (e) {} //tfw still no safe navigation operator

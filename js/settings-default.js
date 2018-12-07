@@ -18,4 +18,5 @@ const settingsDefault = {
     domainExclusions        : '',
     filenamePrefix          : '',
     disableSpacebarHotkey   : false,
+    markSavedImages         : false,
 };
