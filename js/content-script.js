@@ -73,9 +73,11 @@ const de_settings = {
 
     refreshSaveMarkStyle: function(value){
         de_settings.markSavedImages = value;
-        document.styleSheets.deleteRule(de_contentscript.insertedRuleIndex);
+        if (de_contentscript.insertedRuleIndex !== null) {
+            document.styleSheets[0].deleteRule(de_contentscript.insertedRuleIndex);
+        }
         if (de_settings.markSavedImages) {
-            de_contentscript.insertedRuleIndex = document.styleSheets.insertRule('.cute-and-save {opacity: 0.4 !important}');
+            de_contentscript.insertedRuleIndex = document.styleSheets[0].insertRule('.cute-and-save {opacity: 0.4 !important}');
         }
     },
 };
@@ -221,37 +223,29 @@ const de_button = {
 };
 
 const de_contentscript = {
-    host                : null,
     bgSrc               : null,
-    actualNode          : null,
+    actualNode          : null, // actual node with image/video (if the node under cursor is something else)
+    currentNode         : null, // the node button is currently shown on
     srcLocation         : null,
     previousSrc         : null,
     isSeparateTab       : null,
-    dollchanImproved    : null,
     historyTimer        : null,
-    currentNode         : null,
     insertedRuleIndex   : null,
     downloadsHistory    : [],
 
     init: function(){
         window.addEventListener('mouseover', de_listeners.mouseoverListener); // asap
 
-        this.host = this.getFilteredHost();
         this.isSeparateTab = ['image/', 'video/', 'audio/'].includes(document.contentType.substr(0, 6));
         this.srcLocation = this.isSeparateTab ? 'baseURI' : 'currentSrc';
-        window.addEventListener('load', e => this.dollchanImproved = !!document.querySelector('#de-main'), {once: true});
+
+        window.addEventListener('load', de_siteParsers.checkDollchanPresence, {once: true});
+        de_siteParsers.getFilteredHost();
 
         de_button.init();
         de_webextApi.listen();
         de_webextApi.settings();
         de_webextApi.getStyle();
-    },
-
-    getFilteredHost: function(){
-        return document.location.host.replace(/^www\./, '')
-            .replace(/^((.*)\.)?(tumblr\.com)$/, 'tumblr.com')
-            .replace(/^yandex\.[a-z]{2,3}$/, 'yandex.*')
-            .replace(/^(ecchi\.)?(iwara\.tv)$/, 'iwara.tv');
     },
 
     rememberDownload: function(url){
@@ -451,19 +445,32 @@ const de_contentscript = {
 };
 
 const de_siteParsers = {
+    host: null,
+    dollchanImproved: null,
+
+    getFilteredHost: function(){
+        this.host = document.location.host.replace(/^www\./, '')
+            .replace(/^((.*)\.)?(tumblr\.com)$/, 'tumblr.com')
+            .replace(/^yandex\.[a-z]{2,3}$/, 'yandex.*')
+            .replace(/^(ecchi\.)?(iwara\.tv)$/, 'iwara.tv');
+    },
+
+    checkDollchanPresence: function(){
+        this.dollchanImproved = !!document.querySelector('#de-main');
+    },
+
     getActualNode: function(node){
         const dollchanHack = 'self::div[@class="de-fullimg-video-hack"]/following-sibling::video',
-            hostHacks = {
+            siteHacks = {
                 'twitter.com'   : 'self::div[contains(@class, "GalleryNav")]/preceding-sibling::div[@class="Gallery-media"]/img',
                 'tumblr.com'    : 'self::a/parent::div[@class="photo-wrap"]/img | self::a[@target="_blank"]/parent::div/preceding-sibling::div[@class="post_content"]/div/div[@data-imageurl] | self::span/parent::div/parent::a[@target="_blank"]/parent::div/preceding-sibling::div[@class="post_content"]/div/div[@data-imageurl] | self::div[@class="vjs-big-play-button"]/preceding-sibling::video',
                 'yandex.*'      : 'self::div[contains(@class, "preview2__arrow")]/preceding-sibling::div[contains(@class, "preview2__wrapper")]/div[@class="preview2__thumb-wrapper"]/img[contains(@class, "visible")] | self::div[contains(@class, "preview2__control")]/../preceding-sibling::div[contains(@class, "preview2__wrapper")]/div[@class="preview2__thumb-wrapper"]/img[contains(@class, "visible")]',
                 'instagram.com' : 'self::div/preceding-sibling::div/img | self::a[@role="button"]/preceding-sibling::div//video | self::ul/parent::div/preceding-sibling::div/div/img',
                 'iwara.tv'      : 'self::div[@class="vjs-poster"]/preceding-sibling::video[@class="vjs-tech"]',
                 'vk.com'        : 'self::a[contains(@class, "image_cover") and contains(@onclick, "showPhoto")]',
-            },
-            selectedXpath = (de_contentscript.dollchanImproved && dollchanHack) || hostHacks[de_contentscript.host];
+            };
 
-        return xpath(selectedXpath, node);
+        return (this.dollchanImproved && xpath(dollchanHack, node)) || xpath(siteHacks[this.host], node);
     },
 
     getOriginalSrc: function(node){
@@ -490,7 +497,7 @@ const de_siteParsers = {
                     return node.parentNode.href;
                 },
             },
-            getter = getters[de_contentscript.host];
+            getter = getters[this.host];
         let originalSrc = null;
 
         if (!de_settings.saveFullSized || !getter) {return null;}
@@ -528,12 +535,13 @@ const de_siteParsers = {
                 'boards.4channel.org': 'boards.4chan.org',
                 'yuki.la': 'boards.4chan.org',
             },
-            getter = getters[de_contentscript.host] || getters[aliases[de_contentscript.host]];
+            getter = getters[this.host] || getters[aliases[this.host]];
         let originalFilename = null;
 
         function tryFilenameFromDollchanImageByCenter(){
             let filenameTry;
-            if (!de_contentscript.dollchanImproved) {return null;}
+            console.log(this);
+            if (!this.dollchanImproved) {return null;}
             filenameTry = xpath(dollchanXpath, node);
 
             return filenameTry ? filenameTry.textContent : null;
