@@ -1,6 +1,6 @@
 'use strict';
 
-function download(downloadRequest, tabId){
+function download(tabId, downloadRequest){
     new Download(downloadRequest, tabId).process();
 }
 
@@ -90,7 +90,7 @@ Download.prototype = {
         chrome.downloads.search({
             id: downloadId
         }, downloadItems => {
-            if (!downloadItems[0].filename || downloadItems[0].filename.endsWith(originalFilename)) {return;}
+            if (!downloadItems[0] || !downloadItems[0].filename || downloadItems[0].filename.endsWith(originalFilename)) {return;}
             chrome.tabs.sendMessage(this.tabId, 'duplicate_warning');
         });
     },

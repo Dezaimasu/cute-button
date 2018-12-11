@@ -65,6 +65,9 @@
 	"settings_forbidDuplicateFiles": {
 		"message": "避免重复（避免多次保存同一文件）："
 	},
+	"settings_markSavedImages": {
+		"message": "Mark saved images:"
+	},
 	"settings_hideButton": {
 		"message": "非悬停时隐藏按钮："
 	},

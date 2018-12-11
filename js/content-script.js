@@ -4,8 +4,11 @@ const de_webextApi = {
     download: function(downloadRequest){
         chrome.runtime.sendMessage(Object.assign(downloadRequest, {type: 'download'}));
     },
-    getStyle: function(){
-        chrome.runtime.sendMessage({type: 'style'});
+    getButtonStyle: function(){
+        chrome.runtime.sendMessage({type: 'button_style'});
+    },
+    switchPageStyle: function(style, turnOn = true){
+        chrome.runtime.sendMessage({type: 'page_style', style: style, turnOn: turnOn});
     },
     listen: function(){
         chrome.runtime.onMessage.addListener(message => {
@@ -72,12 +75,11 @@ const de_settings = {
     },
 
     refreshSaveMarkStyle: function(value){
+        const style = `.${de_contentscript.saveMarkClass} {opacity: 0.4 !important}`; // TODO customizable style
         de_settings.markSavedImages = value;
-        if (de_contentscript.insertedRuleIndex !== null) {
-            document.styleSheets[0].deleteRule(de_contentscript.insertedRuleIndex);
-        }
+        de_webextApi.switchPageStyle(style, false);
         if (de_settings.markSavedImages) {
-            de_contentscript.insertedRuleIndex = document.styleSheets[0].insertRule('.cute-and-save {opacity: 0.4 !important}');
+            de_webextApi.switchPageStyle(style, true);
         }
     },
 };
@@ -161,7 +163,7 @@ const de_button = {
         const btnElem = this.elem;
 
         if (!this.styled) {
-            de_webextApi.getStyle();
+            de_webextApi.getButtonStyle();
         }
         this.prepareDL(src, originalName);
         btnElem.style.top = position.top;
@@ -232,6 +234,7 @@ const de_contentscript = {
     historyTimer        : null,
     insertedRuleIndex   : null,
     downloadsHistory    : [],
+    saveMarkClass       : 'cute-and-saved',
 
     init: function(){
         window.addEventListener('mouseover', de_listeners.mouseoverListener); // asap
@@ -245,7 +248,7 @@ const de_contentscript = {
         de_button.init();
         de_webextApi.listen();
         de_webextApi.settings();
-        de_webextApi.getStyle();
+        de_webextApi.getButtonStyle();
     },
 
     rememberDownload: function(url){
@@ -262,8 +265,8 @@ const de_contentscript = {
     },
 
     addSaveMark: function(){
-        if (!de_settings.markSavedImages) {return;}
-        this.currentNode.classList.add('cute-and-saved');
+        if (!de_settings.markSavedImages || this.currentNode.tagName !== 'IMG') {return;}
+        this.currentNode.classList.add(this.saveMarkClass);
     },
 
     nodeTools: {
@@ -509,7 +512,8 @@ const de_siteParsers = {
     },
 
     getOriginalFilename: function(node){
-        const dollchanXpath = '(. | self::img/..)/parent::div[contains(@class, "de-fullimg-wrap-center")]//a[@class="de-fullimg-link" and text() != "Spoiler Image"]',
+        const that = this,
+            dollchanXpath = '(. | self::img/..)/parent::div[contains(@class, "de-fullimg-wrap-center")]//a[@class="de-fullimg-link" and text() != "Spoiler Image"]',
             getters = {
                 'boards.4chan.org': () => {
                     const container = xpath('ancestor::div[contains(concat(" ", normalize-space(@class), " "), " file ")]//*[(@class="fileText" and @title) or self::a]', node);
@@ -540,8 +544,7 @@ const de_siteParsers = {
 
         function tryFilenameFromDollchanImageByCenter(){
             let filenameTry;
-            console.log(this);
-            if (!this.dollchanImproved) {return null;}
+            if (!that.dollchanImproved) {return null;}
             filenameTry = xpath(dollchanXpath, node);
 
             return filenameTry ? filenameTry.textContent : null;

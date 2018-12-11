@@ -65,6 +65,9 @@
 	"settings_forbidDuplicateFiles": {
 		"message": "No duplicates (prevent saving of the same file multiple times):"
 	},
+	"settings_markSavedImages": {
+		"message": "Mark saved images:"
+	},
 	"settings_hideButton": {
 		"message": "Hide the button when not hovered:"
 	},

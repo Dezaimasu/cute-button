@@ -6,13 +6,14 @@ let isCute; // used for content scripts enabling/disabling
 chrome.runtime.onMessage.addListener((message, sender) => {
     const tabId = sender.tab.id;
     switch (message.type) {
-        case 'download' : {download(message, tabId); break;}
-        case 'style'    : {addStyles(tabId); break;}
+        case 'download'     : {download(tabId, message); break;}
+        case 'button_style' : {addButtonStyles(tabId); break;}
+        case 'page_style'   : {switchPageStyles(tabId, message.style, message.turnOn); break;}
     }
 });
 
 /* To override "user" originated css rules form other extensions */
-function addStyles(tabId){
+function addButtonStyles(tabId){
     chrome.tabs.insertCSS(tabId, {
         allFrames   : true,
         cssOrigin   : 'user',
@@ -21,6 +22,15 @@ function addStyles(tabId){
     }, () => {
         if (chrome.extension.lastError) {return;}
         chrome.tabs.sendMessage(tabId, 'css_injected');
+    });
+}
+
+function switchPageStyles(tabId, style, turnOn){
+    const action = turnOn ? 'insertCSS' : 'removeCSS';
+    chrome.tabs[action](tabId, {
+        allFrames   : true,
+        cssOrigin   : 'user',
+        code        : style,
     });
 }
 
