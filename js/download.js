@@ -137,6 +137,6 @@ const filenameTools = {
     },
 
     prepareFilename: function(filename, prefix){
-        return this.trimForbiddenWinChars((prefix ? `${prefix}__` : '') + decodeURIComponent(filename));
+        return this.trimForbiddenWinChars((prefix ? `${prefix}__` : '') + unescape(filename));
     }
 };
