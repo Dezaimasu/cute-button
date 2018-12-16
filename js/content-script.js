@@ -459,7 +459,7 @@ const de_siteParsers = {
     },
 
     checkDollchanPresence: function(){
-        this.dollchanImproved = !!document.querySelector('#de-main');
+        de_siteParsers.dollchanImproved = !!document.querySelector('#de-main');
     },
 
     getActualNode: function(node){
