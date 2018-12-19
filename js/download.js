@@ -11,6 +11,7 @@ function Download(downloadRequest, tabId){
     this.filename           = '';
     this.basename           = '';
     this.prefix             = '';
+    this.duplicateCheckTry  = 0;
 }
 
 Download.prototype = {
@@ -90,10 +91,24 @@ Download.prototype = {
         chrome.downloads.search({
             id: downloadId
         }, downloadItems => {
-            if (!downloadItems[0] || !downloadItems[0].filename || downloadItems[0].filename.endsWith(originalFilename)) {return;}
-            chrome.tabs.sendMessage(this.tabId, 'duplicate_warning');
+            if (!downloadItems[0]) {
+            	this.checkForDuplicateRetry(originalFilename, downloadId);
+            	return;
+            }
+            if (downloadItems[0].filename && !downloadItems[0].filename.endsWith(originalFilename)) {
+                chrome.tabs.sendMessage(this.tabId, 'duplicate_warning');
+            }
         });
     },
+
+    /*
+    * Hack for recently broken(?) downloads.search, now it can't find download if called immediately from downloads.download callback
+    */
+    checkForDuplicateRetry: function(originalFilename, downloadId){
+        if (this.duplicateCheckTry > 5) {return;}
+        this.duplicateCheckTry++;
+        setTimeout(() => this.checkForDuplicate(originalFilename, downloadId), 50);
+    }
 };
 
 const filenameTools = {
