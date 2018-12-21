@@ -78,7 +78,10 @@ Download.prototype = {
                 saveAs          : this.downloadRequest.showSaveDialog,
                 conflictAction  : 'uniquify'
             },
-            downloadId => this.checkForDuplicate(finalFilename, downloadId)
+            downloadId => {
+                if (chrome.extension.lastError) {return;}
+                this.checkForDuplicate(finalFilename, downloadId);
+            }
         );
     },
 
@@ -152,6 +155,13 @@ const filenameTools = {
     },
 
     prepareFilename: function(filename, prefix){
-        return this.trimForbiddenWinChars((prefix ? `${prefix}__` : '') + unescape(filename));
+        let decodedFilename;
+        try {
+            decodedFilename = decodeURI(filename);
+        } catch (e) { // malformed URI sequence
+            decodedFilename = filename;
+        }
+
+        return this.trimForbiddenWinChars((prefix ? `${prefix}__` : '') + decodedFilename);
     }
 };
