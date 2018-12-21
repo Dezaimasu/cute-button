@@ -65,8 +65,8 @@
 	"settings_forbidDuplicateFiles": {
 		"message": "Без дубликатов (предотвращать сохранение одного и того же файла несколько раз):"
 	},
-	"settings_markSavedImages": {
-		"message": "Отмечать сохранённые изображения:"
+	"settings_styleForSaveMark": {
+		"message": "Отмечать сохранённые изображения пользовательским стилем (любые CSS декларации):"
 	},
 	"settings_hideButton": {
 		"message": "Скрывать кнопку если на неё не наведён курсор мыши:"

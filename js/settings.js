@@ -23,18 +23,16 @@ function i18n(){
 */
 function loadOptions(){
     chrome.storage.local.get(settingsDefault, result => {
-        Object.keys(settingsDefault).forEach(optionName => setValue(optionName, result[optionName]));
-        refreshIcon();
-        refreshFolders(result.folders);
-        setPrefixSelector(result.filenamePrefix);
+        setOptionsValues(result);
+        additionalOptionsProcessing(result);
         saveOptions();
-        document.querySelectorAll('.path').forEach(pathElem => checkSavePath(pathElem)); // to check previously saved invalid paths; could be removed later
     });
 }
 
 function saveOptions(){
     const newSettings = {};
     prepareCurrentFoldersForSave();
+    prepareCss();
     Object.keys(settingsDefault).forEach(optionName => newSettings[optionName] = getValue(optionName));
     newSettings.folders = folders;
     chrome.storage.local.set(newSettings);
@@ -42,11 +40,13 @@ function saveOptions(){
 }
 
 function resetOptions(){
-    Object.keys(settingsDefault).forEach(optionName => setValue(optionName, settingsDefault[optionName]));
-    refreshIcon();
-    refreshFolders(settingsDefault.folders);
-    setPrefixSelector(settingsDefault.filenamePrefix);
+    setOptionsValues(settingsDefault);
+    additionalOptionsProcessing(settingsDefault);
     enableSave();
+}
+
+function setOptionsValues(optionsValues){
+    Object.keys(settingsDefault).forEach(optionName => setValue(optionName, optionsValues[optionName]));
 }
 
 function getValue(optionName){
@@ -72,6 +72,12 @@ function showMessage(message, type){
         elem['message'].textContent = '';
         elem['message'].classList.remove(type);
     }, 3000);
+}
+
+function additionalOptionsProcessing(options){
+    refreshIcon();
+    refreshFolders(options.folders);
+    setPrefixSelector(options.filenamePrefix);
 }
 
 /*
@@ -209,11 +215,33 @@ function isTextPrefix(value){
 }
 
 /*
+-------------------- Custom styles --------------------
+*/
+
+function setExampleCss(){
+    setValue('styleForSaveMark', 'opacity: 0.4 !important;');
+    enableSave();
+}
+
+function prepareCss(){
+    const cssInputValue = getValue('styleForSaveMark').trim(),
+        declarations = cssInputValue && cssInputValue.split(';'),
+        preparedDeclarations = [];
+
+    if (!declarations) {return;}
+    declarations.forEach(declaration => {
+        declaration && preparedDeclarations.push(declaration.replace(/( !important)? *$/, ' !important').trim());
+    });
+
+    setValue('styleForSaveMark', preparedDeclarations.join('; '));
+}
+
+/*
 -------------------- Initialization --------------------
 */
 function initSelectors(){
     const settingsElems = Object.keys(settingsDefault),
-        otherElems = ['blank-folder', 'add-folder', 'add-folder-container', 'prefix-selector', 'save', 'reset', 'file-input', 'message', 'de-cute-id'];
+        otherElems = ['blank-folder', 'add-folder', 'add-folder-container', 'prefix-selector', 'save', 'reset', 'file-input', 'message', 'save-mark-example', 'de-cute-id'];
 
     settingsElems.forEach(name => {
         setting[name] = document.querySelector(`#${name}`);
@@ -243,6 +271,7 @@ function init(){
     i18n();
     initSelectors();
 
+    elem['save-mark-example'].addEventListener('click', setExampleCss);
     elem['prefix-selector'].addEventListener('change', prefixSelectorListener);
     elem['file-input'].addEventListener('change', fileInputListener);
     elem['reset'].addEventListener('click', resetOptions);

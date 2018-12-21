@@ -60,7 +60,7 @@ const de_settings = {
         filenamePrefix          : newValue => de_settings.filenamePrefix = newValue,
         disableSpacebarHotkey   : newValue => Object.assign(de_hotkeys.list, newValue ? {} : de_hotkeys.reserved),
         domainExclusions        : newValue => de_settings.disableIfExcluded(newValue),
-        markSavedImages         : newValue => de_settings.refreshSaveMarkStyle(newValue),
+        styleForSaveMark        : newValue => de_settings.refreshStyleForSaveMark(newValue),
     },
 
     prepareHotkeysList: function(folders){
@@ -74,12 +74,13 @@ const de_settings = {
         de_listeners.switch(!de_settings.domainExcluded);
     },
 
-    refreshSaveMarkStyle: function(value){
-        const style = `.${de_contentscript.saveMarkClass} {opacity: 0.4 !important}`; // TODO customizable style
-        de_settings.markSavedImages = value;
-        de_webextApi.switchPageStyle(style, false);
-        if (de_settings.markSavedImages) {
-            de_webextApi.switchPageStyle(style, true);
+    refreshStyleForSaveMark: function(value){
+        const newCssString = `.${de_contentscript.classForSaveMark} {${value}}`;
+
+        de_webextApi.switchPageStyle(de_settings.styleForSaveMark, false);
+        de_settings.styleForSaveMark = newCssString;
+        if (de_settings.styleForSaveMark) {
+            de_webextApi.switchPageStyle(newCssString, true);
         }
     },
 };
@@ -234,7 +235,7 @@ const de_contentscript = {
     historyTimer        : null,
     insertedRuleIndex   : null,
     downloadsHistory    : [],
-    saveMarkClass       : 'cute-and-saved',
+    classForSaveMark    : 'cute-and-saved',
 
     init: function(){
         window.addEventListener('mouseover', de_listeners.mouseoverListener); // asap
@@ -265,8 +266,8 @@ const de_contentscript = {
     },
 
     addSaveMark: function(){
-        if (!de_settings.markSavedImages || this.currentNode.tagName !== 'IMG') {return;}
-        this.currentNode.classList.add(this.saveMarkClass);
+        if (!de_settings.styleForSaveMark || this.currentNode.tagName !== 'IMG') {return;}
+        this.currentNode.classList.add(this.classForSaveMark);
     },
 
     nodeTools: {

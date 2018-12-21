@@ -65,8 +65,8 @@
 	"settings_forbidDuplicateFiles": {
 		"message": "Без дублікатів (запобігти збереження одного і того ж файла кілька разів):"
 	},
-	"settings_markSavedImages": {
-		"message": "Відзначати збережені зображення:"
+	"settings_styleForSaveMark": {
+		"message": "Відзначати збережені зображення своїм стилем (будь-які CSS декларації):"
 	},
 	"settings_hideButton": {
 		"message": "Ховати кнопку коли на неї не наведений курсор миші:"

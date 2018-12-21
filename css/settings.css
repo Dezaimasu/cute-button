@@ -72,3 +72,12 @@ button#reset {
 #add-folder-container td {
 	padding: 6px 0 13px;
 }
+input#styleForSaveMark {
+	width: 333px;
+}
+#save-mark-example {
+	text-decoration: underline;
+	margin-left: 5px;
+	cursor: pointer;
+	color: blue;
+}
