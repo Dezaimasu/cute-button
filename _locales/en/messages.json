@@ -66,7 +66,13 @@
 		"message": "No duplicates (prevent saving of the same file multiple times):"
 	},
 	"settings_styleForSaveMark": {
-		"message": "Mark saved images with custom style (any CSS declarations):"
+		"message": "Mark saved images with custom style:"
+	},
+	"settings_styleForSaveMarkPlaceholder": {
+		"message": "CSS declarations"
+	},
+	"settings_saveMarkExample": {
+		"message": "Example"
 	},
 	"settings_hideButton": {
 		"message": "Hide the button when not hovered:"
