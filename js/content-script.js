@@ -522,7 +522,7 @@ const de_siteParsers = {
                     return container.title || container.textContent;
                 },
                 '2ch.hk': () => {
-                    const container = xpath('ancestor::figure[@class="image"]/figcaption/a', node);
+                    const container = xpath('ancestor::figure[@class="image" or @class="post__image"]/figcaption/a', node);
                     return container.title || container.textContent;
                 },
                 'iichan.hk': () => {
