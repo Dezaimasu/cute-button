@@ -70,7 +70,7 @@ const de_settings = {
     },
 
     disableIfExcluded: function(excludedDomains){
-        de_settings.domainExcluded = excludedDomains.split(' ').includes(document.location.host);
+        de_settings.domainExcluded = excludedDomains.split(' ').includes(de_contentscript.pageInfo.domain);
         de_listeners.switch(!de_settings.domainExcluded);
     },
 
@@ -92,9 +92,9 @@ const de_button = {
     downloadRequest: {
         src             : null,
         originalName    : null,
-        backupName      : null,
         showSaveDialog  : null,
         filenamePrefix  : null,
+        pageInfo        : {},
     },
 
     init: function(){
@@ -117,7 +117,7 @@ const de_button = {
         that.disableEvent(event);
         that.globalEventsHandlers[event.type](event.button);
     },
-    
+
     globalEventsHandlers: {
         mouseup: function(eventButton){
             const that = de_button,
@@ -126,6 +126,7 @@ const de_button = {
                     {path: de_settings.selectedSavePath || de_settings.defaultSavePath},
                     that.downloadRequest,
                     that.isOriginalNameButton(eventButton) ? {} : {originalName: null},
+                    {pageInfo: de_contentscript.pageInfo},
                 ),
                 historyEntry = JSON.stringify(downloadRequest);
 
@@ -151,7 +152,7 @@ const de_button = {
         mousedown: function(){
             de_button.elem.classList.add('click');
         },
-        
+
         click: function(){},
     },
 
@@ -203,9 +204,9 @@ const de_button = {
         this.downloadRequest = {
             src             : src,
             originalName    : originalName,
-            backupName      : (src && de_contentscript.isSeparateTab) ? document.title : null,
             showSaveDialog  : de_settings.showSaveDialog,
             filenamePrefix  : de_settings.filenamePrefix,
+            pageInfo        : {},
         };
     },
 
@@ -236,15 +237,27 @@ const de_contentscript = {
     insertedRuleIndex   : null,
     downloadsHistory    : [],
     classForSaveMark    : 'cute-and-saved',
+    pageInfo            : {
+        domain      : null,
+        title       : null,
+        threadNum   : null,
+    },
 
     init: function(){
+        const hostname = document.location.hostname;
+
         window.addEventListener('mouseover', de_listeners.mouseoverListener); // asap
 
         this.isSeparateTab = ['image/', 'video/', 'audio/'].includes(document.contentType.substr(0, 6));
         this.srcLocation = this.isSeparateTab ? 'baseURI' : 'currentSrc';
+        this.pageInfo = {
+            domain      : hostname,
+            title       : document.title,
+            threadNum   : de_siteParsers.getPossibleThreadNum(),
+        };
 
         window.addEventListener('load', de_siteParsers.checkDollchanPresence, {once: true});
-        de_siteParsers.getFilteredHost();
+        de_siteParsers.setFilteredHost(hostname);
 
         de_button.init();
         de_webextApi.listen();
@@ -452,11 +465,16 @@ const de_siteParsers = {
     host: null,
     dollchanImproved: null,
 
-    getFilteredHost: function(){
-        this.host = document.location.host.replace(/^www\./, '')
+    setFilteredHost: function(hostname){
+        this.host = hostname.replace(/^www\./, '')
             .replace(/^((.*)\.)?(tumblr\.com)$/, 'tumblr.com')
             .replace(/^yandex\.[a-z]{2,3}$/, 'yandex.*')
             .replace(/^(ecchi\.)?(iwara\.tv)$/, 'iwara.tv');
+    },
+
+    getPossibleThreadNum: function(){
+        const threadNumTry = document.location.pathname.match(/\/(\d+)(\/|\.|$)/);
+        return threadNumTry && threadNumTry[1];
     },
 
     checkDollchanPresence: function(){

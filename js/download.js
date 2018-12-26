@@ -16,7 +16,7 @@ function Download(downloadRequest, tabId){
 
 Download.prototype = {
     process: function(){
-        this.savePath = filenameTools.prepareSavePath(this.downloadRequest.path);
+        this.savePath = filenameTools.prepareSavePath(this.downloadRequest.path, this.downloadRequest.pageInfo);
         this.prefix = filenameTools.preparePrefix(this.downloadRequest.filenamePrefix);
 
         if (this.downloadRequest.originalName) {
@@ -61,13 +61,13 @@ Download.prototype = {
             const contentType = xhr.getResponseHeader('Content-Type'),
                 extension = contentType ? ('.' + contentType.match(/\w+\/(\w+)/)[1].replace('jpeg', 'jpg')) : '';
 
-            this.filename = (this.basename || Date.now()) + extension
+            this.filename = (this.basename || filenameTools.getTimestamp()) + extension
         }
     },
 
     setFallbackFilename: function(){
-        const filenameTry = (this.downloadRequest.backupName || '').match(/[^\s]+\.(jpg|jpeg|png|gif|bmp|webm|mp4|ogg|mp3)/i);
-        this.filename = filenameTry ? filenameTry[0] : this.downloadRequest.backupName;
+        const filenameTry = (this.downloadRequest.pageInfo.title || '').match(/[^\s]+\.(jpg|jpeg|png|gif|bmp|webm|mp4|ogg|mp3)/i);
+        this.filename = filenameTry ? filenameTry[0] : filenameTools.getTimestamp();
     },
 
     download: function(){
@@ -120,14 +120,35 @@ const filenameTools = {
     * and adds a single slash to the end for concating with filename.
     * Doesn't matter which slashes are used in save path, WebExt API recognizes both.
     */
-    prepareSavePath: function(rawPath){
-        return rawPath && (rawPath.replace(/^\\+|^\/+|\\+$|\/+$/, '') + '/');
+    prepareSavePath: function(rawPath, pageInfo){
+        const savePath = this.prepareSpecificSavePath(rawPath, pageInfo);
+        return savePath && (savePath.replace(/^\\+|^\/+|\\+$|\/+$/, '') + '/');
+    },
+
+    /*
+    * TODO: config with host-specific templates with whitelist/blacklist
+    */
+    prepareSpecificSavePath: function(rawPath, pageInfo){
+        let savePath = rawPath;
+        const placeholders = {
+            '::domain::'    : this.trimForbiddenWinChars(pageInfo.domain),
+            '::title::'     : this.trimForbiddenWinChars(pageInfo.title),
+            '::thread_num::': this.trimForbiddenWinChars(pageInfo.threadNum),
+            '::date::'      : this.getDatetimeString(),
+            '::time::'      : this.getTimestamp(),
+        };
+
+        savePath.includes(':') && Object.keys(placeholders).forEach(placeholder => {
+            savePath = savePath.replace(placeholder, placeholders[placeholder]);
+        });
+
+        return savePath;
     },
 
     preparePrefix: function(prefix){
         switch (prefix) {
-            case '::date::' : {return new Date().toISOString().replace('T', '_').replace(/\..+/g, '').replace(/[^\d_]/g, '');}
-            case '::time::' : {return new Date().getTime();}
+            case '::date::' : {return this.getDatetimeString();}
+            case '::time::' : {return this.getTimestamp();}
             default         : {return prefix;}
         }
     },
@@ -163,5 +184,13 @@ const filenameTools = {
         }
 
         return this.trimForbiddenWinChars((prefix ? `${prefix}__` : '') + decodedFilename);
-    }
+    },
+
+    getDatetimeString: function(){
+        return new Date().toISOString().replace('T', '_').replace(/\..+/g, '').replace(/[^\d_]/g, '');
+    },
+
+    getTimestamp: function(){
+        return Date.now();
+    },
 };
