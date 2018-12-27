@@ -26,6 +26,9 @@
 	"settings_defaultSavePathPlaceholder": {
 		"message": "default save path"
 	},
+	"settings_domain": {
+		"message": "domain name"
+	},
 	"settings_hotkey": {
 		"message": "hotkey"
 	},

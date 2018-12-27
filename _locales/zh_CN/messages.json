@@ -26,6 +26,9 @@
 	"settings_defaultSavePathPlaceholder": {
 		"message": "默认保存路径"
 	},
+	"settings_domain": {
+		"message": "domain name"
+	},
 	"settings_hotkey": {
 		"message": "快捷键"
 	},

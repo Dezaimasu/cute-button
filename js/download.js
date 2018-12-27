@@ -172,7 +172,7 @@ const filenameTools = {
     },
 
     trimForbiddenWinChars: function(string){
-        return string.replace(/[/\\:*?"<>|\x09]/g, '');
+        return (string || '').replace(/[/\\:*?"<>|\x09]/g, '');
     },
 
     prepareFilename: function(filename, prefix){

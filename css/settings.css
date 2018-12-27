@@ -52,6 +52,9 @@ button#reset {
 	vertical-align: middle;
 	line-height: 23px;
 }
+.folder .domain {
+	width: 250px;
+}
 .folder .key-container {
 	padding-right: 13px;
 	float: right;
@@ -72,6 +75,7 @@ button#reset {
 #add-folder-container td {
 	padding: 6px 0 13px;
 }
+
 input#styleForSaveMark {
 	width: 333px;
 }

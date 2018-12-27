@@ -51,7 +51,7 @@ const de_settings = {
         hideButton              : newValue => de_button.elem.classList.toggle('shy', newValue),
         isCute                  : newValue => de_listeners.switch(newValue),
         position                : newValue => [de_settings.vertical, de_settings.horizontal] = newValue.split('-'),
-        folders                 : newValue => Object.assign(de_hotkeys.list, de_settings.prepareHotkeysList(newValue)),
+        folders                 : newValue => de_settings.assignHotkeys(newValue),
         placeUnderCursor        : newValue => de_settings.placeUnderCursor = newValue,
         saveOnHover             : newValue => de_settings.saveOnHover = newValue,
         showSaveDialog          : newValue => de_settings.showSaveDialog = newValue,
@@ -63,10 +63,11 @@ const de_settings = {
         styleForSaveMark        : newValue => de_settings.refreshStyleForSaveMark(newValue),
     },
 
-    prepareHotkeysList: function(folders){
-        const hotkeys = {};
-        folders.forEach(folder => hotkeys[folder.id] = folder);
-        return hotkeys;
+    assignHotkeys: function(folders){
+        folders.forEach(de_hotkeys.assignHotkeyRule);
+        if (de_hotkeys.list['00000']) {
+            de_settings.defaultSavePath = de_hotkeys.list['00000'].path;
+        }
     },
 
     disableIfExcluded: function(excludedDomains){
@@ -75,11 +76,10 @@ const de_settings = {
     },
 
     refreshStyleForSaveMark: function(value){
-        const newCssString = `.${de_contentscript.classForSaveMark} {${value}}`;
-
-        de_webextApi.switchPageStyle(de_settings.styleForSaveMark, false);
-        de_settings.styleForSaveMark = newCssString;
-        if (de_settings.styleForSaveMark) {
+        de_settings.styleForSaveMark && de_webextApi.switchPageStyle(de_settings.styleForSaveMark, false);
+        if (value) {
+            const newCssString = `.${de_contentscript.classForSaveMark} {${value}}`;
+            de_settings.styleForSaveMark = newCssString;
             de_webextApi.switchPageStyle(newCssString, true);
         }
     },
@@ -252,11 +252,15 @@ const de_contentscript = {
         this.srcLocation = this.isSeparateTab ? 'baseURI' : 'currentSrc';
         this.pageInfo = {
             domain      : hostname,
-            title       : document.title,
+            title       : null,
             threadNum   : de_siteParsers.getPossibleThreadNum(),
         };
 
-        window.addEventListener('load', de_siteParsers.checkDollchanPresence, {once: true});
+        window.addEventListener('load', () => {
+            this.pageInfo.title = document.title;
+            de_siteParsers.checkDollchanPresence();
+        }, {once: true});
+
         de_siteParsers.setFilteredHost(hostname);
 
         de_button.init();
@@ -648,7 +652,35 @@ const de_hotkeys = {
 
     isNoScroll: function(){
         return document.body.scrollHeight === document.body.clientHeight;
-    }
+    },
+
+    assignHotkeyRule: function(rule){
+        const that = de_hotkeys;
+        let priority;
+        if (!that.isRuleForCurrentDomain(rule)) {return;}
+
+        priority = that.getPriorityLevel(rule);
+        if (that.list[rule.id] && that.list[rule.id].priority < priority) {return;}
+
+        that.list[rule.id] = {
+            path    : rule.path,
+            priority: priority,
+        };
+    },
+
+    isRuleForCurrentDomain: function(rule){
+        return !rule.domain || (rule.domain === de_contentscript.pageInfo.domain && rule.domain !== `-${de_contentscript.pageInfo.domain}`);
+    },
+
+    getPriorityLevel: function(rule){
+        if (!rule.domain) {
+        	return 3;
+        } else if (rule.domain.indexOf('-') === 0) {
+            return 2;
+        } else {
+            return 1;
+        }
+    },
 };
 
 function xpath(path, contextNode){

@@ -113,7 +113,7 @@ function prepareCurrentFoldersForSave(){
     const currentFoldersList = [];
     document.querySelectorAll('.folder').forEach(folderElem => {
         const folderSettings = buildFolderSettings(folderElem);
-        if (!folderSettings.key || !folderSettings.keyCode) {return;}
+        if ((!folderSettings.key || !folderSettings.keyCode) && !folderSettings.domain) {return;}
         currentFoldersList.push(folderSettings);
     });
     folders = currentFoldersList;
@@ -144,6 +144,7 @@ function keyInputListener(event){
 }
 
 function fillFolder(folderElem, folderSettings){
+    folderElem.querySelector('.domain').value   = folderSettings.domain;
     folderElem.querySelector('.key').value      = folderSettings.key;
     folderElem.querySelector('.keyCode').value  = folderSettings.keyCode;
     folderElem.querySelector('.modifier').value = folderSettings.modifier;
@@ -152,6 +153,7 @@ function fillFolder(folderElem, folderSettings){
 
 function buildFolderSettings(folderElem){
     const folderSettings = {
+        domain  : folderElem.querySelector('.domain').value,
         key     : folderElem.querySelector('.key').value,
         keyCode : Number(folderElem.querySelector('.keyCode').value),
         modifier: folderElem.querySelector('.modifier').value,
@@ -165,7 +167,7 @@ function buildFolderSettings(folderElem){
 function addHotkeyId(folder){
     const pseudoEvent = {keyCode: folder.keyCode};
     pseudoEvent[folder.modifier] = true;
-    folder.id = `${pseudoEvent.ctrlKey ? 1 : 0}${pseudoEvent.altKey ? 1 : 0}${pseudoEvent.shiftKey ? 1 : 0}${pseudoEvent.keyCode}`;
+    folder.id = `${pseudoEvent.ctrlKey ? 1 : 0}${pseudoEvent.altKey ? 1 : 0}${pseudoEvent.shiftKey ? 1 : 0}${pseudoEvent.keyCode || '00'}`;
 }
 
 /*
