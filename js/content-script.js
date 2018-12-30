@@ -494,7 +494,8 @@ const de_siteParsers = {
                 'instagram.com'     : 'self::div/preceding-sibling::div/img | self::a[@role="button"]/preceding-sibling::div//video | self::ul/parent::div/preceding-sibling::div/div/img',
                 'iwara.tv'          : 'self::div[@class="vjs-poster"]/preceding-sibling::video[@class="vjs-tech"]',
                 'vk.com'            : 'self::a[contains(@class, "image_cover") and contains(@onclick, "showPhoto")]',
-                'clips.twitch.tv'   : 'self::div[@class="player-overlay"]/ancestor::div[contains(@class, "video-player__container")]/div[@class="player-video"]/video'
+                'clips.twitch.tv'   : 'self::div[@class="player-overlay"]/ancestor::div[contains(@class, "video-player__container")]/div[@class="player-video"]/video',
+                'behance.net'       : 'self::div[contains(@class, "js-prev") or contains(@class, "js-next")]/following::div[contains(@class, "js-slide-content") and not(contains(@class, "hidden"))]/img',
             };
 
         return (this.dollchanImproved && xpath(dollchanHack, node)) || xpath(siteHacks[this.host], node);
