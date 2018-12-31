@@ -37,9 +37,7 @@
 		"page": "settings.html"
 	},
 	"browser_action": {
-		"default_icon": {
-			"48": "bestgirl.png"
-		}
+		"default_icon": "bestgirl.png"
 	},
 	"applications": {
 		"gecko": {

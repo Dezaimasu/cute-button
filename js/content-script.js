@@ -70,6 +70,7 @@ const de_settings = {
         }
     },
 
+    // TODO: conflict between "domainExclusions" and "isCute"
     disableIfExcluded: function(excludedDomains){
         de_settings.domainExcluded = excludedDomains.split(' ').includes(de_contentscript.pageInfo.domain);
         de_listeners.switch(!de_settings.domainExcluded);

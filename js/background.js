@@ -1,7 +1,5 @@
 'use strict';
 
-let isCute; // used for content scripts enabling/disabling
-
 /* Listens for messages from content script */
 chrome.runtime.onMessage.addListener((message, sender) => {
     const tabId = sender.tab.id;
@@ -70,14 +68,12 @@ function initSettings(details){
 function setCuteState(state){
     const stateProps = state ? {text: 'on', color: '#6D6'} : {text: 'off', color: '#D66'};
 
-    isCute = state;
     chrome.browserAction.setBadgeText({text: stateProps.text});
     chrome.browserAction.setBadgeBackgroundColor({color: stateProps.color});
 }
 
 chrome.browserAction.onClicked.addListener(() => {
-    isCute = !isCute;
-    chrome.storage.local.set({'isCute': isCute});
+    chrome.storage.local.get('isCute', items => chrome.storage.local.set({'isCute': !items.isCute}));
 });
 
 chrome.storage.onChanged.addListener(changes => {
