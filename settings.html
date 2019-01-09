@@ -30,42 +30,60 @@
 			<td><label for="defaultSavePath"><i18n>settings_defaultSavePath</i18n></label></td>
 			<td><input id="defaultSavePath" class="default-path" data-i18n-placeholder="settings_defaultSavePathPlaceholder"></td>
 		</tr>
-		<!-- TODO: replace .folder rows with table -->
-		<!-- TODO: manual for users -->
-		<!-- TODO: placeholders list -->
 		<!-- TODO: test priorities for conflicting rules -->
-		<tr class="folder" id="blank-folder">
-			<td>
-				<label>
-					<i18n>settings_domain</i18n>
-					<input class="domain">
-				</label>
-				<span class="key-container">
-					<label>
-						<i18n>settings_hotkey</i18n>
-						<input class="key" size="1" maxlength="1">
-						<input class="keyCode" type="hidden">
-					</label>
-					<label>
-						<i18n>settings_modifier</i18n>
-						<select class="modifier">
-							<option value="" selected>-</option>
-							<option value="ctrlKey">Ctrl</option>
-							<option value="shiftKey">Shift</option>
-							<option value="altKey">Alt</option>
-						</select>
-					</label>
-				</span>
-			</td>
-			<td>
-				<label><input class="path" data-i18n-placeholder="settings_savePathPlaceholder"></label>
-				<button class="delete-folder">X</button>
-			</td>
-		</tr>
-		<tr id="add-folder-container">
-			<td></td>
-			<td>
-				<button id="add-folder"><i18n>settings_addHotkey</i18n></button>
+		<tr>
+			<td colspan="2">
+				<table>
+					<tr>
+						<td colspan="5">
+							<!-- TODO: manual for users -->
+							<!-- TODO: placeholders list -->
+						</td>
+					</tr>
+					<tr>
+						<th><i18n>settings_domain</i18n></th>
+						<th><i18n>settings_hotkey</i18n></th>
+						<th><i18n>settings_modifier</i18n></th>
+						<th>Save path</th> <!-- TODO: i18n -->
+						<th>Delete</th> <!-- TODO: i18n -->
+					</tr>
+					<tr class="folder" id="blank-folder">
+						<td>
+							<label>
+								<input class="domain">
+							</label>
+						</td>
+						<td>
+							<label>
+								<input class="key" size="1" maxlength="1">
+								<input class="keyCode" type="hidden">
+							</label>
+						</td>
+						<td>
+							<label>
+								<select class="modifier">
+									<option value="" selected>-</option>
+									<option value="ctrlKey">Ctrl</option>
+									<option value="shiftKey">Shift</option>
+									<option value="altKey">Alt</option>
+								</select>
+							</label>
+						</td>
+						<td>
+							<label>
+								<input class="path" data-i18n-placeholder="settings_savePathPlaceholder">
+							</label>
+						</td>
+						<td>
+							<button class="delete-folder">X</button>
+						</td>
+					</tr>
+					<tr id="add-folder-container">
+						<td colspan="5">
+							<button id="add-folder"><i18n>settings_addHotkey</i18n></button>
+						</td>
+					</tr>
+				</table>
 			</td>
 		</tr>
 		<tr>
