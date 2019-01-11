@@ -56,9 +56,6 @@
 	"settings_disableSpacebarHotkey": {
 		"message": "Disable saving with Spacebar hotkey:"
 	},
-	"settings_originalNameByDefault": {
-		"message": "Save with original name by default if available (swaps LMB and RMB actions):"
-	},
 	"settings_saveFullSized": {
 		"message": "Always save full-sized images (works on twitter, tumblr, vk, instagram, iwara):"
 	},

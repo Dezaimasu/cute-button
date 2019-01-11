@@ -10,14 +10,12 @@ function Download(downloadRequest, tabId){
     this.savePath           = '';
     this.filename           = '';
     this.basename           = '';
-    this.prefix             = '';
     this.duplicateCheckTry  = 0;
 }
 
 Download.prototype = {
     process: function(){
         this.savePath = filenameTools.prepareSavePath(this.downloadRequest.path, this.downloadRequest.pageInfo);
-        this.prefix = filenameTools.preparePrefix(this.downloadRequest.filenamePrefix);
 
         if (this.downloadRequest.originalName) {
             this.filename = this.downloadRequest.originalName;
@@ -71,7 +69,7 @@ Download.prototype = {
     },
 
     download: function(){
-        const finalFilename = filenameTools.prepareFilename(this.filename, this.prefix);
+        const finalFilename = filenameTools.prepareFilename(this.filename);
         chrome.downloads.download({
                 url             : this.downloadRequest.src,
                 filename        : this.savePath + finalFilename,
@@ -125,17 +123,14 @@ const filenameTools = {
         return savePath && (savePath.replace(/^\\+|^\/+|\\+$|\/+$/, '') + '/');
     },
 
-    /*
-    * TODO: config with host-specific templates with whitelist/blacklist
-    */
     prepareSpecificSavePath: function(rawPath, pageInfo){
         let savePath = rawPath;
         const placeholders = {
-            '::domain::'    : this.trimForbiddenWinChars(pageInfo.domain),
-            '::title::'     : this.trimForbiddenWinChars(pageInfo.title),
-            '::thread_num::': this.trimForbiddenWinChars(pageInfo.threadNum),
-            '::date::'      : this.getDatetimeString(),
-            '::time::'      : this.getTimestamp(),
+            '::domain::'    : () => {return this.trimForbiddenWinChars(pageInfo.domain)},
+            '::title::'     : () => {return this.trimForbiddenWinChars(pageInfo.title)},
+            '::thread_num::': () => {return this.trimForbiddenWinChars(pageInfo.threadNum)},
+            '::date::'      : this.getDatetimeString,
+            '::time::'      : this.getTimestamp,
         };
 
         savePath.includes(':') && Object.keys(placeholders).forEach(placeholder => {
@@ -143,14 +138,6 @@ const filenameTools = {
         });
 
         return savePath;
-    },
-
-    preparePrefix: function(prefix){
-        switch (prefix) {
-            case '::date::' : {return this.getDatetimeString();}
-            case '::time::' : {return this.getTimestamp();}
-            default         : {return prefix;}
-        }
     },
 
     /*
@@ -175,7 +162,7 @@ const filenameTools = {
         return (string || '').replace(/[/\\:*?"<>|\x09]/g, '');
     },
 
-    prepareFilename: function(filename, prefix){
+    prepareFilename: function(filename){
         let decodedFilename;
         try {
             decodedFilename = decodeURI(filename);
@@ -183,7 +170,7 @@ const filenameTools = {
             decodedFilename = filename;
         }
 
-        return this.trimForbiddenWinChars((prefix ? `${prefix}__` : '') + decodedFilename);
+        return this.trimForbiddenWinChars(decodedFilename);
     },
 
     getDatetimeString: function(){

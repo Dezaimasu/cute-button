@@ -47,7 +47,6 @@ const de_settings = {
         minSize                 : newValue => de_settings.minSize = newValue,
         exclusions              : newValue => de_settings.exclusions = newValue,
         icon                    : newValue => de_button.elem.style.backgroundImage = newValue,
-        originalNameByDefault   : newValue => de_settings.originalNameButton = newValue ? 0 : 2,
         hideButton              : newValue => de_button.elem.classList.toggle('shy', newValue),
         isCute                  : newValue => de_listeners.switch(newValue),
         position                : newValue => [de_settings.vertical, de_settings.horizontal] = newValue.split('-'),
@@ -57,7 +56,6 @@ const de_settings = {
         showSaveDialog          : newValue => de_settings.showSaveDialog = newValue,
         forbidDuplicateFiles    : newValue => de_settings.forbidDuplicateFiles = newValue,
         saveFullSized           : newValue => de_settings.saveFullSized = newValue,
-        filenamePrefix          : newValue => de_settings.filenamePrefix = newValue,
         disableSpacebarHotkey   : newValue => Object.assign(de_hotkeys.list, newValue ? {} : de_hotkeys.reserved),
         domainExclusions        : newValue => de_settings.disableIfExcluded(newValue),
         styleForSaveMark        : newValue => de_settings.refreshStyleForSaveMark(newValue),
@@ -94,7 +92,6 @@ const de_button = {
         src             : null,
         originalName    : null,
         showSaveDialog  : null,
-        filenamePrefix  : null,
         pageInfo        : {},
     },
 
@@ -126,7 +123,6 @@ const de_button = {
                 downloadRequest = Object.assign(
                     {path: de_settings.selectedSavePath || de_settings.defaultSavePath},
                     that.downloadRequest,
-                    that.isOriginalNameButton(eventButton) ? {} : {originalName: null},
                     {pageInfo: de_contentscript.pageInfo},
                 ),
                 historyEntry = JSON.stringify(downloadRequest);
@@ -206,13 +202,8 @@ const de_button = {
             src             : src,
             originalName    : originalName,
             showSaveDialog  : de_settings.showSaveDialog,
-            filenamePrefix  : de_settings.filenamePrefix,
             pageInfo        : {},
         };
-    },
-
-    isOriginalNameButton: function(eventButton){
-        return eventButton === de_settings.originalNameButton;
     },
 
     copyToClipboard: function(string){
@@ -488,10 +479,12 @@ const de_siteParsers = {
 
     getActualNode: function(node){
         const dollchanHack = 'self::div[@class="de-fullimg-video-hack"]/following-sibling::video',
+            // TODO: try to move these to user-customizable settings
             siteHacks = {
                 'twitter.com'       : 'self::div[contains(@class, "GalleryNav")]/preceding-sibling::div[@class="Gallery-media"]/img',
                 'tumblr.com'        : 'self::a/parent::div[@class="photo-wrap"]/img | self::a[@target="_blank"]/parent::div/preceding-sibling::div[@class="post_content"]/div/div[@data-imageurl] | self::span/parent::div/parent::a[@target="_blank"]/parent::div/preceding-sibling::div[@class="post_content"]/div/div[@data-imageurl] | self::div[@class="vjs-big-play-button"]/preceding-sibling::video',
                 'yandex.*'          : 'self::div[contains(@class, "preview2__arrow")]/preceding-sibling::div[contains(@class, "preview2__wrapper")]/div[@class="preview2__thumb-wrapper"]/img[contains(@class, "visible")] | self::div[contains(@class, "preview2__control")]/../preceding-sibling::div[contains(@class, "preview2__wrapper")]/div[@class="preview2__thumb-wrapper"]/img[contains(@class, "visible")]',
+                // TODO: don't show button on instagram previews
                 'instagram.com'     : 'self::div/preceding-sibling::div/img | self::span/preceding-sibling::div/div/video | self::ul/parent::div/preceding-sibling::div/div/img | self::div[@role="dialog"]/parent::div/parent::div/img',
                 'iwara.tv'          : 'self::div[@class="vjs-poster"]/preceding-sibling::video[@class="vjs-tech"]',
                 'vk.com'            : 'self::a[contains(@class, "image_cover") and contains(@onclick, "showPhoto")]',

@@ -56,9 +56,6 @@
 	"settings_disableSpacebarHotkey": {
 		"message": "Отключить сохранение по нажатию пробела:"
 	},
-	"settings_originalNameByDefault": {
-		"message": "Сохранять по-умолчанию с оригинальным именем, если оно доступно (меняет местами действия правой и левой кнопок мыши):"
-	},
 	"settings_saveFullSized": {
 		"message": "Всегда сохранять полноразмерные версии изображений (работает в twitter, tumblr, vk, instagram, iwara):"
 	},

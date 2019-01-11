@@ -36,8 +36,33 @@
 				<table>
 					<tr>
 						<td colspan="5">
-							<!-- TODO: manual for users -->
-							<!-- TODO: placeholders list -->
+							<!-- TODO: i18n holy shit -->
+							All specified paths are relative to your default save folder.
+							If you leave it empty, it will save files "as is" in default save folder.
+							Strings ending with "/" means some directory inside your default save folder. Otherwise it will use last part after "/" as a template for filename.
+							Use placeholders from the list below if you want to save files from each domain in their own folders, or with some specific filenames.
+
+							Available placeholders, must be surrounded with ::
+							::domain:: 		Domain name of the current site
+							::title::		Title of the current page
+							::thread_num::	Thread number if exists
+							::date::		Current date
+							::time::		UNIX timestamp
+							::filename::	Default filename as assigned by browser
+							::original::	Original filename, available on most popular imageboards
+
+							You can choose both left/right mouse button and keyboard hotkey for each save template.
+
+							You can specify domain name if you want some hotkey/save template to work only on this specific site.
+							You can also exclude hotkey for specific site, so it will work everywhere except this specific site.
+							To do this add domain name starting with "-" symbol.
+							Domain name you need to specify is usually shown in address bar, or you can open Web Console (Ctrl+Shift+K)
+							and write document.location.hostname, the result will be domain name you can insert into "host" field.
+							Rules with "host" have priority over "-host" rules. Rules without host specified have lowest priority.
+
+							Example:
+							wikipedia.org : this hotkey will only work on wikipedia.org
+							-bing.com     : this hotkey will work everywhere except bing.com
 						</td>
 					</tr>
 					<tr>
@@ -105,10 +130,6 @@
 		<tr>
 			<td><label for="disableSpacebarHotkey"><i18n>settings_disableSpacebarHotkey</i18n></label></td>
 			<td><input id="disableSpacebarHotkey" type="checkbox"></td>
-		</tr>
-		<tr>
-			<td><label for="originalNameByDefault"><i18n>settings_originalNameByDefault</i18n></label></td>
-			<td><input id="originalNameByDefault" type="checkbox"></td>
 		</tr>
 		<tr>
 			<td><label for="saveFullSized"><i18n>settings_saveFullSized</i18n></label></td>
