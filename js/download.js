@@ -123,12 +123,16 @@ const filenameTools = {
         return savePath && (savePath.replace(/^\\+|^\/+|\\+$|\/+$/, '') + '/');
     },
 
+    isFilenameRequired: function(savePath){
+        return savePath.includes('::filename::') || !savePath.includes('::original::');
+    },
+
     prepareSpecificSavePath: function(rawPath, pageInfo){
         let savePath = rawPath;
         const placeholders = {
-            '::domain::'    : () => {return this.trimForbiddenWinChars(pageInfo.domain)},
-            '::title::'     : () => {return this.trimForbiddenWinChars(pageInfo.title)},
-            '::thread_num::': () => {return this.trimForbiddenWinChars(pageInfo.threadNum)},
+            '::domain::'    : () => this.trimForbiddenWinChars(pageInfo.domain),
+            '::title::'     : () => this.trimForbiddenWinChars(pageInfo.title),
+            '::thread_num::': () => this.trimForbiddenWinChars(pageInfo.threadNum),
             '::date::'      : this.getDatetimeString,
             '::time::'      : this.getTimestamp,
         };
