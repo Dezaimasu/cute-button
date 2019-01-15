@@ -490,6 +490,7 @@ const de_siteParsers = {
                 'vk.com'            : 'self::a[contains(@class, "image_cover") and contains(@onclick, "showPhoto")]',
                 'clips.twitch.tv'   : 'self::div[@class="player-overlay"]/ancestor::div[contains(@class, "video-player__container")]/div[@class="player-video"]/video',
                 'behance.net'       : 'self::div[contains(@class, "js-prev") or contains(@class, "js-next")]/following::div[contains(@class, "js-slide-content") and not(contains(@class, "hidden"))]/img',
+                '2ch.hk'            : 'self::div[@id="html5videofixer"]/preceding-sibling::video',
             };
 
         return (this.dollchanImproved && xpath(dollchanHack, node)) || xpath(siteHacks[this.host], node);
