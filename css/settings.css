@@ -1,25 +1,26 @@
-body {
-	min-width: 900px;
-}
-table {
+table#main {
 	border-collapse:collapse;
 	border: 1px solid grey;
 }
-table tr:not(#path-restrictions):not(#default-path):not(.folder) td {
+table#main > tbody > tr:not(#path-restrictions):not(.folder) > td {
 	border-bottom: 1px solid grey;
 }
-td:first-child {
-	max-width: 666px;
+table#main > tbody > tr > td:first-child {
+	max-width: 250px;
 	padding: 6px 10px;
 	height: 25px;
 }
+table#main td#table-container {
+	padding-right: 0;
+	padding-left: 0;
+}
 input#exclusions,
 input#domainExclusions,
-input.default-path {
-	width: 400px;
+input#defaultSavePath {
+	width: 95%;
 }
 input.path {
-	width: 366px;
+	width: 266px;
 }
 input[type=file] {
 	width: 350px;
@@ -45,39 +46,39 @@ button#reset {
 	width: 50px;
 }
 
+#path-description {
+	white-space: pre;
+}
+
 .folder {
 	height: 25px;
+}
+.folder > td {
+	text-align: center;
 }
 .folder td:first-child {
 	vertical-align: middle;
 	line-height: 23px;
 }
-.folder .domain {
-	width: 250px;
+.folder input.domain {
+	width: 150px;
 }
-.folder .key-container {
-	padding-right: 13px;
-	float: right;
+.folder input.key {
+	text-transform: uppercase;
+}
+.folder input:placeholder-shown {
+	background-color: #e9e9e9;;
 }
 .folder#blank-folder,
 #hidden-settings {
 	display: none;
-}
-.folder td > div {
-	display: inline-block;
-}
-.folder td > div:last-child {
-	float: right;
-}
-.folder input.key {
-	text-transform: uppercase;
 }
 #add-folder-container td {
 	padding: 6px 0 13px;
 }
 
 input#styleForSaveMark {
-	width: 333px;
+	width: 80%;
 }
 #save-mark-example {
 	text-decoration: underline;

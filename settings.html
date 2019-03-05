@@ -6,7 +6,7 @@
 	<link rel="stylesheet" type="text/css" href="css/settings.css">
 </head>
 <body>
-	<table>
+	<table id="main">
 		<tr id="path-restrictions" class="alarm">
 			<td colspan="2">
 				<i18n>settings_pathRestrictions_1</i18n>
@@ -26,72 +26,81 @@
 				<br>
 			</td>
 		</tr>
-		<tr id="default-path">
-			<td><label for="defaultSavePath"><i18n>settings_defaultSavePath</i18n></label></td>
-			<td><input id="defaultSavePath" class="default-path" data-i18n-placeholder="settings_defaultSavePathPlaceholder"></td>
-		</tr>
-		<!-- TODO: test priorities for conflicting rules -->
 		<tr>
-			<td colspan="2">
+			<td id="table-container" colspan="2">
 				<table>
 					<tr>
-						<td colspan="5">
+						<td colspan="5" id="path-description">
 							<!-- TODO: i18n holy shit -->
-							All specified paths are relative to your default save folder.
-							If you leave it empty, it will save files "as is" in default save folder.
-							Strings ending with "/" means some directory inside your default save folder. Otherwise it will use last part after "/" as a template for filename.
-							File extension will be set automatically, don't specify it explicitly.
-							Use placeholders from the list below if you want to save files from each domain in their own folders, or with some specific filenames.
+All specified paths are relative to your default save folder.
+If you leave it empty, it will save files "as is" in default save folder.
+Strings ending with "/" means some directory inside your default save folder.
+Otherwise it will use last part after "/" as a template for filename.
+File extension will be set automatically, don't specify it explicitly.
+Use placeholders from the list below if you want to save files from each domain
+in their own folders, or with some specific filenames.
 
-							Available placeholders, must be surrounded with ::
-							::domain:: 		Domain name of the current site
-							::title::		Title of the current page
-							::thread_num::	Thread number if exists
-							::date::		Current date
-							::time::		UNIX timestamp
-							::filename::	Default filename as assigned by browser
-							::original::	Original filename, available on most popular imageboards
+List of available placeholders, must be surrounded with ::
+::domain:: 				Domain name of the current site
+::title::				Title of the current page
+::thread_number::		Thread number if exists
+::date::				Current date
+::time::				UNIX timestamp
+::filename::			Default filename as assigned by browser
+::original_filename::	Original filename, available on most popular imageboards
 
-							You can choose both left/right mouse button and keyboard hotkey for each save template.
+You can choose both mouse button and keyboard hotkey for each save template.
 
-							You can specify domain name if you want some hotkey/save template to work only on this specific site.
-							You can also exclude hotkey for specific site, so it will work everywhere except this specific site.
-							To do this add domain name starting with "-" symbol.
-							Domain name you need to specify is usually shown in address bar, or you can open Web Console (Ctrl+Shift+K)
-							and write document.location.hostname, the result will be domain name you can insert into "host" field.
-							Rules with "host" have priority over "-host" rules. Rules without host specified have lowest priority.
+You can specify domain name if you want some hotkey/save template to work only on this specific site.
+You can also exclude hotkey for specific site, so it will work everywhere except this specific site.
+To do this add domain name starting with "-" symbol.
+Domain name you need to specify is usually shown in address bar, or you can open
+Web Console (Ctrl+Shift+K) and write document.location.hostname, the result will be
+domain name you can insert into "host" field.
+Rules with "host" have higher priority than "-host" rules.
+Rules without host specified have lowest priority.
 
-							Example:
-							wikipedia.org : this hotkey will only work on wikipedia.org
-							-bing.com     : this hotkey will work everywhere except bing.com
+Examples:
+wikipedia.org : this hotkey will only work on wikipedia.org
+-bing.com     : this hotkey will work everywhere except bing.com
 						</td>
 					</tr>
 					<tr>
 						<th><i18n>settings_domain</i18n></th>
-						<th><i18n>settings_hotkey</i18n></th>
 						<th><i18n>settings_modifier</i18n></th>
-						<th>Save path</th> <!-- TODO: i18n -->
-						<th>Delete</th> <!-- TODO: i18n -->
+						<th><i18n>settings_hotkey</i18n></th>
+						<th>mouse<br>button</th>
+						<th>save path</th> <!-- TODO: i18n -->
+						<th></th>
 					</tr>
 					<tr class="folder" id="blank-folder">
 						<td>
 							<label>
-								<input class="domain">
-							</label>
-						</td>
-						<td>
-							<label>
-								<input class="key" size="1" maxlength="1">
-								<input class="keyCode" type="hidden">
+								<input class="domain" placeholder="domain">
 							</label>
 						</td>
 						<td>
 							<label>
 								<select class="modifier">
-									<option value="" selected>-</option>
+									<option value="" selected></option>
 									<option value="ctrlKey">Ctrl</option>
 									<option value="shiftKey">Shift</option>
 									<option value="altKey">Alt</option>
+								</select>
+							</label>
+						</td>
+						<td>
+							<label>
+								<input class="key" size="1" maxlength="1" placeholder="space">
+								<input class="keyCode" type="hidden">
+							</label>
+						</td>
+						<td>
+							<label>
+								<select class="mouseButton">
+									<option value="0" selected>LMB</option>
+									<option value="2">RMB</option>
+									<option value="1">MMB</option>
 								</select>
 							</label>
 						</td>
@@ -113,6 +122,10 @@
 			</td>
 		</tr>
 		<tr>
+			<td><label for="defaultSavePath"><i18n>settings_defaultSavePath</i18n></label></td>
+			<td><input id="defaultSavePath" data-i18n-placeholder="settings_defaultSavePathPlaceholder"></td>
+		</tr>
+		<tr>
 			<td><label for="minSize"><i18n>settings_minSize</i18n></label></td>
 			<td><input id="minSize" type="number" min="0"></td>
 		</tr>
@@ -123,6 +136,13 @@
 		<tr>
 			<td><label for="domainExclusions"><i18n>settings_domainExclusions</i18n></label></td>
 			<td><input id="domainExclusions"></td>
+		</tr>
+		<tr>
+			<td><label for="styleForSaveMark"><i18n>settings_styleForSaveMark</i18n></label></td>
+			<td>
+				<input id="styleForSaveMark" data-i18n-placeholder="settings_styleForSaveMarkPlaceholder">
+				<a id="save-mark-example"><i18n>settings_saveMarkExample</i18n></a>
+			</td>
 		</tr>
 		<tr>
 			<td><label for="showSaveDialog"><i18n>settings_showSaveDialog</i18n></label></td>
@@ -145,13 +165,6 @@
 			<td><input id="forbidDuplicateFiles" type="checkbox"></td>
 		</tr>
 		<tr>
-			<td><label for="styleForSaveMark"><i18n>settings_styleForSaveMark</i18n></label></td>
-			<td>
-				<input id="styleForSaveMark" data-i18n-placeholder="settings_styleForSaveMarkPlaceholder">
-				<a id="save-mark-example"><i18n>settings_saveMarkExample</i18n></a>
-			</td>
-		</tr>
-		<tr>
 			<td><label for="hideButton"><i18n>settings_hideButton</i18n></label></td>
 			<td><input id="hideButton" type="checkbox"></td>
 		</tr>
@@ -169,18 +182,6 @@
 		<tr>
 			<td><label for="placeUnderCursor"><i18n>settings_placeUnderCursor</i18n> (<span class="alarm"><i18n>settings_placeUnderCursorWarning</i18n></span>):</label></td>
 			<td><input id="placeUnderCursor" type="checkbox"></td>
-		</tr>
-		<tr>
-			<td><label for="filenamePrefix"><i18n>settings_filenamePrefix</i18n></label></td>
-			<td>
-				<select id="prefix-selector">
-					<option value="" data-i18n="settings_filenamePrefixNone"></option>
-					<option value="text" data-i18n="settings_filenamePrefixText"></option>
-					<option value="::date::" data-i18n="settings_filenamePrefixDate"></option>
-					<option value="::time::" data-i18n="settings_filenamePrefixTime"></option>
-				</select>
-				<input id="filenamePrefix" disabled>
-			</td>
 		</tr>
 		<tr>
 			<td><label for="file-input"><i18n>settings_icon</i18n></label></td>

@@ -8,7 +8,10 @@ const settingsDefault = {
     hideButton              : false,
     isCute                  : true,
     position                : 'top-left',
-    folders                 : [],
+    folders                 : [
+        {domain: '', key: ' ', keyCode: 32, modifier: '',        mouseButton: 0, path: '::filename::'},
+        {domain: '', key: ' ', keyCode: 32, modifier: 'ctrlKey', mouseButton: 2, path: '::original_filename::'},
+    ],
     placeUnderCursor        : false,
     saveOnHover             : false,
     showSaveDialog          : false,

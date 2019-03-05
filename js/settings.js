@@ -77,7 +77,6 @@ function showMessage(message, type){
 function additionalOptionsProcessing(options){
     refreshIcon();
     refreshFolders(options.folders);
-    setPrefixSelector(options.filenamePrefix);
 }
 
 /*
@@ -144,20 +143,22 @@ function keyInputListener(event){
 }
 
 function fillFolder(folderElem, folderSettings){
-    folderElem.querySelector('.domain').value   = folderSettings.domain;
-    folderElem.querySelector('.key').value      = folderSettings.key;
-    folderElem.querySelector('.keyCode').value  = folderSettings.keyCode;
-    folderElem.querySelector('.modifier').value = folderSettings.modifier;
-    folderElem.querySelector('.path').value     = folderSettings.path;
+    folderElem.querySelector('.domain').value       = folderSettings.domain;
+    folderElem.querySelector('.key').value          = folderSettings.key;
+    folderElem.querySelector('.keyCode').value      = folderSettings.keyCode;
+    folderElem.querySelector('.modifier').value     = folderSettings.modifier;
+    folderElem.querySelector('.mouseButton').value  = folderSettings.mouseButton;
+    folderElem.querySelector('.path').value         = folderSettings.path;
 }
 
 function buildFolderSettings(folderElem){
     const folderSettings = {
-        domain  : folderElem.querySelector('.domain').value,
-        key     : folderElem.querySelector('.key').value,
-        keyCode : Number(folderElem.querySelector('.keyCode').value),
-        modifier: folderElem.querySelector('.modifier').value,
-        path    : folderElem.querySelector('.path').value
+        domain      : folderElem.querySelector('.domain').value,
+        key         : folderElem.querySelector('.key').value,
+        keyCode     : Number(folderElem.querySelector('.keyCode').value),
+        modifier    : folderElem.querySelector('.modifier').value,
+        mouseButton : folderElem.querySelector('.mouseButton').value,
+        path        : folderElem.querySelector('.path').value
     };
     addHotkeyId(folderSettings);
 
@@ -189,34 +190,6 @@ function isValidPath(path){
 }
 
 /*
--------------------- Prefix --------------------
-*/
-
-function prefixSelectorListener(){
-    if (isTextPrefix(elem['prefix-selector'].value)) {
-        setValue('filenamePrefix', '');
-        setting['filenamePrefix'].disabled = false;
-    } else {
-        setValue('filenamePrefix', elem['prefix-selector'].value);
-        setting['filenamePrefix'].disabled = true;
-    }
-}
-
-function setPrefixSelector(prefix){
-    if (isTextPrefix(prefix)) {
-        elem['prefix-selector'].value = 'text';
-        setting['filenamePrefix'].disabled = false;
-    } else {
-        elem['prefix-selector'].value = prefix;
-        setting['filenamePrefix'].disabled = true;
-    }
-}
-
-function isTextPrefix(value){
-    return !['', '::date::', '::time::'].includes(value);
-}
-
-/*
 -------------------- Custom styles --------------------
 */
 
@@ -243,7 +216,7 @@ function prepareCss(){
 */
 function initSelectors(){
     const settingsElems = Object.keys(settingsDefault),
-        otherElems = ['blank-folder', 'add-folder', 'add-folder-container', 'prefix-selector', 'save', 'reset', 'file-input', 'message', 'save-mark-example', 'de-cute-id'];
+        otherElems = ['blank-folder', 'add-folder', 'add-folder-container', 'save', 'reset', 'file-input', 'message', 'save-mark-example', 'de-cute-id'];
 
     settingsElems.forEach(name => {
         setting[name] = document.querySelector(`#${name}`);
@@ -274,7 +247,6 @@ function init(){
     initSelectors();
 
     elem['save-mark-example'].addEventListener('click', setExampleCss);
-    elem['prefix-selector'].addEventListener('change', prefixSelectorListener);
     elem['file-input'].addEventListener('change', fileInputListener);
     elem['reset'].addEventListener('click', resetOptions);
     elem['save'].addEventListener('click', event => {
