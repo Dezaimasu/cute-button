@@ -519,6 +519,9 @@ const de_siteParsers = {
                 'iwara.tv': () => {
                     return node.parentNode.href;
                 },
+                'tiktokapi.ga': () => {
+                    return 'https://tiktokapi.ga/' + node.getAttribute('info');
+                },
             },
             getter = getters[this.host];
         let originalSrc = null;
@@ -553,6 +556,11 @@ const de_siteParsers = {
                 '8ch.net': () => {
                     const container = xpath('../preceding-sibling::p[@class="fileinfo"]/span[@class="unimportant"]/a', node);
                     return container.title || container.textContent;
+                },
+                'tiktokapi.ga': () => {
+                    const id = node.getAttribute('aweme'),
+                        name = node.getAttribute('info').split('&name=')[1];
+                    return `${id}__${name}.mp4`;
                 },
             },
             aliases = {
