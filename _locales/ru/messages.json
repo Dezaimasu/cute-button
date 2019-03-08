@@ -35,11 +35,11 @@
 	"settings_modifier": {
 		"message": "модификатор"
 	},
-	"settings_addHotkey": {
-		"message": "Добавить хоткей для другой директории"
+	"settings_addFolder": {
+		"message": "Добавить другой путь для сохранения"
 	},
 	"settings_savePathPlaceholder": {
-		"message": "путь для сохранения файлов"
+		"message": "сохранять файлы в"
 	},
 	"settings_minSize": {
 		"message": "Минимальная ширина/высота изображения (в пикселях):"

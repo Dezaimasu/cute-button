@@ -9,62 +9,48 @@
 	<table id="main">
 		<tr id="path-restrictions" class="alarm">
 			<td colspan="2">
-				<i18n>settings_pathRestrictions_1</i18n>
-				<br>
-				<i18n>settings_pathRestrictions_2</i18n>
-				<br>
-				<i18n>settings_pathRestrictions_3</i18n>
-				<br>
-				<br>
-				<i18n>settings_pathRestrictions_4</i18n>
-				<br>
-				<i18n>settings_pathRestrictions_5</i18n>
-				<br>
-				<br>
-				<i18n>settings_pathRestrictions_6</i18n>
-				<br>
+				<span id="toggle-basic-rules" class="toggle">
+					&#9654; Show/hide rules
+				</span>
+				<span id="basic-rules" class="hidden-block">
+					<br>
+					<i18n>settings_pathRestrictions_1</i18n>
+					<br>
+					<i18n>settings_pathRestrictions_2</i18n>
+					<br>
+					<i18n>settings_pathRestrictions_3</i18n>
+					<br>
+					<br>
+					<i18n>settings_pathRestrictions_4</i18n>
+					<br>
+					<i18n>settings_pathRestrictions_5</i18n>
+					<br>
+					<br>
+					<i18n>settings_pathRestrictions_6</i18n>
+					<br>
+				</span>
 				<br>
 			</td>
 		</tr>
 		<tr>
-			<td id="table-container" colspan="2">
-				<table>
-					<tr>
-						<td colspan="5" id="path-description">
-							<!-- TODO: i18n holy shit -->
-All specified paths are relative to your default save folder.
-If you leave it empty, it will save files "as is" in default save folder.
-Strings ending with "/" means some directory inside your default save folder.
-Otherwise it will use last part after "/" as a template for filename.
-File extension will be set automatically, don't specify it explicitly.
-Use placeholders from the list below if you want to save files from each domain
-in their own folders, or with some specific filenames.
-
-List of available placeholders, must be surrounded with ::
-::domain:: 				Domain name of the current site
-::title::				Title of the current page
-::thread_number::		Thread number if exists
-::date::				Current date
-::time::				UNIX timestamp
-::filename::			Default filename as assigned by browser
-::original_filename::	Original filename, available on most popular imageboards
-
-You can choose both mouse button and keyboard hotkey for each save template.
-
-You can specify domain name if you want some hotkey/save template to work only on this specific site.
-You can also exclude hotkey for specific site, so it will work everywhere except this specific site.
-To do this add domain name starting with "-" symbol.
-Domain name you need to specify is usually shown in address bar, or you can open
-Web Console (Ctrl+Shift+K) and write document.location.hostname, the result will be
-domain name you can insert into "host" field.
-Rules with "host" have higher priority than "-host" rules.
-Rules without host specified have lowest priority.
-
-Examples:
-wikipedia.org : this hotkey will only work on wikipedia.org
--bing.com     : this hotkey will work everywhere except bing.com
-						</td>
-					</tr>
+			<td><label for="defaultSavePath"><i18n>settings_defaultSavePath</i18n></label></td>
+			<td><input id="defaultSavePath" data-i18n-placeholder="settings_defaultSavePathPlaceholder"></td>
+		</tr>
+		<tr>
+			<td id="folders-container" colspan="2">
+				<span id="toggle-folders" class="toggle">
+					<span>&#9654;</span>
+					<span>Click here if you want to save images to different folders</span>
+				</span>
+				<table id="folders-table" class="hidden-block">
+					<colgroup>
+						<col id="col-domain">
+						<col id="col-modifier">
+						<col id="col-hotkey">
+						<col id="col-mouse">
+						<col id="col-path">
+						<col id="col-delete">
+					</colgroup>
 					<tr>
 						<th><i18n>settings_domain</i18n></th>
 						<th><i18n>settings_modifier</i18n></th>
@@ -110,20 +96,57 @@ wikipedia.org : this hotkey will only work on wikipedia.org
 							</label>
 						</td>
 						<td>
-							<button class="delete-folder">X</button>
+							<a class="button delete-folder">✖</a>
 						</td>
 					</tr>
 					<tr id="add-folder-container">
-						<td colspan="5">
-							<button id="add-folder"><i18n>settings_addHotkey</i18n></button>
+						<td colspan="6">
+							<button id="add-folder" class="button"><i18n>settings_addFolder</i18n></button>
+						</td>
+					</tr>
+					<tr>
+						<td colspan="6">
+							<span id="toggle-folders-rules" class="toggle">
+								&#9654; Show/hide rules
+							</span>
+							<span id="folders-rules" class="hidden-block">
+							<!-- TODO: i18n holy shit -->
+All specified paths are relative to your default save folder.
+If you leave it empty, it will save files "as is" in default save folder.
+Strings ending with "/" means some directory inside your default save folder.
+Otherwise it will use last part after "/" as a template for filename.
+File extension will be set automatically, don't specify it explicitly.
+Use placeholders from the list below if you want to save files from each domain
+in their own folders, or with some specific filenames.
+
+List of available placeholders, must be surrounded with ::
+::domain:: 			Domain name of the current site
+::title::				Title of the current page
+::thread_number::		Thread number if exists
+::date::				Current date
+::time::				UNIX timestamp
+::filename::			Default filename as assigned by browser
+::original_filename::	Original filename, available on most popular imageboards
+
+You can choose both mouse button and keyboard hotkey for each save template.
+
+You can specify domain name if you want some hotkey/save template to work only on this specific site.
+You can also exclude hotkey for specific site, so it will work everywhere except this specific site.
+To do this add domain name starting with "-" symbol.
+Domain name you need to specify is usually shown in address bar, or you can open
+Web Console (Ctrl+Shift+K) and write document.location.hostname, the result will be
+domain name you can insert into "host" field.
+Rules with "host" have higher priority than "-host" rules.
+Rules without host specified have lowest priority.
+
+Examples:
+wikipedia.org : this hotkey will only work on wikipedia.org
+-bing.com     : this hotkey will work everywhere except bing.com
+							</span>
 						</td>
 					</tr>
 				</table>
 			</td>
-		</tr>
-		<tr>
-			<td><label for="defaultSavePath"><i18n>settings_defaultSavePath</i18n></label></td>
-			<td><input id="defaultSavePath" data-i18n-placeholder="settings_defaultSavePathPlaceholder"></td>
 		</tr>
 		<tr>
 			<td><label for="minSize"><i18n>settings_minSize</i18n></label></td>

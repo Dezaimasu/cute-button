@@ -79,6 +79,16 @@ function additionalOptionsProcessing(options){
     refreshFolders(options.folders);
 }
 
+function show(elemName){
+    elem[elemName].classList.remove('hidden-block');
+}
+function hide(elemName){
+    elem[elemName].classList.add('hidden-block');
+}
+function toggle(elemName){
+    elem[elemName].classList.toggle('hidden-block');
+}
+
 /*
 -------------------- Icon --------------------
 */
@@ -106,6 +116,10 @@ function refreshFolders(foldersSettings){
     document.querySelectorAll('.folder').forEach(folderElem => folderElem.remove());
     folders = foldersSettings;
     folders.forEach(addNewFolder);
+    if (folders.length > 0) {
+        show('folders-table');
+        hide('toggle-folders');
+    }
 }
 
 function prepareCurrentFoldersForSave(){
@@ -216,7 +230,23 @@ function prepareCss(){
 */
 function initSelectors(){
     const settingsElems = Object.keys(settingsDefault),
-        otherElems = ['blank-folder', 'add-folder', 'add-folder-container', 'save', 'reset', 'file-input', 'message', 'save-mark-example', 'de-cute-id'];
+        otherElems = [
+            'blank-folder',
+            'add-folder',
+            'add-folder-container',
+            'toggle-folders',
+            'folders-table',
+            'toggle-folders-rules',
+            'folders-rules',
+            'toggle-basic-rules',
+            'basic-rules',
+            'save',
+            'reset',
+            'file-input',
+            'message',
+            'save-mark-example',
+            'de-cute-id',
+        ];
 
     settingsElems.forEach(name => {
         setting[name] = document.querySelector(`#${name}`);
@@ -234,6 +264,17 @@ function enableInputListeners(inputsContainer){
             if (!event.target.classList.contains('path')) {return;}
             checkSavePath(event.target);
         });
+    });
+}
+
+function enableToggles(){
+    const toggles = {
+        'toggle-basic-rules'    : 'basic-rules',
+        'toggle-folders-rules'  : 'folders-rules',
+        'toggle-folders'        : 'folders-table',
+    };
+    Object.entries(toggles).forEach(([toggleName, togglableElemName]) => {
+        elem[toggleName].addEventListener('click', () => toggle(togglableElemName));
     });
 }
 
@@ -263,6 +304,7 @@ function init(){
         enableSave();
     });
 
+    enableToggles();
     enableInputListeners(document);
     disableSave();
     loadOptions();

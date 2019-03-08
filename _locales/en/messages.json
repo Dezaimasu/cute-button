@@ -35,8 +35,8 @@
 	"settings_modifier": {
 		"message": "modifier"
 	},
-	"settings_addHotkey": {
-		"message": "Add hotkey for another location"
+	"settings_addFolder": {
+		"message": "Add another save path"
 	},
 	"settings_savePathPlaceholder": {
 		"message": "save files to"

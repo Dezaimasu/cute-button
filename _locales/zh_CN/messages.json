@@ -35,7 +35,7 @@
 	"settings_modifier": {
 		"message": "修饰键"
 	},
-	"settings_addHotkey": {
+	"settings_addFolder": {
 		"message": "添加另一个位置的快捷键"
 	},
 	"settings_savePathPlaceholder": {

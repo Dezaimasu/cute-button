@@ -35,8 +35,8 @@
 	"settings_modifier": {
 		"message": "модифікатор"
 	},
-	"settings_addHotkey": {
-		"message": "Додати гарячу клавішу для іншої директорії"
+	"settings_addFolder": {
+		"message": "Додати інший шлях для збереження"
 	},
 	"settings_savePathPlaceholder": {
 		"message": "зберігати файли до"
