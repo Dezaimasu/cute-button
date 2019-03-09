@@ -139,7 +139,7 @@ const de_button = {
             de_webextApi.download(downloadRequest);
             de_settings.selectedSavePath = null;
             de_contentscript.rememberDownload(historyEntry);
-            if (eventButton === 1) {
+            if (eventButton === 1) { // TODO: make optional or delete
                 that.copyToClipboard(that.downloadRequest.src);
             }
             that.unclick();
@@ -246,6 +246,7 @@ const de_contentscript = {
             domain      : hostname,
             title       : null,
             threadNum   : de_siteParsers.getPossibleThreadNum(),
+            boardName   : de_siteParsers.getPossibleBoardName(),
         };
 
         window.addEventListener('load', () => {
@@ -468,6 +469,11 @@ const de_siteParsers = {
             .replace(/^(ecchi\.)?(iwara\.tv)$/, 'iwara.tv');
     },
 
+    getPossibleBoardName: function(){
+        const boardNameTry = document.location.pathname.match(/^\/(\w+)\//);
+        return boardNameTry && boardNameTry[1];
+    },
+
     getPossibleThreadNum: function(){
         const threadNumTry = document.location.pathname.match(/\/(\d+)(\/|\.|$)/);
         return threadNumTry && threadNumTry[1];
@@ -646,7 +652,11 @@ const de_hotkeys = {
     isHotkeyPossible: function(event){
         return (
             (de_contentscript.isSeparateTab && de_hotkeys.isNoScroll()) ||
-            (de_button.isVisible() && !['INPUT', 'TEXTAREA'].includes(event.target.tagName))
+            (
+                de_button.isVisible() &&
+                !['INPUT', 'TEXTAREA'].includes(event.target.tagName) &&
+                !event.target.classList.contains('submit_post_field') // vk inputs
+            )
         );
     },
 
@@ -668,6 +678,7 @@ const de_hotkeys = {
 
         that.list[rule.id] = {
             path    : rule.path,
+            filename: rule.filename,
             priority: priority,
         };
     },

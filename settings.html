@@ -49,6 +49,7 @@
 						<col id="col-hotkey">
 						<col id="col-mouse">
 						<col id="col-path">
+						<col id="col-filename">
 						<col id="col-delete">
 					</colgroup>
 					<tr>
@@ -57,12 +58,13 @@
 						<th><i18n>settings_hotkey</i18n></th>
 						<th>mouse<br>button</th>
 						<th>save path</th> <!-- TODO: i18n -->
+						<th>filename</th> <!-- TODO: i18n -->
 						<th></th>
 					</tr>
 					<tr class="folder" id="blank-folder">
 						<td>
 							<label>
-								<input class="domain" placeholder="domain">
+								<input class="domain" placeholder="any domain">
 							</label>
 						</td>
 						<td>
@@ -77,14 +79,15 @@
 						</td>
 						<td>
 							<label>
-								<input class="key" size="1" maxlength="1" placeholder="space">
+								<input class="key" size="1" maxlength="1">
 								<input class="keyCode" type="hidden">
 							</label>
 						</td>
 						<td>
 							<label>
 								<select class="mouseButton">
-									<option value="0" selected>LMB</option>
+									<option value="" selected></option>
+									<option value="0">LMB</option>
 									<option value="2">RMB</option>
 									<option value="1">MMB</option>
 								</select>
@@ -96,39 +99,45 @@
 							</label>
 						</td>
 						<td>
+							<label>
+								<input class="filename" data-i18n-placeholder="settings_filenamePlaceholder"> <!-- TODO: i18n -->
+							</label>
+						</td>
+						<td>
 							<a class="button delete-folder">✖</a>
 						</td>
 					</tr>
 					<tr id="add-folder-container">
-						<td colspan="6">
+						<td colspan="7">
 							<button id="add-folder" class="button"><i18n>settings_addFolder</i18n></button>
 						</td>
 					</tr>
 					<tr>
-						<td colspan="6">
+						<td colspan="7">
 							<span id="toggle-folders-rules" class="toggle">
 								&#9654; Show/hide rules
 							</span>
 							<span id="folders-rules" class="hidden-block">
 							<!-- TODO: i18n holy shit -->
 All specified paths are relative to your default save folder.
-If you leave it empty, it will save files "as is" in default save folder.
-Strings ending with "/" means some directory inside your default save folder.
-Otherwise it will use last part after "/" as a template for filename.
-File extension will be set automatically, don't specify it explicitly.
-Use placeholders from the list below if you want to save files from each domain
+If you leave it empty, it will save files in default save folder.
+if you leave "filename" field empty, files will be saved with default filename.
+File extension will be set automatically, please don't specify it explicitly.
+Using placeholders from the list below you can save files from each domain
 in their own folders, or with some specific filenames.
+Feel free to request more
 
 List of available placeholders, must be surrounded with ::
 ::domain:: 			Domain name of the current site
 ::title::				Title of the current page
+::board_name::		Board name if exists (without // symbols)
 ::thread_number::		Thread number if exists
 ::date::				Current date
 ::time::				UNIX timestamp
 ::filename::			Default filename as assigned by browser
 ::original_filename::	Original filename, available on most popular imageboards
 
-You can choose both mouse button and keyboard hotkey for each save template.
+You can choose mouse button or keyboard hotkey or both for each template.
 
 You can specify domain name if you want some hotkey/save template to work only on this specific site.
 You can also exclude hotkey for specific site, so it will work everywhere except this specific site.

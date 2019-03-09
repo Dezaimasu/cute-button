@@ -62,12 +62,13 @@ button#reset {
 #folders-table .folder td * {
 	width: 100%;
 }
-#folders-table #col-domain	{width: 29%;}
-#folders-table #col-modifier{width: 10%;}
-#folders-table #col-hotkey 	{width: 10%;}
-#folders-table #col-mouse 	{width: 10%;}
-#folders-table #col-path 	{width: 40%;}
-#folders-table #col-delete 	{width: 5%;}
+#folders-table #col-domain	{width: 20%;}
+#folders-table #col-modifier{width: 8%;}
+#folders-table #col-hotkey 	{width: 7%;}
+#folders-table #col-mouse 	{width: 8%;}
+#folders-table #col-path 	{width: 25%;}
+#folders-table #col-filename{width: 18%;}
+#folders-table #col-delete 	{width: 4%;}
 
 .folder {
 	height: 25px;

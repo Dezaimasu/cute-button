@@ -17,7 +17,7 @@ Download.prototype = {
     process: function(){
         this.savePath = filenameTools.prepareSavePath(this.downloadRequest.path, this.downloadRequest.pageInfo);
 
-        if (this.downloadRequest.originalName) {
+        if (this.downloadRequest.originalName) { // TODO: also check if originalName contains extension only, e.g. ".jpg"
             this.filename = this.downloadRequest.originalName;
         } else {
             Object.assign(this, filenameTools.getFilename(this.downloadRequest.src));
@@ -119,29 +119,28 @@ const filenameTools = {
     * Doesn't matter which slashes are used in save path, WebExt API recognizes both.
     */
     prepareSavePath: function(rawPath, pageInfo){
-        const savePath = this.prepareSpecificSavePath(rawPath, pageInfo);
+        const savePath = this.replacePlaceholders(rawPath, pageInfo);
         return savePath && (savePath.replace(/^\\+|^\/+|\\+$|\/+$/, '') + '/');
     },
 
-    isFilenameRequired: function(savePath){
-        return savePath.includes('::filename::') || !savePath.includes('::original::');
-    },
-
-    prepareSpecificSavePath: function(rawPath, pageInfo){
-        let savePath = rawPath;
+    replacePlaceholders: function(string, pageInfo){
+        let pathPart = string;
         const placeholders = {
-            '::domain::'    : () => this.trimForbiddenWinChars(pageInfo.domain),
-            '::title::'     : () => this.trimForbiddenWinChars(pageInfo.title),
-            '::thread_num::': () => this.trimForbiddenWinChars(pageInfo.threadNum),
-            '::date::'      : this.getDatetimeString,
-            '::time::'      : this.getTimestamp,
+            '::domain::'            : () => this.trimForbiddenWinChars(pageInfo.domain),
+            '::title::'             : () => this.trimForbiddenWinChars(pageInfo.title),
+            '::thread_number::'     : () => this.trimForbiddenWinChars(pageInfo.threadNum),
+            '::board_name::'        : () => this.trimForbiddenWinChars(pageInfo.boardName),
+            '::date::'              : this.getDatetimeString,
+            '::time::'              : this.getTimestamp,
+            '::filename::'          : '',
+            '::original_filename::' : '',
         };
 
-        savePath.includes(':') && Object.keys(placeholders).forEach(placeholder => {
-            savePath = savePath.replace(placeholder, placeholders[placeholder]);
+        pathPart.includes(':') && Object.entries(placeholders).forEach(([placeholder, replacement]) => {
+            pathPart = pathPart.replace(placeholder, replacement);
         });
 
-        return savePath;
+        return pathPart;
     },
 
     /*
@@ -182,6 +181,7 @@ const filenameTools = {
     },
 
     getTimestamp: function(){
+        console.log(123123123123);
         return Date.now();
     },
 };
