@@ -26,10 +26,8 @@ const de_webextApi = {
                 de_hotkeys.list = {};
             }
 
-            Object.keys(settings).forEach(settingName => {
-                const setting = settings[settingName],
-                    settingValue = isChanges ? setting.newValue : setting;
-
+            Object.entries(settings).forEach(([settingName, setting]) => {
+                const settingValue = isChanges ? setting.newValue : setting;
                 de_settings.setters[settingName](settingValue);
             });
         }
@@ -50,21 +48,21 @@ const de_settings = {
         hideButton              : newValue => de_button.elem.classList.toggle('shy', newValue),
         isCute                  : newValue => de_listeners.switch(newValue),
         position                : newValue => [de_settings.vertical, de_settings.horizontal] = newValue.split('-'),
-        folders                 : newValue => de_settings.assignHotkeys(newValue),
+        folders                 : newValue => de_settings.setFoldersRules(newValue),
         placeUnderCursor        : newValue => de_settings.placeUnderCursor = newValue,
         saveOnHover             : newValue => de_settings.saveOnHover = newValue,
         showSaveDialog          : newValue => de_settings.showSaveDialog = newValue,
         forbidDuplicateFiles    : newValue => de_settings.forbidDuplicateFiles = newValue,
         saveFullSized           : newValue => de_settings.saveFullSized = newValue,
-        disableSpacebarHotkey   : newValue => Object.assign(de_hotkeys.list, newValue ? {} : de_hotkeys.reserved),
+        disableSpacebarHotkey   : newValue => Object.assign(de_hotkeys.keyboardHotkeys, newValue ? {} : de_hotkeys.reserved),
         domainExclusions        : newValue => de_settings.disableIfExcluded(newValue),
         styleForSaveMark        : newValue => de_settings.refreshStyleForSaveMark(newValue),
     },
 
-    assignHotkeys: function(folders){
+    setFoldersRules: function(folders){
         folders.forEach(de_hotkeys.assignHotkeyRule);
-        if (de_hotkeys.list['00000']) {
-            de_settings.defaultSavePath = de_hotkeys.list['00000'].path;
+        if (de_hotkeys.keyboardHotkeys['00000']) { // TODO
+            de_settings.defaultSavePath = de_hotkeys.keyboardHotkeys['00000'].path;
         }
     },
 
@@ -120,8 +118,13 @@ const de_button = {
         mouseup: function(eventButton){
             const that = de_button,
                 btnElem = that.elem,
-                downloadRequest = Object.assign(
-                    {path: de_settings.selectedSavePath || de_settings.defaultSavePath},
+                savePath = (
+                    de_settings.selectedSavePath ||
+                    (isSet(de_hotkeys.mouseHotkeys, eventButton) ? de_hotkeys.mouseHotkeys[eventButton].path : null) ||
+                    de_settings.defaultSavePath
+                ),
+                downloadRequest = Object.assign( // TODO: add some flag for original filename
+                    {path: savePath},
                     that.downloadRequest,
                     {pageInfo: de_contentscript.pageInfo},
                 ),
@@ -623,8 +626,8 @@ const de_listeners = {
             de_contentscript.nodeHandler(document.body.childNodes[0]);
         }
 
-        de_settings.selectedSavePath = de_hotkeys.list[hotkeyId].path;
-        de_button.emulateClick(hotkeyId === '10032' ? 2 : 0);
+        de_settings.selectedSavePath = de_hotkeys.keyboardHotkeys[hotkeyId].path;
+        de_button.emulateClick(de_hotkeys.keyboardHotkeys[hotkeyId].mouseButton || 0);
     },
 
     switch: function(turnOn = true){
@@ -636,13 +639,15 @@ const de_listeners = {
 };
 
 const de_hotkeys = {
-    list: {},
+    keyboardHotkeys: {},
+
+    mouseHotkeys: {},
 
     hide: '01081', // Alt+Q, hide button
 
     reserved: {
-        '00032': {path: null}, // Space, save to default location
-        '10032': {path: null}, // Ctrl+Space, save to default location with original filename
+        '00032': {path: null, mouseButton: 0}, // Space, save to default location
+        '10032': {path: null, mouseButton: 2}, // Ctrl+Space, save to default location with original filename
     },
 
     buildHotkeyId: function(event){
@@ -661,7 +666,7 @@ const de_hotkeys = {
     },
 
     isHotkeyExists: function(hotkeyId){
-        return isSet(de_hotkeys.list, hotkeyId);
+        return isSet(de_hotkeys.keyboardHotkeys, hotkeyId);
     },
 
     isNoScroll: function(){
@@ -674,13 +679,27 @@ const de_hotkeys = {
         if (!that.isRuleForCurrentDomain(rule)) {return;}
 
         priority = that.getPriorityLevel(rule);
-        if (that.list[rule.id] && that.list[rule.id].priority < priority) {return;}
 
-        that.list[rule.id] = {
-            path    : rule.path,
-            filename: rule.filename,
-            priority: priority,
-        };
+        if (that.isHigherPriority(that.mouseHotkeys[rule.id], priority)) {
+            that.keyboardHotkeys[rule.id] = {
+                path        : rule.path,
+                filename    : rule.filename,
+                mouseButton : rule.mouseButton,
+                priority    : priority,
+            };
+        }
+
+        if (that.isHigherPriority(that.mouseHotkeys[rule.mouseButton], priority)) {
+            that.mouseHotkeys[rule.mouseButton] = {
+                path    : rule.path,
+                filename: rule.filename,
+                priority: priority,
+            };
+        }
+    },
+
+    isHigherPriority: function(previousRule, newPriority){
+        return !previousRule || previousRule.priority >= newPriority;
     },
 
     isRuleForCurrentDomain: function(rule){
