@@ -242,6 +242,7 @@ const de_contentscript = {
         const hostname = document.location.hostname;
 
         window.addEventListener('mouseover', de_listeners.mouseoverListener); // asap
+        document.addEventListener('readystatechange', de_listeners.readystatechangeListener);
 
         this.isSeparateTab = ['image/', 'video/', 'audio/'].includes(document.contentType.substr(0, 6));
         this.srcLocation = this.isSeparateTab ? 'baseURI' : 'currentSrc';
@@ -251,11 +252,6 @@ const de_contentscript = {
             threadNum   : de_siteParsers.getPossibleThreadNum(),
             boardName   : de_siteParsers.getPossibleBoardName(),
         };
-
-        window.addEventListener('load', () => {
-            this.pageInfo.title = document.title;
-            de_siteParsers.checkDollchanPresence();
-        }, {once: true});
 
         de_siteParsers.setFilteredHost(hostname);
 
@@ -483,7 +479,7 @@ const de_siteParsers = {
     },
 
     checkDollchanPresence: function(){
-        de_siteParsers.dollchanImproved = !!document.querySelector('#de-main');
+        setTimeout(() => {de_siteParsers.dollchanImproved = !!document.querySelector('#de-main');}, 1000);
     },
 
     getActualNode: function(node){
@@ -597,6 +593,13 @@ const de_siteParsers = {
 };
 
 const de_listeners = {
+    readystatechangeListener: function(event){
+        if (event.target.readyState !== 'complete') {return;}
+
+        de_contentscript.pageInfo.title = document.title;
+        de_siteParsers.checkDollchanPresence();
+        document.removeEventListener('readystatechange', de_listeners.readystatechangeListener);
+    },
     mouseoverListener: function(event){
         if (event.target.tagName === de_button.name || (event.relatedTarget && event.relatedTarget.tagName === de_button.name)) {return;}
         try {
