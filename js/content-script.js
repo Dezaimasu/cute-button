@@ -493,12 +493,16 @@ const de_siteParsers = {
                 'instagram.com'     : 'self::div/preceding-sibling::div/img | self::span/preceding-sibling::div/div/video | self::ul/parent::div/preceding-sibling::div/div/img | self::div[@role="dialog"]/parent::div/parent::div/img',
                 'iwara.tv'          : 'self::div[@class="vjs-poster"]/preceding-sibling::video[@class="vjs-tech"]',
                 'vk.com'            : 'self::a[contains(@class, "image_cover") and contains(@onclick, "showPhoto")]',
-                'clips.twitch.tv'   : 'self::div[@class="player-overlay"]/ancestor::div[contains(@class, "video-player__container")]/div[@class="player-video"]/video',
+                'twitch.tv'         : 'self::div[@class="player-overlay"]/ancestor::div[contains(@class, "video-player__container")]/div[@class="player-video"]/video',
                 'behance.net'       : 'self::div[contains(@class, "js-prev") or contains(@class, "js-next")]/following::div[contains(@class, "js-slide-content") and not(contains(@class, "hidden"))]/img',
                 '2ch.hk'            : 'self::div[@id="html5videofixer"]/preceding-sibling::video',
-            };
+            },
+            aliases = {
+                'clips.twitch.tv': 'twitch.tv',
+            },
+            xpathForHost = siteHacks[this.host] || siteHacks[aliases[this.host]];
 
-        return (this.dollchanImproved && xpath(dollchanHack, node)) || xpath(siteHacks[this.host], node);
+        return (this.dollchanImproved && xpath(dollchanHack, node)) || (xpathForHost && xpath(xpathForHost, node));
     },
 
     getOriginalSrc: function(node){
