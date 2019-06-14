@@ -513,7 +513,7 @@ const de_siteParsers = {
                     return info['base'] + (info['w_'] || info['z_'] || info['y_'] || info['x_'])[0] + '.jpg';
                 },
                 'twitter.com': () => {
-                    return node.currentSrc.replace(/(jpg|jpeg|png)(:[a-z0-9]+)?$/i, '$1:orig');
+                    return node.currentSrc.replace(/(jpg|jpeg|png)(:[a-z0-9]+)?$/i, '$1:orig').replace(/name=[a-z0-9]+/, 'name=orig');
                 },
                 'tumblr.com': function(){
                     return (node.dataset['imageurl'] || node.currentSrc).replace(/(\/[a-z0-9]{32}\/tumblr_\w+)(_\d{2,4}).(jpg|jpeg|png|gif)$/i, '$1_1280.$3');
