@@ -20,55 +20,53 @@ Download.prototype = {
         if (this.downloadRequest.originalName) { // TODO: also check if originalName contains extension only, e.g. ".jpg"
             this.filename = this.downloadRequest.originalName;
         } else {
-            Object.assign(this, filenameTools.getFilename(this.downloadRequest.src));
+            Object.assign(this, filenameTools.extractFilename(this.downloadRequest.src));
         }
 
-        if (this.filename) {
-            this.download();
-        } else {
-            this.getHeadersAndDownload();
-        }
-    },
-
-    getHeadersAndDownload: function(requestType = 'HEAD'){
-        const xhr = new XMLHttpRequest();
-        xhr.open(requestType, this.downloadRequest.src);
-        xhr.onload = () => {
-            if (requestType === 'HEAD' && [404, 405, 501].includes(xhr.status)) { // HEAD request method is not supported / allowed / implemented by server
-                this.getHeadersAndDownload('GET');
-            } else {
-                this.setFilenameFromHeaders(xhr);
-                this.download();
-            }
-        };
-        xhr.onerror = () => {
-            this.setFallbackFilename();
-            this.download();
-        };
-        xhr.send();
-    },
-
-    setFilenameFromHeaders: function(xhr){
-        const contentDisposition = xhr.getResponseHeader('Content-Disposition'),
-            tmpFilename = contentDisposition && contentDisposition.match(/^.+filename\*?=(.{0,20}')?([^;]*);?$/i);
-
-        if (tmpFilename) {
-            this.filename = decodeURI(tmpFilename[2]).replace(/"/g, '');
-        }
         if (!this.filename) {
-            const contentType = xhr.getResponseHeader('Content-Type'),
-                extension = contentType ? ('.' + contentType.match(/\w+\/(\w+)/)[1].replace('jpeg', 'jpg')) : '';
-
-            this.filename = (this.basename || filenameTools.getTimestamp()) + extension
+        	this.filename = this.getFilenameFromHeaders();
         }
+
+        this.download();
     },
 
-    setFallbackFilename: function(){
+    getFilenameFromHeaders: async function(){
+        const headers = await this.getHeaders();
+        let tmpFilename,
+            extension;
+
+        if (!headers) {
+            return this.getFallbackFilename();
+        }
+
+        tmpFilename = headers.contentDisposition && headers.contentDisposition.match(/^.+filename\*?=(.{0,20}')?([^;]*);?$/i),
+        extension = headers.contentType ? ('.' + headers.contentType.match(/\w+\/(\w+)/)[1].replace('jpeg', 'jpg')) : '';
+
+        return tmpFilename ?
+            decodeURI(tmpFilename[2]).replace(/"/g, '') :
+            (this.basename || filenameTools.getTimestamp()) + extension;
+    },
+
+    getHeaders: async function(){
+        let response = await fetch(this.downloadRequest.src, {method: 'HEAD'});
+
+        if ([404, 405, 501].includes(response.status)) { // HEAD request method is not supported / allowed / implemented by server
+            response = await fetch(this.downloadRequest.src, {method: 'GET'});
+        }
+
+        return response.ok ? {
+            contentType: response.headers.get('content-type'),
+            contentDisposition: response.headers.get('content-disposition'),
+        } : null;
+    },
+
+    getFallbackFilename: function(){
         const filenameTry = (this.downloadRequest.pageInfo.title || '').match(/[^\s]+\.(jpg|jpeg|png|gif|bmp|webm|mp4|ogg|mp3)/i);
-        this.filename = filenameTry ? filenameTry[0] : filenameTools.getTimestamp();
+        return filenameTry ? filenameTry[0] : filenameTools.getTimestamp();
     },
 
     download: function(){
+        // TODO: replace placeholders
         const finalFilename = filenameTools.prepareFilename(this.filename);
         chrome.downloads.download({
                 url             : this.downloadRequest.src,
@@ -118,26 +116,26 @@ const filenameTools = {
     * and adds a single slash to the end for concating with filename.
     * Doesn't matter which slashes are used in save path, WebExt API recognizes both.
     */
-    prepareSavePath: function(rawPath, pageInfo){
-        const savePath = this.replacePlaceholders(rawPath, pageInfo);
+    prepareSavePath: function(rawPath, data){
+        const savePath = this.replacePlaceholders(rawPath, data);
         return savePath && (savePath.replace(/^\\+|^\/+|\\+$|\/+$/, '') + '/');
     },
 
-    replacePlaceholders: function(string, pageInfo){
+    replacePlaceholders: function(string, data){
         let pathPart = string;
         const placeholders = {
-            '::domain::'            : () => this.trimForbiddenWinChars(pageInfo.domain),
-            '::title::'             : () => this.trimForbiddenWinChars(pageInfo.title),
-            '::thread_number::'     : () => this.trimForbiddenWinChars(pageInfo.threadNum),
-            '::board_name::'        : () => this.trimForbiddenWinChars(pageInfo.boardName),
+            '::domain::'            : () => this.trimForbiddenWinChars(data.pageInfo.domain),
+            '::title::'             : () => this.trimForbiddenWinChars(data.pageInfo.title),
+            '::thread_number::'     : () => this.trimForbiddenWinChars(data.pageInfo.threadNum),
+            '::board_name::'        : () => this.trimForbiddenWinChars(data.pageInfo.boardName),
             '::date::'              : this.getDatetimeString,
             '::time::'              : this.getTimestamp,
-            '::filename::'          : '',
-            '::original_filename::' : '',
+            '::filename::'          : () => '', // TODO
+            '::original_filename::' : () => data.originalName,
         };
 
         pathPart.includes(':') && Object.entries(placeholders).forEach(([placeholder, replacement]) => {
-            pathPart = pathPart.replace(placeholder, replacement);
+            pathPart = pathPart.replace(placeholder, replacement());
         });
 
         return pathPart;
@@ -152,7 +150,7 @@ const filenameTools = {
     * WebExt API is incapable of extracting such filenames.
     * Cheers pineapple.
     */
-    getFilename: function(originalUrl){
+    extractFilename: function(originalUrl){
         const url = decodeURI(originalUrl).replace(/^.*https?:\/\/([^/]+)\/+/, '').split(/[?#]/)[0].replace(/:\w+$/, '').replace(/\/{2,}/, '/'),
             filenameTry = url.match(/^([^/]+\/)*([^/]+\.(jpg|jpeg|png|gif|bmp|webm|mp4|ogg|mp3))([\/][^.]+)?$/i);
 
@@ -181,7 +179,6 @@ const filenameTools = {
     },
 
     getTimestamp: function(){
-        console.log(123123123123);
         return Date.now();
     },
 };
