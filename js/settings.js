@@ -163,6 +163,7 @@ function fillFolder(folderElem, folderSettings){
     folderElem.querySelector('.modifier').value     = folderSettings.modifier;
     folderElem.querySelector('.mouseButton').value  = folderSettings.mouseButton;
     folderElem.querySelector('.path').value         = folderSettings.path;
+    folderElem.querySelector('.filename').value     = folderSettings.filename;
 }
 
 function buildFolderSettings(folderElem){
@@ -172,7 +173,8 @@ function buildFolderSettings(folderElem){
         keyCode     : Number(folderElem.querySelector('.keyCode').value),
         modifier    : folderElem.querySelector('.modifier').value,
         mouseButton : folderElem.querySelector('.mouseButton').value,
-        path        : folderElem.querySelector('.path').value
+        path        : folderElem.querySelector('.path').value,
+        filename    : folderElem.querySelector('.filename').value,
     };
     addHotkeyId(folderSettings);
 

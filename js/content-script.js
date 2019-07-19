@@ -13,8 +13,6 @@ const de_webextApi = {
     listen: function(){
         chrome.runtime.onMessage.addListener(message => {
             switch (message) {
-                case 'on'               : {de_listeners.switch(true); break;}
-                case 'off'              : {de_listeners.switch(false); break;}
                 case 'css_injected'     : {de_button.styled = true; break;}
                 case 'duplicate_warning': {de_button.jerkClass('warning'); break;}
             }
@@ -38,8 +36,6 @@ const de_webextApi = {
 };
 
 const de_settings = {
-    selectedSavePath: null,
-
     setters: {
         defaultSavePath         : newValue => de_settings.defaultSavePath = newValue,
         minSize                 : newValue => de_settings.minSize = newValue,
@@ -90,6 +86,7 @@ const de_button = {
         src             : null,
         originalName    : null,
         showSaveDialog  : null,
+        rule            : null,
         pageInfo        : {},
     },
 
@@ -118,14 +115,10 @@ const de_button = {
         mouseup: function(eventButton){
             const that = de_button,
                 btnElem = that.elem,
-                savePath = (
-                    de_settings.selectedSavePath ||
-                    (isSet(de_hotkeys.mouseHotkeys, eventButton) ? de_hotkeys.mouseHotkeys[eventButton].path : null) ||
-                    de_settings.defaultSavePath
-                ),
+                selectedRule = de_hotkeys.selectedKeyboardRule || de_hotkeys.mouseHotkeys[eventButton] || null,
                 downloadRequest = Object.assign( // TODO: add some flag for original filename
-                    {path: savePath},
                     that.downloadRequest,
+                    {rule: selectedRule},
                     {pageInfo: de_contentscript.pageInfo},
                 ),
                 historyEntry = JSON.stringify(downloadRequest);
@@ -140,7 +133,7 @@ const de_button = {
             }
 
             de_webextApi.download(downloadRequest);
-            de_settings.selectedSavePath = null;
+            de_hotkeys.selectedKeyboardRule = null;
             de_contentscript.rememberDownload(historyEntry);
             if (eventButton === 1) { // TODO: make optional or delete
                 that.copyToClipboard(that.downloadRequest.src);
@@ -205,6 +198,7 @@ const de_button = {
             src             : src,
             originalName    : originalName,
             showSaveDialog  : de_settings.showSaveDialog,
+            template        : {path: null, filename: null},
             pageInfo        : {},
         };
     },
@@ -236,6 +230,7 @@ const de_contentscript = {
         domain      : null,
         title       : null,
         threadNum   : null,
+        boardName   : null,
     },
 
     init: function(){
@@ -634,8 +629,8 @@ const de_listeners = {
             de_contentscript.nodeHandler(document.body.childNodes[0]);
         }
 
-        de_settings.selectedSavePath = de_hotkeys.keyboardHotkeys[hotkeyId].path;
-        de_button.emulateClick(de_hotkeys.keyboardHotkeys[hotkeyId].mouseButton || 0);
+        de_hotkeys.selectedKeyboardRule = de_hotkeys.keyboardHotkeys[hotkeyId];
+        de_button.emulateClick(de_hotkeys.selectedKeyboardRule.mouseButton || 0);
     },
 
     switch: function(turnOn = true){
@@ -647,6 +642,8 @@ const de_listeners = {
 };
 
 const de_hotkeys = {
+    selectedKeyboardRule: null,
+
     keyboardHotkeys: {},
 
     mouseHotkeys: {},
@@ -688,7 +685,7 @@ const de_hotkeys = {
 
         priority = that.getPriorityLevel(rule);
 
-        if (that.isHigherPriority(that.mouseHotkeys[rule.id], priority)) {
+        if (that.isHigherPriority(that.keyboardHotkeys[rule.id], priority)) {
             that.keyboardHotkeys[rule.id] = {
                 path        : rule.path,
                 filename    : rule.filename,
