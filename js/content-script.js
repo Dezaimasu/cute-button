@@ -49,8 +49,9 @@ const de_settings = {
         saveOnHover             : newValue => de_settings.saveOnHover = newValue,
         showSaveDialog          : newValue => de_settings.showSaveDialog = newValue,
         forbidDuplicateFiles    : newValue => de_settings.forbidDuplicateFiles = newValue,
+        originalNameByDefault   : newValue => de_settings.originalNameButton = newValue ? 0 : 2,
         saveFullSized           : newValue => de_settings.saveFullSized = newValue,
-        disableSpacebarHotkey   : newValue => Object.assign(de_hotkeys.keyboardHotkeys, newValue ? {} : de_hotkeys.reserved),
+        disableSpacebarHotkey   : newValue => Object.assign(de_hotkeys.keyboardHotkeys, newValue ? {} : de_hotkeys.reservedKeyboardHotkeys),
         domainExclusions        : newValue => de_settings.disableIfExcluded(newValue),
         styleForSaveMark        : newValue => de_settings.refreshStyleForSaveMark(newValue),
     },
@@ -74,13 +75,7 @@ const de_button = {
     elem: null,
     name: 'DE_CBUTTON',
     styled: false,
-    downloadRequest: {
-        src             : null,
-        originalName    : null,
-        showSaveDialog  : null,
-        rule            : null,
-        pageInfo        : {},
-    },
+    downloadRequest: {},
 
     init: function(){
         const that = this;
@@ -89,10 +84,22 @@ const de_button = {
         that.elem.id = 'de-cute-id';
         that.elem.addEventListener('contextmenu', that.disableEvent);
         that.elem.addEventListener('mouseout', that.unclick);
+        that.initDownloadRequest(null, null);
 
         Object.keys(that.globalEventsHandlers).forEach(
             eventName => document.addEventListener(eventName, that.overrideEvent, {capture: true})
         );
+    },
+
+    initDownloadRequest: function(src, originalName){
+        this.downloadRequest = {
+            src             : src,
+            originalName    : originalName,
+            useOriginalName : null,
+            showSaveDialog  : de_settings.showSaveDialog,
+            template        : {path: '', filename: ''},
+            pageInfo        : {},
+        };
     },
 
     overrideEvent: function(event){
@@ -107,11 +114,14 @@ const de_button = {
         mouseup: function(eventButton){
             const that = de_button,
                 btnElem = that.elem,
-                selectedRule = de_hotkeys.selectedKeyboardRule || de_hotkeys.mouseHotkeys[eventButton] || null,
-                downloadRequest = Object.assign( // TODO: add some flag for original filename
+                selectedRule = de_hotkeys.selectedKeyboardRule || de_hotkeys.mouseHotkeys[eventButton] || de_hotkeys.fallbackRule,
+                downloadRequest = Object.assign(
                     that.downloadRequest,
-                    {rule: selectedRule},
-                    {pageInfo: de_contentscript.pageInfo},
+                    {
+                        useOriginalName : that.isOriginalNameButton(eventButton), // TODO: conflict with rules with specified mouse button
+                        template        : selectedRule,
+                        pageInfo        : de_contentscript.pageInfo
+                    },
                 ),
                 historyEntry = JSON.stringify(downloadRequest);
 
@@ -152,7 +162,7 @@ const de_button = {
         if (!this.styled) {
             de_webextApi.getButtonStyle();
         }
-        this.prepareDL(src, originalName);
+        this.initDownloadRequest(src, originalName);
         btnElem.style.top = position.top;
         btnElem.style.bottom = position.bottom;
         btnElem.style.left = position.left;
@@ -162,7 +172,7 @@ const de_button = {
     },
 
     hide: function(){
-        this.prepareDL(null, null);
+        this.initDownloadRequest(null, null);
         this.elem.classList.remove('visible');
     },
 
@@ -185,14 +195,8 @@ const de_button = {
         setTimeout(() => buttonClasses.remove(...classNames), 100);
     },
 
-    prepareDL: function(src, originalName){
-        this.downloadRequest = {
-            src             : src,
-            originalName    : originalName,
-            showSaveDialog  : de_settings.showSaveDialog,
-            template        : {path: null, filename: null},
-            pageInfo        : {},
-        };
+    isOriginalNameButton: function(eventButton){
+        return eventButton === de_settings.originalNameButton;
     },
 
     copyToClipboard: function(string){
@@ -643,7 +647,7 @@ const de_hotkeys = {
 
     hide: '01081', // Alt+Q, hide button
 
-    reserved: {
+    reservedKeyboardHotkeys: {
         '00032': {path: null, mouseButton: 0}, // Space, save to default location
         '10032': {path: null, mouseButton: 2}, // Ctrl+Space, save to default location with original filename
     },
@@ -673,26 +677,24 @@ const de_hotkeys = {
 
     assignHotkeyRule: function(rule){
         const that = de_hotkeys;
-        let priority;
+        let priority,
+            newRule;
+
         if (!that.isRuleForCurrentDomain(rule)) {return;}
 
         priority = that.getPriorityLevel(rule);
+        newRule = {
+            path        : rule.path,
+            filename    : rule.filename,
+            mouseButton : rule.mouseButton,
+            priority    : priority,
+        };
 
         if (that.isHigherPriority(that.keyboardHotkeys[rule.id], priority)) {
-            that.keyboardHotkeys[rule.id] = {
-                path        : rule.path,
-                filename    : rule.filename,
-                mouseButton : rule.mouseButton,
-                priority    : priority,
-            };
+            that.keyboardHotkeys[rule.id] = newRule;
         }
-
         if (that.isHigherPriority(that.mouseHotkeys[rule.mouseButton], priority)) {
-            that.mouseHotkeys[rule.mouseButton] = {
-                path    : rule.path,
-                filename: rule.filename,
-                priority: priority,
-            };
+            that.mouseHotkeys[rule.mouseButton] = newRule;
         }
     },
 
