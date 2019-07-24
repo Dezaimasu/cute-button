@@ -37,14 +37,14 @@ const de_webextApi = {
 
 const de_settings = {
     setters: {
-        defaultSavePath         : newValue => de_settings.defaultSavePath = newValue,
+        defaultSavePath         : newValue => de_hotkeys.fallbackRule.path = newValue,
         minSize                 : newValue => de_settings.minSize = newValue,
         exclusions              : newValue => de_settings.exclusions = newValue,
         icon                    : newValue => de_button.elem.style.backgroundImage = newValue,
         hideButton              : newValue => de_button.elem.classList.toggle('shy', newValue),
         isCute                  : newValue => de_listeners.switch(newValue),
         position                : newValue => [de_settings.vertical, de_settings.horizontal] = newValue.split('-'),
-        folders                 : newValue => de_settings.setFoldersRules(newValue),
+        folders                 : newValue => newValue.forEach(de_hotkeys.assignHotkeyRule),
         placeUnderCursor        : newValue => de_settings.placeUnderCursor = newValue,
         saveOnHover             : newValue => de_settings.saveOnHover = newValue,
         showSaveDialog          : newValue => de_settings.showSaveDialog = newValue,
@@ -55,14 +55,6 @@ const de_settings = {
         styleForSaveMark        : newValue => de_settings.refreshStyleForSaveMark(newValue),
     },
 
-    setFoldersRules: function(folders){
-        folders.forEach(de_hotkeys.assignHotkeyRule);
-        if (de_hotkeys.keyboardHotkeys['00000']) { // TODO
-            de_settings.defaultSavePath = de_hotkeys.keyboardHotkeys['00000'].path;
-        }
-    },
-
-    // TODO: conflict between "domainExclusions" and "isCute"
     disableIfExcluded: function(excludedDomains){
         de_settings.domainExcluded = excludedDomains.split(' ').includes(de_contentscript.pageInfo.domain);
         de_listeners.switch(!de_settings.domainExcluded);
@@ -479,7 +471,6 @@ const de_siteParsers = {
 
     getActualNode: function(node){
         const dollchanHack = 'self::div[@class="de-fullimg-video-hack"]/following-sibling::video',
-            // TODO: try to move these to user-customizable settings
             siteHacks = {
                 'twitter.com'       : 'self::div[contains(@class, "GalleryNav")]/preceding-sibling::div[@class="Gallery-media"]/img',
                 'tumblr.com'        : 'self::a/parent::div[@class="photo-wrap"]/img | self::a[@target="_blank"]/parent::div/preceding-sibling::div[@class="post_content"]/div/div[@data-imageurl] | self::span/parent::div/parent::a[@target="_blank"]/parent::div/preceding-sibling::div[@class="post_content"]/div/div[@data-imageurl] | self::div[@class="vjs-big-play-button"]/preceding-sibling::video',
@@ -643,6 +634,8 @@ const de_listeners = {
 
 const de_hotkeys = {
     selectedKeyboardRule: null,
+
+    fallbackRule: {path: '', filename: ''},
 
     keyboardHotkeys: {},
 
