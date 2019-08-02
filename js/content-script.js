@@ -98,7 +98,7 @@ const de_button = {
             useOriginalName : null,
             showSaveDialog  : de_settings.showSaveDialog,
             template        : de_hotkeys.fallbackRule,
-            pageInfo        : {},
+            pageInfo        : de_contentscript.pageInfo,
         };
     },
 
@@ -114,13 +114,11 @@ const de_button = {
         mouseup: function(eventButton){
             const that = de_button,
                 btnElem = that.elem,
-                selectedRule = de_hotkeys.selectedKeyboardRule || de_hotkeys.mouseHotkeys[eventButton] || de_hotkeys.fallbackRule,
                 downloadRequest = Object.assign(
                     that.downloadRequest,
                     {
                         useOriginalName : that.isOriginalNameButton(eventButton),
-                        template        : selectedRule,
-                        pageInfo        : de_contentscript.pageInfo
+                        template        : de_hotkeys.selectedKeyboardRule || de_hotkeys.mouseHotkeys[eventButton] || de_hotkeys.fallbackRule,
                     },
                 ),
                 historyEntry = JSON.stringify(downloadRequest);

@@ -7,7 +7,7 @@ function download(tabId, downloadRequest){
 function Download(downloadRequest, tabId){
     this.downloadRequest    = downloadRequest;
     this.tabId              = tabId;
-    this.savePath           = '';
+    this.path               = '';
     this.filename           = '';
     this.basename           = '';
     this.duplicateCheckTry  = 0;
@@ -15,17 +15,23 @@ function Download(downloadRequest, tabId){
 
 Download.prototype = {
     process: async function(){
-        this.savePath = filenameTools.replacePlaceholders(this.downloadRequest.template.path, this.downloadRequest);
+        let extractedFilename;
+
+        if (!this.downloadRequest.template.filename) {
+            this.downloadRequest.template.filename = '::both_filenames::'; // default behavior
+        }
+
+        this.path = filenameTools.replacePathPlaceholders(this.downloadRequest);
 
         if (this.filenameExtractionRequired()) {
             Object.assign(this, filenameTools.extractFilename(this.downloadRequest.src));
             if (!this.filename) {
                 this.filename = await this.getFilenameFromHeaders();
             }
-            this.downloadRequest.filename = this.filename;
+            extractedFilename = this.filename;
         }
 
-        this.filename = filenameTools.replacePlaceholders(this.downloadRequest.template.filename, this.downloadRequest);
+        this.filename = filenameTools.replaceFilenamePlaceholders(this.downloadRequest, extractedFilename);
         this.download();
     },
 
@@ -65,14 +71,14 @@ Download.prototype = {
     },
 
     download: function(){
-        const finalSavePath = filenameTools.prepareSavePath(this.savePath),
+        const finalPath = filenameTools.preparePath(this.path),
             finalFilename = filenameTools.prepareFilename(this.filename);
 
         chrome.downloads.download({
                 url             : this.downloadRequest.src,
-                filename        : finalSavePath + finalFilename,
+                filename        : finalPath + finalFilename,
                 saveAs          : this.downloadRequest.showSaveDialog,
-                conflictAction  : 'uniquify'
+                conflictAction  : 'uniquify',
             },
             downloadId => {
                 if (chrome.extension.lastError) {return;}
@@ -82,7 +88,7 @@ Download.prototype = {
     },
 
     /*
-    * If resulted filename is not the same as the filename, passed to downloads.download function,
+    * If resulted filename is not the same as the filename passed to downloads.download function,
     * then it was modified by 'uniquify' conflict action of WebExt API,
     * and user should be warned that he saved already existing file.
     */
@@ -101,7 +107,7 @@ Download.prototype = {
     },
 
     /*
-    * Hack for recently broken(?) downloads.search, now it can't find download if called immediately from downloads.download callback
+    * Hack for once broken(?) downloads.search, now it can't find download if called instantly from downloads.download callback
     */
     checkForDuplicateRetry: function(originalFilename, downloadId){
         if (this.duplicateCheckTry > 5) {return;}
@@ -113,16 +119,22 @@ Download.prototype = {
         const filenameTemplate = this.downloadRequest.template.filename;
         return (
             filenameTemplate.includes('::filename::') ||
-            (
-                !this.downloadRequest.useOriginalName &&
-                (!filenameTemplate || filenameTemplate.includes('::both_filenames::'))
-            )
+            (filenameTemplate.includes('::both_filenames::') && !this.downloadRequest.useOriginalName)
         );
     },
 };
 
 const filenameTools = {
-    replacePlaceholders: function(template, dlRequest){
+    replacePathPlaceholders: function(dlRequest){
+        // TODO: don't use *filename* replacements
+        return this.replacePlaceholders(dlRequest.template.path, dlRequest)
+    },
+
+    replaceFilenamePlaceholders: function(dlRequest, extractedFilename){
+        return this.replacePlaceholders(dlRequest.template.filename, dlRequest, extractedFilename)
+    },
+
+    replacePlaceholders: function(template, dlRequest, extractedFilename = null){
         let string = template;
         const placeholders = {
             '::domain::'            : () => this.trimForbiddenWinChars(dlRequest.pageInfo.domain),
@@ -131,9 +143,9 @@ const filenameTools = {
             '::board_name::'        : () => this.trimForbiddenWinChars(dlRequest.pageInfo.boardName),
             '::date::'              : this.getDatetimeString,
             '::time::'              : this.getTimestamp,
-            '::filename::'          : () => dlRequest.filename,
+            '::filename::'          : () => extractedFilename,
             '::original_filename::' : () => dlRequest.originalName,
-            '::both_filenames::'    : () => dlRequest.useOriginalName ? dlRequest.originalName : dlRequest.filename,
+            '::both_filenames::'    : () => dlRequest.useOriginalName ? dlRequest.originalName : extractedFilename,
         };
 
         string.includes(':') && Object.entries(placeholders).forEach(([placeholder, replacement]) => {
@@ -170,8 +182,8 @@ const filenameTools = {
     * and adds a single slash to the end for concating with filename.
     * Doesn't matter which slashes are used in save path, WebExt API recognizes both.
     */
-    prepareSavePath: function(savePath){
-        return savePath && (savePath.replace(/^\\+|\\+$|^\/+|\/+$/, '') + '/');
+    preparePath: function(path){
+        return path && (path.replace(/^\\+|\\+$|^\/+|\/+$/, '') + '/');
     },
 
     prepareFilename: function(filename){
