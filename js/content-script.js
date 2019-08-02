@@ -97,7 +97,7 @@ const de_button = {
             originalName    : originalName,
             useOriginalName : null,
             showSaveDialog  : de_settings.showSaveDialog,
-            template        : {path: '', filename: ''},
+            template        : de_hotkeys.fallbackRule,
             pageInfo        : {},
         };
     },
@@ -118,7 +118,7 @@ const de_button = {
                 downloadRequest = Object.assign(
                     that.downloadRequest,
                     {
-                        useOriginalName : that.isOriginalNameButton(eventButton), // TODO: conflict with rules with specified mouse button
+                        useOriginalName : that.isOriginalNameButton(eventButton),
                         template        : selectedRule,
                         pageInfo        : de_contentscript.pageInfo
                     },

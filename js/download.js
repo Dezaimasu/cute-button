@@ -13,18 +13,11 @@ function Download(downloadRequest, tabId){
     this.duplicateCheckTry  = 0;
 }
 
-// src             : src,
-// originalName    : originalName,
-// useOriginalName : null,
-// showSaveDialog  : de_settings.showSaveDialog,
-// template        : {path: '', filename: ''},
-// pageInfo        : {},
-
 Download.prototype = {
     process: async function(){
-        this.savePath = filenameTools.prepareSavePath(this.downloadRequest.template.path, this.downloadRequest);
+        this.savePath = filenameTools.replacePlaceholders(this.downloadRequest.template.path, this.downloadRequest);
 
-        if (this.filenameRequired()) {
+        if (this.filenameExtractionRequired()) {
             Object.assign(this, filenameTools.extractFilename(this.downloadRequest.src));
             if (!this.filename) {
                 this.filename = await this.getFilenameFromHeaders();
@@ -72,10 +65,12 @@ Download.prototype = {
     },
 
     download: function(){
-        const finalFilename = filenameTools.prepareFilename(this.filename);
+        const finalSavePath = filenameTools.prepareSavePath(this.savePath),
+            finalFilename = filenameTools.prepareFilename(this.filename);
+
         chrome.downloads.download({
                 url             : this.downloadRequest.src,
-                filename        : this.savePath + finalFilename,
+                filename        : finalSavePath + finalFilename,
                 saveAs          : this.downloadRequest.showSaveDialog,
                 conflictAction  : 'uniquify'
             },
@@ -114,32 +109,21 @@ Download.prototype = {
         setTimeout(() => this.checkForDuplicate(originalFilename, downloadId), 50);
     },
 
-    filenameRequired: function(){
-        const filename = this.downloadRequest.template.filename;
-
+    filenameExtractionRequired: function(){
+        const filenameTemplate = this.downloadRequest.template.filename;
         return (
-            filename.includes('::filename::') ||
+            filenameTemplate.includes('::filename::') ||
             (
                 !this.downloadRequest.useOriginalName &&
-                (!filename || filename.includes('::both_filenames::'))
+                (!filenameTemplate || filenameTemplate.includes('::both_filenames::'))
             )
         );
     },
 };
 
 const filenameTools = {
-    /*
-    * If the path is not empty then trims leading/trailing slashes/backslashes
-    * and adds a single slash to the end for concating with filename.
-    * Doesn't matter which slashes are used in save path, WebExt API recognizes both.
-    */
-    prepareSavePath: function(rawPath, dlRequest){
-        const savePath = this.replacePlaceholders(rawPath, dlRequest);
-        return savePath && (savePath.replace(/^\\+|^\/+|\\+$|\/+$/, '') + '/');
-    },
-
-    replacePlaceholders: function(string, dlRequest){
-        let pathPart = string;
+    replacePlaceholders: function(template, dlRequest){
+        let string = template;
         const placeholders = {
             '::domain::'            : () => this.trimForbiddenWinChars(dlRequest.pageInfo.domain),
             '::title::'             : () => this.trimForbiddenWinChars(dlRequest.pageInfo.title),
@@ -147,16 +131,16 @@ const filenameTools = {
             '::board_name::'        : () => this.trimForbiddenWinChars(dlRequest.pageInfo.boardName),
             '::date::'              : this.getDatetimeString,
             '::time::'              : this.getTimestamp,
-            '::filename::'          : () => dlRequest.filename, // implied it will be added before calling function if required
+            '::filename::'          : () => dlRequest.filename,
             '::original_filename::' : () => dlRequest.originalName,
             '::both_filenames::'    : () => dlRequest.useOriginalName ? dlRequest.originalName : dlRequest.filename,
         };
 
-        pathPart.includes(':') && Object.entries(placeholders).forEach(([placeholder, replacement]) => {
-            pathPart = pathPart.replace(placeholder, replacement());
+        string.includes(':') && Object.entries(placeholders).forEach(([placeholder, replacement]) => {
+            string = string.replace(placeholder, replacement());
         });
 
-        return pathPart;
+        return string;
     },
 
     /*
@@ -179,6 +163,15 @@ const filenameTools = {
 
     trimForbiddenWinChars: function(string){
         return (string || '').replace(/[/\\:*?"<>|\x09\u0080-\u008f]/g, '').replace(/^\.+|\.+$/g, '');
+    },
+
+    /*
+    * If the path is not empty then trims leading/trailing slashes/backslashes
+    * and adds a single slash to the end for concating with filename.
+    * Doesn't matter which slashes are used in save path, WebExt API recognizes both.
+    */
+    prepareSavePath: function(savePath){
+        return savePath && (savePath.replace(/^\\+|\\+$|^\/+|\/+$/, '') + '/');
     },
 
     prepareFilename: function(filename){
