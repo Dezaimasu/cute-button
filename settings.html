@@ -136,6 +136,7 @@ List of available placeholders, must be surrounded with ::
 ::time::				UNIX timestamp
 ::filename::			Default filename as assigned by browser
 ::original_filename::	Original filename, available on most popular imageboards
+::both_filenames::		Save with original/default filename depending on mouse button pressed (empty filename field has same behavior)
 
 You can choose mouse button or keyboard hotkey or both for each template.
 
@@ -144,7 +145,7 @@ You can also exclude hotkey for specific site, so it will work everywhere except
 To do this add domain name starting with "-" symbol.
 Domain name you need to specify is usually shown in address bar, or you can open
 Web Console (Ctrl+Shift+K) and write document.location.hostname, the result will be
-domain name you can insert into "host" field.
+domain name you should insert into "host" field.
 Rules with "host" have higher priority than "-host" rules.
 Rules without host specified have lowest priority.
 

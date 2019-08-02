@@ -13,20 +13,26 @@ function Download(downloadRequest, tabId){
     this.duplicateCheckTry  = 0;
 }
 
+// src             : src,
+// originalName    : originalName,
+// useOriginalName : null,
+// showSaveDialog  : de_settings.showSaveDialog,
+// template        : {path: '', filename: ''},
+// pageInfo        : {},
+
 Download.prototype = {
-    process: function(){
-        this.savePath = filenameTools.prepareSavePath(this.downloadRequest.path, this.downloadRequest.pageInfo);
+    process: async function(){
+        this.savePath = filenameTools.prepareSavePath(this.downloadRequest.template.path, this.downloadRequest);
 
-        if (this.downloadRequest.originalName) { // TODO: also check if originalName contains extension only, e.g. ".jpg"
-            this.filename = this.downloadRequest.originalName;
-        } else {
+        if (this.filenameRequired()) {
             Object.assign(this, filenameTools.extractFilename(this.downloadRequest.src));
+            if (!this.filename) {
+                this.filename = await this.getFilenameFromHeaders();
+            }
+            this.downloadRequest.filename = this.filename;
         }
 
-        if (!this.filename) {
-        	this.filename = this.getFilenameFromHeaders();
-        }
-
+        this.filename = filenameTools.replacePlaceholders(this.downloadRequest.template.filename, this.downloadRequest);
         this.download();
     },
 
@@ -66,7 +72,6 @@ Download.prototype = {
     },
 
     download: function(){
-        // TODO: replace placeholders
         const finalFilename = filenameTools.prepareFilename(this.filename);
         chrome.downloads.download({
                 url             : this.downloadRequest.src,
@@ -107,7 +112,19 @@ Download.prototype = {
         if (this.duplicateCheckTry > 5) {return;}
         this.duplicateCheckTry++;
         setTimeout(() => this.checkForDuplicate(originalFilename, downloadId), 50);
-    }
+    },
+
+    filenameRequired: function(){
+        const filename = this.downloadRequest.template.filename;
+
+        return (
+            filename.includes('::filename::') ||
+            (
+                !this.downloadRequest.useOriginalName &&
+                (!filename || filename.includes('::both_filenames::'))
+            )
+        );
+    },
 };
 
 const filenameTools = {
@@ -116,22 +133,23 @@ const filenameTools = {
     * and adds a single slash to the end for concating with filename.
     * Doesn't matter which slashes are used in save path, WebExt API recognizes both.
     */
-    prepareSavePath: function(rawPath, data){
-        const savePath = this.replacePlaceholders(rawPath, data);
+    prepareSavePath: function(rawPath, dlRequest){
+        const savePath = this.replacePlaceholders(rawPath, dlRequest);
         return savePath && (savePath.replace(/^\\+|^\/+|\\+$|\/+$/, '') + '/');
     },
 
-    replacePlaceholders: function(string, data){
+    replacePlaceholders: function(string, dlRequest){
         let pathPart = string;
         const placeholders = {
-            '::domain::'            : () => this.trimForbiddenWinChars(data.pageInfo.domain),
-            '::title::'             : () => this.trimForbiddenWinChars(data.pageInfo.title),
-            '::thread_number::'     : () => this.trimForbiddenWinChars(data.pageInfo.threadNum),
-            '::board_name::'        : () => this.trimForbiddenWinChars(data.pageInfo.boardName),
+            '::domain::'            : () => this.trimForbiddenWinChars(dlRequest.pageInfo.domain),
+            '::title::'             : () => this.trimForbiddenWinChars(dlRequest.pageInfo.title),
+            '::thread_number::'     : () => this.trimForbiddenWinChars(dlRequest.pageInfo.threadNum),
+            '::board_name::'        : () => this.trimForbiddenWinChars(dlRequest.pageInfo.boardName),
             '::date::'              : this.getDatetimeString,
             '::time::'              : this.getTimestamp,
-            '::filename::'          : () => '', // TODO
-            '::original_filename::' : () => data.originalName,
+            '::filename::'          : () => dlRequest.filename, // implied it will be added before calling function if required
+            '::original_filename::' : () => dlRequest.originalName,
+            '::both_filenames::'    : () => dlRequest.useOriginalName ? dlRequest.originalName : dlRequest.filename,
         };
 
         pathPart.includes(':') && Object.entries(placeholders).forEach(([placeholder, replacement]) => {
