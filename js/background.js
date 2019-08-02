@@ -51,11 +51,17 @@ function initSettings(details){
             settingName => newSettings[settingName] = settingsDefault[settingName]
         );
 
-        /* START for converting pre-0.6.2 exclusions TODO: remove later */
-        const previousVersion = details.reason === 'update' ? Number(details.previousVersion.replace(/\./g, '')) : null,
-            previousExclusions = currentSettings['exclusions'];
-        if (previousVersion && previousVersion < 62 && !/[.#]/.test(previousExclusions)) {
-            newSettings['exclusions'] = previousExclusions.split(' ').map(x => `.${x}`).join(', ');
+        /* START for converting old settings TODO: remove later */
+        if (details.reason === 'update') {
+            const previousVersion = Number(details.previousVersion.replace(/\./g, '')),
+                previousExclusions = currentSettings['exclusions'];
+
+            if (previousVersion < 62 && !/[.#]/.test(previousExclusions)) {
+                newSettings['exclusions'] = previousExclusions.split(' ').map(x => `.${x}`).join(', ');
+            }
+            if (previousVersion < 65) {
+            	newSettings['folders'] = [];
+            }
         }
         /* END TODO: remove later */
 
