@@ -8,8 +8,6 @@ function Download(downloadRequest, tabId){
     this.downloadRequest    = downloadRequest;
     this.tabId              = tabId;
     this.path               = '';
-    this.filename           = '';
-    this.basename           = '';
     this.duplicateCheckTry  = 0;
 }
 
@@ -21,35 +19,39 @@ Download.prototype = {
             this.downloadRequest.template.filename = '::both_filenames::'; // default behavior
         }
 
-        this.path = filenameTools.replacePathPlaceholders(this.downloadRequest);
-
         if (this.filenameExtractionRequired()) {
-            Object.assign(this, filenameTools.extractFilename(this.downloadRequest.src));
-            if (!this.filename) {
-                this.filename = await this.getFilenameFromHeaders();
+            const extractedFromSrc = filenameTools.extractFilename(this.downloadRequest.src);
+            if (extractedFromSrc.filename) {
+                extractedFilename = extractedFromSrc.filename;
+            } else {
+                const extractedFromHeaders = await this.getFilenameFromHeaders();
+                if (extractedFromHeaders.filename) {
+                    extractedFilename = extractedFromHeaders.filename;
+                } else {
+                    extractedFilename = this.getFallbackFilename(extractedFromHeaders.extension)
+                }
             }
-            extractedFilename = this.filename;
         }
 
-        this.filename = filenameTools.replaceFilenamePlaceholders(this.downloadRequest, extractedFilename);
-        this.download();
+        this.download(
+            filenameTools.replacePathPlaceholders(this.downloadRequest),
+            filenameTools.replaceFilenamePlaceholders(this.downloadRequest, extractedFilename)
+        );
     },
 
     getFilenameFromHeaders: async function(){
         const headers = await this.getHeaders();
-        let tmpFilename,
-            extension;
+        let tmpFilename;
 
         if (!headers) {
-            return this.getFallbackFilename();
+            return null;
         }
 
         tmpFilename = headers.contentDisposition && headers.contentDisposition.match(/^.+filename\*?=(.{0,20}')?([^;]*);?$/i);
-        extension = headers.contentType ? ('.' + headers.contentType.match(/\w+\/(\w+)/)[1].replace('jpeg', 'jpg')) : '';
 
         return tmpFilename ?
-            decodeURI(tmpFilename[2]).replace(/"/g, '') :
-            (this.basename || filenameTools.getTimestamp()) + extension;
+            {filename: decodeURI(tmpFilename[2]).replace(/"/g, '')} :
+            {extension: headers.contentType && headers.contentType.match(/\w+\/(\w+)/)[1].replace('jpeg', 'jpg')};
     },
 
     getHeaders: async function(){
@@ -65,14 +67,14 @@ Download.prototype = {
         } : null;
     },
 
-    getFallbackFilename: function(){
+    getFallbackFilename: function(possibleExtension){
         const filenameTry = (this.downloadRequest.pageInfo.title || '').match(/[^\s]+\.(jpg|jpeg|png|gif|bmp|webm|mp4|ogg|mp3)/i);
-        return filenameTry ? filenameTry[0] : filenameTools.getTimestamp();
+        return filenameTry ? filenameTry[0] : `${filenameTools.getTimestamp()}.${possibleExtension || 'jpg'}`;
     },
 
-    download: function(){
-        const finalPath = filenameTools.preparePath(this.path),
-            finalFilename = filenameTools.prepareFilename(this.filename);
+    download: function(path, filename){
+        const finalPath = filenameTools.preparePath(path),
+            finalFilename = filenameTools.prepareFilename(filename);
 
         chrome.downloads.download({
                 url             : this.downloadRequest.src,
