@@ -7,7 +7,6 @@ function download(tabId, downloadRequest){
 function Download(downloadRequest, tabId){
     this.downloadRequest    = downloadRequest;
     this.tabId              = tabId;
-    this.path               = '';
     this.duplicateCheckTry  = 0;
 }
 
@@ -44,7 +43,7 @@ Download.prototype = {
         let tmpFilename;
 
         if (!headers) {
-            return null;
+            return {};
         }
 
         tmpFilename = headers.contentDisposition && headers.contentDisposition.match(/^.+filename\*?=(.{0,20}')?([^;]*);?$/i);
