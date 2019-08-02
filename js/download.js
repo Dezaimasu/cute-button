@@ -45,7 +45,7 @@ Download.prototype = {
             return this.getFallbackFilename();
         }
 
-        tmpFilename = headers.contentDisposition && headers.contentDisposition.match(/^.+filename\*?=(.{0,20}')?([^;]*);?$/i),
+        tmpFilename = headers.contentDisposition && headers.contentDisposition.match(/^.+filename\*?=(.{0,20}')?([^;]*);?$/i);
         extension = headers.contentType ? ('.' + headers.contentType.match(/\w+\/(\w+)/)[1].replace('jpeg', 'jpg')) : '';
 
         return tmpFilename ?
