@@ -204,7 +204,7 @@ const filenameTools = {
     },
 
     getDateString: function(){
-        return this.getDatetimeString().split('_')[0];
+        return filenameTools.getDatetimeString().split('_')[0];
     },
 
     getTimestamp: function(){

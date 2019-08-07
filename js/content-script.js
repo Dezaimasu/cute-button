@@ -114,7 +114,7 @@ const de_button = {
                     that.downloadRequest,
                     {
                         useOriginalName : that.isOriginalNameButton(eventButton),
-                        template        : de_hotkeys.selectedKeyboardRule || de_hotkeys.mouseHotkeys[eventButton] || de_hotkeys.fallbackRule,
+                        template        : de_hotkeys.selectedKeyboardRule || de_hotkeys.mouseHotkeys['ANY'] || de_hotkeys.mouseHotkeys[eventButton] || de_hotkeys.fallbackRule,
                     },
                 ),
                 historyEntry = JSON.stringify(downloadRequest);
