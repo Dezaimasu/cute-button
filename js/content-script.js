@@ -20,10 +20,6 @@ const de_webextApi = {
     },
     settings: function(){
         function setSettings(settings, isChanges = false){
-            if (isSet(settings, 'folders') && isSet(settings, 'disableSpacebarHotkey')) { // implied they always changes together
-                de_hotkeys.list = {};
-            }
-
             Object.entries(settings).forEach(([settingName, setting]) => {
                 const settingValue = isChanges ? setting.newValue : setting;
                 de_settings.setters[settingName](settingValue);
@@ -656,7 +652,7 @@ const de_hotkeys = {
 
     isHotkeyPossible: function(event){
         return (
-            (de_contentscript.isSeparateTab && de_hotkeys.isNoScroll()) ||
+            (de_contentscript.isSeparateTab && this.isNoScroll()) ||
             (
                 de_button.isVisible() &&
                 !['INPUT', 'TEXTAREA'].includes(event.target.tagName) &&
@@ -666,7 +662,7 @@ const de_hotkeys = {
     },
 
     isHotkeyExists: function(hotkeyId){
-        return isSet(de_hotkeys.keyboardHotkeys, hotkeyId);
+        return isSet(this.keyboardHotkeys, hotkeyId);
     },
 
     isNoScroll: function(){
@@ -701,17 +697,25 @@ const de_hotkeys = {
     },
 
     isRuleForCurrentDomain: function(rule){
-        return !rule.domain || (rule.domain === de_contentscript.pageInfo.domain && rule.domain !== `-${de_contentscript.pageInfo.domain}`);
+        return (
+            !rule.domain ||
+            rule.domain === de_contentscript.pageInfo.domain ||
+            (this.isExclusionRule(rule) && rule.domain !==`-${de_contentscript.pageInfo.domain}`)
+        );
     },
 
     getPriorityLevel: function(rule){
         if (!rule.domain) {
         	return 3;
-        } else if (rule.domain.indexOf('-') === 0) {
+        } else if (this.isExclusionRule(rule)) {
             return 2;
         } else {
             return 1;
         }
+    },
+
+    isExclusionRule: function(rule){
+        return rule.domain.startsWith('-');
     },
 };
 

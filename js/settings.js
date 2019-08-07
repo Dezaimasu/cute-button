@@ -126,7 +126,7 @@ function prepareCurrentFoldersForSave(){
     const currentFoldersList = [];
     document.querySelectorAll('.folder').forEach(folderElem => {
         const folderSettings = buildFolderSettings(folderElem);
-        if ((!folderSettings.key || !folderSettings.keyCode) && !folderSettings.domain) {return;}
+        if ((!folderSettings.key || !folderSettings.keyCode) && !folderSettings.mouseButton && !folderSettings.domain) {return;}
         currentFoldersList.push(folderSettings);
     });
     folders = currentFoldersList;
