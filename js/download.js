@@ -1,7 +1,7 @@
 'use strict';
 
 function download(tabId, downloadRequest){
-    new Download(downloadRequest, tabId).process();
+    new Download(downloadRequest, tabId).action();
 }
 
 function Download(downloadRequest, tabId){
@@ -11,7 +11,7 @@ function Download(downloadRequest, tabId){
 }
 
 Download.prototype = {
-    process: async function(){
+    action: async function(){
         let extractedFilename;
 
         if (!this.downloadRequest.template.filename) {
@@ -142,7 +142,8 @@ const filenameTools = {
             '::title::'             : () => this.trimForbiddenWinChars(dlRequest.pageInfo.title),
             '::thread_number::'     : () => this.trimForbiddenWinChars(dlRequest.pageInfo.threadNum),
             '::board_name::'        : () => this.trimForbiddenWinChars(dlRequest.pageInfo.boardName),
-            '::date::'              : this.getDatetimeString,
+            '::datetime::'          : this.getDatetimeString,
+            '::date::'              : this.getDateString,
             '::time::'              : this.getTimestamp,
             '::filename::'          : () => extractedFilename,
             '::original_filename::' : () => dlRequest.originalName,
@@ -200,6 +201,10 @@ const filenameTools = {
 
     getDatetimeString: function(){
         return new Date().toISOString().replace('T', '_').replace(/\..+/g, '').replace(/[^\d_]/g, '');
+    },
+
+    getDateString: function(){
+        return this.getDatetimeString().split('_')[0];
     },
 
     getTimestamp: function(){
