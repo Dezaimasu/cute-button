@@ -41,6 +41,9 @@
 	"settings_savePathPlaceholder": {
 		"message": "сохранять файлы в"
 	},
+	"settings_filenamePlaceholder": {
+		"message": "шаблон имени файла"
+	},
 	"settings_minSize": {
 		"message": "Минимальная ширина/высота изображения (в пикселях):"
 	},
@@ -130,5 +133,8 @@
 	},
 	"settings_messageInvalidPath": {
 		"message": "Нельзя указывать абсолютные пути для сохранения. Прочитайте правила выше."
+	},
+	"settings_inProgress": {
+		"message": "Локалізація в процесі"
 	}
 }

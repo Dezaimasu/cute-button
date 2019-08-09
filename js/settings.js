@@ -1,6 +1,6 @@
 'use strict';
 
-const setting = {}, elem = {};
+const settings = {}, elems = {};
 let folders;
 
 /*
@@ -50,27 +50,27 @@ function setOptionsValues(optionsValues){
 }
 
 function getValue(optionName){
-    return setting[optionName][setting[optionName].dataset.valueLocation];
+    return settings[optionName][settings[optionName].dataset.valueLocation];
 }
 
 function setValue(optionName, optionValue){
-    setting[optionName][setting[optionName].dataset.valueLocation] = optionValue;
+    settings[optionName][settings[optionName].dataset.valueLocation] = optionValue;
 }
 
 function disableSave(){
-    elem['save'].disabled = true;
+    elems['save'].disabled = true;
 }
 
 function enableSave(){
-    elem['save'].disabled = false;
+    elems['save'].disabled = false;
 }
 
 function showMessage(message, type){
-    elem['message'].textContent = message;
-    elem['message'].classList.add(type);
+    elems['message'].textContent = message;
+    elems['message'].classList.add(type);
     setTimeout(() => {
-        elem['message'].textContent = '';
-        elem['message'].classList.remove(type);
+        elems['message'].textContent = '';
+        elems['message'].classList.remove(type);
     }, 3000);
 }
 
@@ -80,31 +80,31 @@ function additionalOptionsProcessing(options){
 }
 
 function show(elemName){
-    elem[elemName].classList.remove('hidden-block');
+    elems[elemName].classList.remove('hidden-block');
 }
 function hide(elemName){
-    elem[elemName].classList.add('hidden-block');
+    elems[elemName].classList.add('hidden-block');
 }
-function toggle(elemName){
-    elem[elemName].classList.toggle('hidden-block');
+function toggle(elem){
+    elem.classList.toggle('hidden-block');
 }
 
 /*
 -------------------- Icon --------------------
 */
 function refreshIcon(){
-    elem['de-cute-id'].style.backgroundImage = setting['icon'].value;
+    elems['de-cute-id'].style.backgroundImage = settings['icon'].value;
 }
 
 function fileInputListener(){
     const reader = new FileReader();
-    reader.readAsDataURL(elem['file-input'].files[0]);
+    reader.readAsDataURL(elems['file-input'].files[0]);
     reader.onload = function(){
         if (reader.result.length > 2097152) {
             showMessage('File is too big (~2MB maximum).', 'error');
             return;
         }
-        setting['icon'].value = `url("${reader.result}")`;
+        settings['icon'].value = `url("${reader.result}")`;
         refreshIcon();
     };
 }
@@ -133,7 +133,7 @@ function prepareCurrentFoldersForSave(){
 }
 
 function addNewFolder(folderSettings = null){
-    const newFolder = elem['blank-folder'].cloneNode(true);
+    const newFolder = elems['blank-folder'].cloneNode(true);
 
     newFolder.removeAttribute('id');
     newFolder.querySelector('.key').addEventListener('keyup', keyInputListener);
@@ -142,7 +142,7 @@ function addNewFolder(folderSettings = null){
     if (folderSettings) {
         fillFolder(newFolder, folderSettings);
     }
-    elem['add-folder-container'].parentNode.insertBefore(newFolder, elem['add-folder-container']);
+    elems['add-folder-container'].parentNode.insertBefore(newFolder, elems['add-folder-container']);
 }
 
 function deleteFolder(event){
@@ -236,12 +236,6 @@ function initSelectors(){
             'blank-folder',
             'add-folder',
             'add-folder-container',
-            'toggle-folders',
-            'folders-table',
-            'toggle-folders-rules',
-            'folders-rules',
-            'toggle-basic-rules',
-            'basic-rules',
             'save',
             'reset',
             'file-input',
@@ -251,11 +245,11 @@ function initSelectors(){
         ];
 
     settingsElems.forEach(name => {
-        setting[name] = document.querySelector(`#${name}`);
-        setting[name].dataset.valueLocation = setting[name].type === 'checkbox' ? 'checked' : 'value';
+        settings[name] = document.querySelector(`#${name}`);
+        settings[name].dataset.valueLocation = settings[name].type === 'checkbox' ? 'checked' : 'value';
     });
     otherElems.forEach(name => {
-        elem[name] = document.querySelector(`#${name}`);
+        elems[name] = document.querySelector(`#${name}`);
     });
 }
 
@@ -270,13 +264,8 @@ function enableInputListeners(inputsContainer){
 }
 
 function enableToggles(){
-    const toggles = {
-        'toggle-basic-rules'    : 'basic-rules',
-        'toggle-folders-rules'  : 'folders-rules',
-        'toggle-folders'        : 'folders-table',
-    };
-    Object.entries(toggles).forEach(([toggleName, togglableElemName]) => {
-        elem[toggleName].addEventListener('click', () => toggle(togglableElemName));
+    document.querySelectorAll('.toggle').forEach(toggleSwitch => {
+        toggleSwitch.addEventListener('click', () => toggle(toggleSwitch.nextElementSibling));
     });
 }
 
@@ -289,10 +278,10 @@ function init(){
     i18n();
     initSelectors();
 
-    elem['save-mark-example'].addEventListener('click', setExampleCss);
-    elem['file-input'].addEventListener('change', fileInputListener);
-    elem['reset'].addEventListener('click', resetOptions);
-    elem['save'].addEventListener('click', event => {
+    elems['save-mark-example'].addEventListener('click', setExampleCss);
+    elems['file-input'].addEventListener('change', fileInputListener);
+    elems['reset'].addEventListener('click', resetOptions);
+    elems['save'].addEventListener('click', event => {
         if (allSavePathsAreValid()) {
             saveOptions();
             showMessage(messages.success);
@@ -301,7 +290,7 @@ function init(){
             showMessage(messages.invalidPath, 'error');
         }
     });
-    elem['add-folder'].addEventListener('click', event => {
+    elems['add-folder'].addEventListener('click', event => {
         addNewFolder();
         enableSave();
     });

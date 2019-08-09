@@ -41,6 +41,9 @@
 	"settings_savePathPlaceholder": {
 		"message": "зберігати файли до"
 	},
+	"settings_filenamePlaceholder": {
+		"message": "шаблон імені файлу"
+	},
 	"settings_minSize": {
 		"message": "Мінімальна ширина/висота зображення (в пікселях):"
 	},
@@ -130,5 +133,8 @@
 	},
 	"settings_messageInvalidPath": {
 		"message": "Не можна вказувати абсолютні шляхи для завантажень. Прочитайте правила вище."
+	},
+	"settings_inProgress": {
+		"message": "Проводиться локалізація"
 	}
 }

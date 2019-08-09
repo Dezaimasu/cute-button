@@ -41,6 +41,9 @@
 	"settings_savePathPlaceholder": {
 		"message": "save files to"
 	},
+	"settings_filenamePlaceholder": {
+		"message": "filename template"
+	},
 	"settings_minSize": {
 		"message": "Minimum image width/height (px):"
 	},
@@ -130,5 +133,8 @@
 	},
 	"settings_messageInvalidPath": {
 		"message": "Absolute paths are not allowed. Read the rules above."
+	},
+	"settings_inProgress": {
+		"message": "Localization is in progress"
 	}
 }

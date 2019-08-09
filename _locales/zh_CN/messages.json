@@ -41,6 +41,9 @@
 	"settings_savePathPlaceholder": {
 		"message": "保存文件至"
 	},
+	"settings_filenamePlaceholder": {
+		"message": "filename template"
+	},
 	"settings_minSize": {
 		"message": "图像最小宽度/高度（像素）："
 	},
@@ -130,5 +133,8 @@
 	},
 	"settings_messageInvalidPath": {
 		"message": "不支持绝对路径。请阅读上方的说明。"
+	},
+	"settings_inProgress": {
+		"message": "Localization is in progress"
 	}
 }

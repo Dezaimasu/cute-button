@@ -7,6 +7,11 @@
 </head>
 <body>
 	<table id="main">
+		<tr>
+			<td colspan="2" class="alarm">
+				<i18n>settings_inProgress</i18n>
+			</td>
+		</tr>
 		<tr id="path-restrictions" class="alarm">
 			<td colspan="2">
 				<span id="toggle-basic-rules" class="toggle">
@@ -56,7 +61,7 @@
 						<th><i18n>settings_domain</i18n></th>
 						<th><i18n>settings_modifier</i18n></th>
 						<th><i18n>settings_hotkey</i18n></th>
-						<th>mouse<br>button</th>
+						<th>mouse<br>button</th> <!-- TODO: i18n -->
 						<th>save path</th> <!-- TODO: i18n -->
 						<th>filename</th> <!-- TODO: i18n -->
 						<th></th>
@@ -101,7 +106,7 @@
 						</td>
 						<td>
 							<label>
-								<input class="filename" data-i18n-placeholder="settings_filenamePlaceholder"> <!-- TODO: i18n -->
+								<input class="filename" data-i18n-placeholder="settings_filenamePlaceholder">
 							</label>
 						</td>
 						<td>
