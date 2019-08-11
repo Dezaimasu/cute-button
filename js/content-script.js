@@ -49,7 +49,7 @@ const de_settings = {
         forbidDuplicateFiles    : newValue => de_settings.forbidDuplicateFiles = newValue,
         originalNameByDefault   : newValue => de_settings.originalNameButton = newValue ? 0 : 2,
         saveFullSized           : newValue => de_settings.saveFullSized = newValue,
-        disableSpacebarHotkey   : newValue => Object.assign(de_hotkeys.keyboardHotkeys, newValue ? {} : de_hotkeys.reservedKeyboardHotkeys),
+        disableSpacebarHotkey   : newValue => !newValue && de_hotkeys.bindReservedHotkeys(),
         domainExclusions        : newValue => de_settings.disableIfExcluded(newValue),
         styleForSaveMark        : newValue => de_settings.refreshStyleForSaveMark(newValue),
     },
@@ -642,14 +642,16 @@ const de_hotkeys = {
 
     hide: '01081', // Alt+Q, hide button
 
-    reservedKeyboardHotkeys: {
-        '00032': {path: null, mouseButton: 0}, // Space, save to default location
-        '10032': {path: null, mouseButton: 2}, // Ctrl+Space, save to default location with original filename
-    },
-
     reset: function(){
         this.keyboardHotkeys = {};
         this.mouseHotkeys = {};
+    },
+
+    bindReservedHotkeys: function(){
+        Object.assign(de_hotkeys.keyboardHotkeys, {
+            '00032': Object.assign({mouseButton: 0}, de_hotkeys.fallbackRule), // Space, save to default location
+            '10032': Object.assign({mouseButton: 2}, de_hotkeys.fallbackRule), // Ctrl+Space, save to default location with original filename
+        });
     },
 
     buildHotkeyId: function(event){

@@ -135,7 +135,7 @@ Download.prototype = {
         }
         return !(
             filenameTemplate.endsWith('::original_filename::') ||
-            (filenameTemplate.endsWith('::both_filenames::') && this.downloadRequest.useOriginalName)
+            (filenameTemplate.endsWith('::both_filenames::') && this.downloadRequest.useOriginalName && this.downloadRequest.originalName)
         );
     },
 };
@@ -162,8 +162,8 @@ const filenameTools = {
             '::date::'              : this.getDateString,
             '::time::'              : this.getTimestamp,
             '::filename::'          : () => extractedFilename,
-            '::original_filename::' : () => dlRequest.originalName,
-            '::both_filenames::'    : () => dlRequest.useOriginalName ? dlRequest.originalName : extractedFilename,
+            '::original_filename::' : () => dlRequest.originalName || extractedFilename,
+            '::both_filenames::'    : () => (dlRequest.useOriginalName && dlRequest.originalName) ? dlRequest.originalName : extractedFilename,
         };
 
         string.includes(':') && Object.entries(placeholders).forEach(([placeholder, replacement]) => {
