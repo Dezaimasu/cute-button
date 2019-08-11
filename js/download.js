@@ -31,7 +31,15 @@ Download.prototype = {
                 extractedFilename = extractedFromSrc.filename;
             } else {
                 const extractedFromHeaders = await this.getFilenameFromHeaders();
-                extractedFilename = extractedFromHeaders.filename || this.getFallbackFilename(extractedFromHeaders.extension);
+                if (extractedFromHeaders.filename) {
+                    extractedFilename = extractedFromHeaders.filename;
+                } else {
+                    if (extractedFromSrc.basename && extractedFromHeaders.extension) {
+                        extractedFilename = `${extractedFromSrc.basename}.${extractedFromHeaders.extension}`;
+                    } else {
+                        extractedFilename = this.getFallbackFilename(extractedFromHeaders.extension);
+                    }
+                }
             }
         }
 
