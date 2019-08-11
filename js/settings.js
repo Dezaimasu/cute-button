@@ -118,7 +118,6 @@ function refreshFolders(foldersSettings){
     folders.forEach(addNewFolder);
     if (folders.length > 0) {
         show('folders-table');
-        hide('toggle-folders');
     }
 }
 
@@ -235,6 +234,7 @@ function initSelectors(){
             'blank-folder',
             'add-folder',
             'add-folder-container',
+            'folders-table',
             'save',
             'reset',
             'file-input',

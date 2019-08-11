@@ -15,9 +15,6 @@ table#main td#folders-container {
 	padding-right: 0;
 	padding-left: 0;
 }
-#toggle-folders {
-	font-size: 15px;
-}
 .toggle {
 	font-weight: bold;
 	margin-left: 20px;

@@ -35,7 +35,7 @@
 		</tr>
 		<tr>
 			<td id="folders-container" colspan="2">
-				<table id="folders-table">
+				<table id="folders-table" class="hidden-block">
 					<colgroup>
 						<col id="col-domain">
 						<col id="col-modifier">
@@ -106,20 +106,15 @@
 							<button id="add-folder" class="button"><i18n>settings_addFolder</i18n></button>
 						</td>
 					</tr>
-					<tr>
-						<td colspan="2" class="alarm">
-							<b>
-								<i18n>settings_inProgress</i18n>
-							</b>
-						</td>
-					</tr>
-					<tr>
-						<td colspan="7">
-							<span id="toggle-folders-rules" class="toggle">
-								&#9654; HOW TO USE
-							</span>
-							<span id="folders-rules" class="hidden-block">
-							<!-- TODO: i18n holy shit -->
+				</table>
+				<h2 class="alarm">
+					<i18n>settings_inProgress</i18n>
+				</h2>
+				<span id="toggle-folders-rules" class="toggle">
+					&#9654; HOW TO USE
+				</span>
+				<span id="folders-rules" class="hidden-block">
+				<!-- TODO: i18n holy shit -->
 All specified paths are relative to your browser save folder.
 If you leave "save path" field empty, it will save files straight to it.
 if you leave "filename" field empty, files will be saved with default filenames.
@@ -154,10 +149,7 @@ Rules without domain name specified have lowest priority.
 Examples:
 wikipedia.org : this hotkey will only work on wikipedia.org
 -twitter.com : this hotkey will work everywhere except twitter.com
-							</span>
-						</td>
-					</tr>
-				</table>
+				</span>
 			</td>
 		</tr>
 		<tr>
