@@ -1,5 +1,12 @@
 'use strict';
 
+const supportedFormats = '(jpg|jpeg|png|gif|bmp|webm|mp4|ogg|mp3)'; // TODO: use it for all regexps
+const regexps = {
+    extensionCheck  : new RegExp(`\\.${supportedFormats}$`),
+    filenameExtract : null, // TODO: regexp for extractFilename
+    filenameInTitle : null, // TODO: regexp for getFallbackFilename
+};
+
 function download(tabId, downloadRequest){
     new Download(downloadRequest, tabId).action();
 }
@@ -24,11 +31,7 @@ Download.prototype = {
                 extractedFilename = extractedFromSrc.filename;
             } else {
                 const extractedFromHeaders = await this.getFilenameFromHeaders();
-                if (extractedFromHeaders.filename) {
-                    extractedFilename = extractedFromHeaders.filename;
-                } else {
-                    extractedFilename = this.getFallbackFilename(extractedFromHeaders.extension)
-                }
+                extractedFilename = extractedFromHeaders.filename || this.getFallbackFilename(extractedFromHeaders.extension);
             }
         }
 
@@ -118,9 +121,13 @@ Download.prototype = {
 
     filenameExtractionRequired: function(){
         const filenameTemplate = this.downloadRequest.template.filename;
-        return (
-            filenameTemplate.includes('::filename::') ||
-            (filenameTemplate.includes('::both_filenames::') && !this.downloadRequest.useOriginalName)
+
+        if (filenameTemplate.includes('::filename::')) {
+        	return true;
+        }
+        return !(
+            filenameTemplate.endsWith('::original_filename::') ||
+            (filenameTemplate.endsWith('::both_filenames::') && this.downloadRequest.useOriginalName)
         );
     },
 };
@@ -128,11 +135,12 @@ Download.prototype = {
 const filenameTools = {
     replacePathPlaceholders: function(dlRequest){
         // TODO: don't use *filename* replacements
-        return this.replacePlaceholders(dlRequest.template.path, dlRequest)
+        return this.replacePlaceholders(dlRequest.template.path, dlRequest);
     },
 
     replaceFilenamePlaceholders: function(dlRequest, extractedFilename){
-        return this.replacePlaceholders(dlRequest.template.filename, dlRequest, extractedFilename)
+        const filename = this.replacePlaceholders(dlRequest.template.filename, dlRequest, extractedFilename);
+        return this.addMissingExtension(filename, extractedFilename);
     },
 
     replacePlaceholders: function(template, dlRequest, extractedFilename = null){
@@ -155,6 +163,15 @@ const filenameTools = {
         });
 
         return string;
+    },
+
+    /*
+    * If there's no extension in the resulting filename, get it from extracted filename
+    */
+    addMissingExtension: function(resultingFilename, extractedFilename){
+        return resultingFilename.match(regexps.extensionCheck) ?
+            resultingFilename :
+            (resultingFilename + extractedFilename.match(regexps.extensionCheck)[0]);
     },
 
     /*
