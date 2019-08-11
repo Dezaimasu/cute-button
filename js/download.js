@@ -134,7 +134,7 @@ Download.prototype = {
 
 const filenameTools = {
     replacePathPlaceholders: function(dlRequest){
-        // TODO: don't use *filename* replacements
+        // TODO: don't use *filename* replacements here
         return this.replacePlaceholders(dlRequest.template.path, dlRequest);
     },
 
@@ -149,7 +149,7 @@ const filenameTools = {
             '::domain::'            : () => this.trimForbiddenWinChars(dlRequest.pageInfo.domain),
             '::title::'             : () => this.trimForbiddenWinChars(dlRequest.pageInfo.title),
             '::thread_number::'     : () => this.trimForbiddenWinChars(dlRequest.pageInfo.threadNum),
-            '::board_name::'        : () => this.trimForbiddenWinChars(dlRequest.pageInfo.boardName),
+            '::board_code::'        : () => this.trimForbiddenWinChars(dlRequest.pageInfo.boardCode),
             '::datetime::'          : this.getDatetimeString,
             '::date::'              : this.getDateString,
             '::time::'              : this.getTimestamp,

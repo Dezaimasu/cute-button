@@ -17,9 +17,6 @@
 	"settings_pathRestrictions_5": {
 		"message": "If you REALLY want to do that, look for \"Symbolic links\"."
 	},
-	"settings_pathRestrictions_6": {
-		"message": "Also make sure your hotkeys won't overlap with browser hotkeys and with each other."
-	},
 	"settings_defaultSavePath": {
 		"message": "Save files to (default location, used if no additional save paths specified):"
 	},
@@ -135,6 +132,6 @@
 		"message": "Absolute paths are not allowed. Read the rules above."
 	},
 	"settings_inProgress": {
-		"message": "Localization is in progress"
+		"message": "LOCALIZATION IN PROGRESS"
 	}
 }

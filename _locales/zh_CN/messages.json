@@ -17,9 +17,6 @@
 	"settings_pathRestrictions_5": {
 		"message": "如果您坚持要那样做，请搜索了解“符号链接”的设置方法。"
 	},
-	"settings_pathRestrictions_6": {
-		"message": "也请注意，您的热键不要与浏览器中已有的热键冲突。"
-	},
 	"settings_defaultSavePath": {
 		"message": "保存文件至（默认路径，当对按钮单击或按空格键）："
 	},
@@ -135,6 +132,6 @@
 		"message": "不支持绝对路径。请阅读上方的说明。"
 	},
 	"settings_inProgress": {
-		"message": "Localization is in progress"
+		"message": "LOCALIZATION IN PROGRESS"
 	}
 }

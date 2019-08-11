@@ -222,7 +222,7 @@ const de_contentscript = {
         domain      : null,
         title       : null,
         threadNum   : null,
-        boardName   : null,
+        boardCode   : null,
     },
 
     init: function(){
@@ -237,7 +237,7 @@ const de_contentscript = {
             domain      : hostname,
             title       : null,
             threadNum   : de_siteParsers.getPossibleThreadNum(),
-            boardName   : de_siteParsers.getPossibleBoardName(),
+            boardCode   : de_siteParsers.getPossibleBoardCode(),
         };
 
         de_siteParsers.setFilteredHost(hostname);
@@ -455,9 +455,9 @@ const de_siteParsers = {
             .replace(/^(ecchi\.)?(iwara\.tv)$/, 'iwara.tv');
     },
 
-    getPossibleBoardName: function(){
-        const boardNameTry = document.location.pathname.match(/^\/(\w+)\//);
-        return boardNameTry && boardNameTry[1];
+    getPossibleBoardCode: function(){
+        const boardCodeTry = document.location.pathname.match(/^\/(\w+)\//);
+        return boardCodeTry && boardCodeTry[1];
     },
 
     getPossibleThreadNum: function(){
