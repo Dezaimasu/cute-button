@@ -475,8 +475,7 @@ const de_siteParsers = {
                 'twitter.com'       : 'self::div[contains(@class, "GalleryNav")]/preceding-sibling::div[@class="Gallery-media"]/img',
                 'tumblr.com'        : 'self::a/parent::div[@class="photo-wrap"]/img | self::a[@target="_blank"]/parent::div/preceding-sibling::div[@class="post_content"]/div/div[@data-imageurl] | self::span/parent::div/parent::a[@target="_blank"]/parent::div/preceding-sibling::div[@class="post_content"]/div/div[@data-imageurl] | self::div[@class="vjs-big-play-button"]/preceding-sibling::video',
                 'yandex.*'          : 'self::div[contains(@class, "preview2__arrow")]/preceding-sibling::div[contains(@class, "preview2__wrapper")]/div[@class="preview2__thumb-wrapper"]/img[contains(@class, "visible")] | self::div[contains(@class, "preview2__control")]/../preceding-sibling::div[contains(@class, "preview2__wrapper")]/div[@class="preview2__thumb-wrapper"]/img[contains(@class, "visible")]',
-                // TODO: don't show button on instagram previews
-                'instagram.com'     : 'self::div/preceding-sibling::div/img | self::span/preceding-sibling::div/div/video | self::ul/parent::div/preceding-sibling::div/div/img | self::div[@role="dialog"]/parent::div/parent::div/img',
+                'instagram.com'     : 'self::div[parent::div/parent::div]/preceding-sibling::div/img | self::a[@role="button"]/preceding-sibling::div/div/video',
                 'iwara.tv'          : 'self::div[@class="vjs-poster"]/preceding-sibling::video[@class="vjs-tech"]',
                 'vk.com'            : 'self::a[contains(@class, "image_cover") and contains(@onclick, "showPhoto")]',
                 'twitch.tv'         : 'self::div[@class="player-overlay"]/ancestor::div[contains(@class, "video-player__container")]/div[@class="player-video"]/video',
