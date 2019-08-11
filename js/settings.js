@@ -151,7 +151,6 @@ function deleteFolder(event){
 }
 
 function keyInputListener(event){
-    if (event.keyCode === 32) {event.target.value = ''; return;}
     if (event.key !== event.target.value) {return;}
     event.target.parentNode.querySelector('.keyCode').value = event.keyCode;
 }

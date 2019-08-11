@@ -651,7 +651,7 @@ const de_listeners = {
 const de_hotkeys = {
     selectedKeyboardRule: null,
 
-    fallbackRule: {path: '', filename: ''},
+    fallbackRule: {path: '', filename: '', priority: 4}, // lowest priority
 
     keyboardHotkeys: {},
 
@@ -712,7 +712,7 @@ const de_hotkeys = {
         if (that.isHigherPriority(that.keyboardHotkeys[rule.id], priority)) {
             that.keyboardHotkeys[rule.id] = newRule;
         }
-        if (that.isHigherPriority(that.mouseHotkeys[rule.mouseButton], priority)) {
+        if (rule.mouseButton !== '' && that.isHigherPriority(that.mouseHotkeys[rule.mouseButton], priority)) {
             that.mouseHotkeys[rule.mouseButton] = newRule;
         }
     },

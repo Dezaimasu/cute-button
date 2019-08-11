@@ -92,8 +92,9 @@ button#reset {
 	width: 20px !important;
 }
 
+.folder select:required:invalid,
 .folder input:placeholder-shown {
-	background-color: #f5f5f5;;
+	background-color: #f5f5f5;
 }
 .folder#blank-folder,
 #hidden-settings,
