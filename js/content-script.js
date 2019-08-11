@@ -20,6 +20,8 @@ const de_webextApi = {
     },
     settings: function(){
         function setSettings(settings, isChanges = false){
+            de_hotkeys.reset();
+
             Object.entries(settings).forEach(([settingName, setting]) => {
                 const settingValue = isChanges ? setting.newValue : setting;
                 de_settings.setters[settingName](settingValue);
@@ -644,6 +646,11 @@ const de_hotkeys = {
     reservedKeyboardHotkeys: {
         '00032': {path: null, mouseButton: 0}, // Space, save to default location
         '10032': {path: null, mouseButton: 2}, // Ctrl+Space, save to default location with original filename
+    },
+
+    reset: function(){
+        this.keyboardHotkeys = {};
+        this.mouseHotkeys = {};
     },
 
     buildHotkeyId: function(event){
