@@ -517,6 +517,10 @@ const de_siteParsers = {
                 'tiktokapi.ga': () => {
                     return 'https://tiktokapi.ga/' + node.getAttribute('info');
                 },
+                'deviantart.com': () => {
+                    const originalImg = xpath('self::img[not(contains(@class, "dev-content-full"))]/../img[contains(@class, "dev-content-full")]', node);
+                    return originalImg && originalImg.currentSrc;
+                },
             },
             getter = getters[this.host];
         let originalSrc = null;
@@ -556,6 +560,19 @@ const de_siteParsers = {
                     const id = node.getAttribute('aweme'),
                         name = node.getAttribute('info').split('&name=')[1];
                     return `${id}__${name}.mp4`;
+                },
+                'deviantart.com': () => {
+                    const filenameTry = node.src.match(/\/([^/]+_by_[^/]+\.\w{3,4})\?/);
+                    let title, dotExtension;
+                    if (filenameTry) {
+                    	return filenameTry[1];
+                    }
+
+                    return (
+                        (title = node.getAttribute('alt')) &&
+                        (dotExtension = node.src.match(/(\.\w{3,4})\?/)) &&
+                        title.toLowerCase().replace(/[^a-z0-9]/g, '_') + dotExtension[1]
+                    );
                 },
             },
             aliases = {
