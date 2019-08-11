@@ -518,8 +518,8 @@ const de_siteParsers = {
                     return 'https://tiktokapi.ga/' + node.getAttribute('info');
                 },
                 'deviantart.com': () => {
-                    const originalImg = xpath('self::img[not(contains(@class, "dev-content-full"))]/../img[contains(@class, "dev-content-full")]', node);
-                    return originalImg && originalImg.currentSrc;
+                    const srcParseTry = node.src.match(/^(.+\/[^/]+\.\w{3,4})\/[^?]+(\?.+)$/);
+                    return srcParseTry && (srcParseTry[1] + srcParseTry[2]);
                 },
             },
             getter = getters[this.host];
