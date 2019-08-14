@@ -23,14 +23,23 @@
 	"settings_defaultSavePathPlaceholder": {
 		"message": "директорія за замовчуванням"
 	},
-	"settings_domain": {
+	"settings_folders_domain": {
 		"message": "доменне ім'я"
 	},
-	"settings_hotkey": {
+	"settings_folders_hotkey": {
 		"message": "гаряча клавіша"
 	},
-	"settings_modifier": {
+	"settings_folders_modifier": {
 		"message": "модифікатор"
+	},
+	"settings_folders_mouseButton": {
+		"message": "кнопка\nмиши"
+	},
+	"settings_folders_path": {
+		"message": "шлях для збереження"
+	},
+	"settings_folders_filename": {
+		"message": "ім'я файла"
 	},
 	"settings_addFolder": {
 		"message": "Додати інший шлях для збереження"
@@ -40,6 +49,9 @@
 	},
 	"settings_filenamePlaceholder": {
 		"message": "шаблон імені файлу"
+	},
+	"settings_howToUse": {
+		"message": "ЯК ВИКОРИСТОВУВАТИ"
 	},
 	"settings_minSize": {
 		"message": "Мінімальна ширина/висота зображення (в пікселях):"

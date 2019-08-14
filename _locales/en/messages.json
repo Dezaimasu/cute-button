@@ -23,14 +23,23 @@
 	"settings_defaultSavePathPlaceholder": {
 		"message": "default save path"
 	},
-	"settings_domain": {
+	"settings_folders_domain": {
 		"message": "domain name"
 	},
-	"settings_hotkey": {
+	"settings_folders_hotkey": {
 		"message": "hotkey"
 	},
-	"settings_modifier": {
+	"settings_folders_modifier": {
 		"message": "modifier"
+	},
+	"settings_folders_mouseButton": {
+		"message": "mouse\nbutton"
+	},
+	"settings_folders_path": {
+		"message": "save path"
+	},
+	"settings_folders_filename": {
+		"message": "filename"
 	},
 	"settings_addFolder": {
 		"message": "Add another save path"
@@ -40,6 +49,9 @@
 	},
 	"settings_filenamePlaceholder": {
 		"message": "filename template"
+	},
+	"settings_howToUse": {
+		"message": "HOW TO USE"
 	},
 	"settings_minSize": {
 		"message": "Minimum image width/height (px):"

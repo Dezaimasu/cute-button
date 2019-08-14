@@ -23,14 +23,23 @@
 	"settings_defaultSavePathPlaceholder": {
 		"message": "默认保存路径"
 	},
-	"settings_domain": {
+	"settings_folders_domain": {
 		"message": "domain name"
 	},
-	"settings_hotkey": {
+	"settings_folders_hotkey": {
 		"message": "快捷键"
 	},
-	"settings_modifier": {
+	"settings_folders_modifier": {
 		"message": "修饰键"
+	},
+	"settings_folders_mouseButton": {
+		"message": "mouse\nbutton"
+	},
+	"settings_folders_path": {
+		"message": "save path"
+	},
+	"settings_folders_filename": {
+		"message": "filename"
 	},
 	"settings_addFolder": {
 		"message": "添加另一个位置的快捷键"
@@ -40,6 +49,9 @@
 	},
 	"settings_filenamePlaceholder": {
 		"message": "filename template"
+	},
+	"settings_howToUse": {
+		"message": "HOW TO USE"
 	},
 	"settings_minSize": {
 		"message": "图像最小宽度/高度（像素）："

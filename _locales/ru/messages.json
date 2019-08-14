@@ -23,14 +23,23 @@
 	"settings_defaultSavePathPlaceholder": {
 		"message": "директория по-умолчанию"
 	},
-	"settings_domain": {
+	"settings_folders_domain": {
 		"message": "доменное имя"
 	},
-	"settings_hotkey": {
+	"settings_folders_hotkey": {
 		"message": "горячая клавиша"
 	},
-	"settings_modifier": {
+	"settings_folders_modifier": {
 		"message": "модификатор"
+	},
+	"settings_folders_mouseButton": {
+		"message": "кнопка\nмыши"
+	},
+	"settings_folders_path": {
+		"message": "путь для сохранения"
+	},
+	"settings_folders_filename": {
+		"message": "имя файла"
 	},
 	"settings_addFolder": {
 		"message": "Добавить другой путь для сохранения"
@@ -40,6 +49,9 @@
 	},
 	"settings_filenamePlaceholder": {
 		"message": "шаблон имени файла"
+	},
+	"settings_howToUse": {
+		"message": "КАК ПОЛЬЗОВАТЬСЯ"
 	},
 	"settings_minSize": {
 		"message": "Минимальная ширина/высота изображения (в пикселях):"
