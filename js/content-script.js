@@ -101,7 +101,7 @@ const de_button = {
     },
 
     overrideEvent: function(event){
-        let that = de_button;
+        const that = de_button;
         if (event.target.nodeName !== that.name) {return;}
 
         that.disableEvent(event);
@@ -288,10 +288,9 @@ const de_contentscript = {
             node.addEventListener(eventName, () => de_contentscript.nodeHandler(node), {once: true});
         },
         checkForBgSrc: function(node, modifier){
-            let bgImg;
             if (!modifier) {return false;}
 
-            bgImg = getComputedStyle(node).getPropertyValue('background-image');
+            const bgImg = getComputedStyle(node).getPropertyValue('background-image');
             if (bgImg) {
                 const bgUrlMatches = bgImg.match(/^url\([\s"']*(https?:\/\/[^\s"']+)[\s"']*\).*/i);
                 if (bgUrlMatches) {
@@ -562,7 +561,7 @@ const de_siteParsers = {
                     return `${id}__${name}.mp4`;
                 },
                 'deviantart.com': () => {
-                    let title = node.getAttribute('alt'),
+                    const title = node.getAttribute('alt'),
                         dotExtension = node.src.match(/(\.\w{3,4})\?/);
 
                     return title && dotExtension && (title.toLowerCase().replace(/[^a-z0-9]/g, '_') + dotExtension[1]);
@@ -576,9 +575,8 @@ const de_siteParsers = {
         let originalFilename = null;
 
         function tryFilenameFromDollchanImageByCenter(){
-            let filenameTry;
             if (!that.dollchanImproved) {return null;}
-            filenameTry = xpath(dollchanXpath, node);
+            const filenameTry = xpath(dollchanXpath, node);
 
             return filenameTry ? filenameTry.textContent : null;
         }
@@ -689,18 +687,16 @@ const de_hotkeys = {
 
     assignHotkeyRule: function(rule){
         const that = de_hotkeys;
-        let priority,
-            newRule;
 
         if (!that.isRuleForCurrentDomain(rule)) {return;}
 
-        priority = that.getPriorityLevel(rule);
-        newRule = {
-            path        : rule.path,
-            filename    : rule.filename,
-            mouseButton : rule.mouseButton,
-            priority    : priority,
-        };
+        const priority = that.getPriorityLevel(rule),
+            newRule = {
+                path        : rule.path,
+                filename    : rule.filename,
+                mouseButton : rule.mouseButton,
+                priority    : priority,
+            };
 
         if (that.isHigherPriority(that.keyboardHotkeys[rule.id], priority)) {
             that.keyboardHotkeys[rule.id] = newRule;

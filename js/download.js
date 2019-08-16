@@ -51,13 +51,12 @@ Download.prototype = {
 
     getFilenameFromHeaders: async function(){
         const headers = await this.getHeaders();
-        let tmpFilename;
 
         if (!headers) {
             return {};
         }
 
-        tmpFilename = headers.contentDisposition && headers.contentDisposition.match(/^.+filename\*?=(.{0,20}')?([^;]*);?$/i);
+        const tmpFilename = headers.contentDisposition && headers.contentDisposition.match(/^.+filename\*?=(.{0,20}')?([^;]*);?$/i);
 
         return tmpFilename ?
             {filename: decodeURI(tmpFilename[2]).replace(/"/g, '')} :
