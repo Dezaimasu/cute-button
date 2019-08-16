@@ -562,17 +562,10 @@ const de_siteParsers = {
                     return `${id}__${name}.mp4`;
                 },
                 'deviantart.com': () => {
-                    const filenameTry = node.src.match(/\/([^/]+_by_[^/]+\.\w{3,4})\?/);
-                    let title, dotExtension;
-                    if (filenameTry) {
-                    	return filenameTry[1];
-                    }
+                    let title = node.getAttribute('alt'),
+                        dotExtension = node.src.match(/(\.\w{3,4})\?/);
 
-                    return (
-                        (title = node.getAttribute('alt')) &&
-                        (dotExtension = node.src.match(/(\.\w{3,4})\?/)) &&
-                        title.toLowerCase().replace(/[^a-z0-9]/g, '_') + dotExtension[1]
-                    );
+                    return title && dotExtension && (title.toLowerCase().replace(/[^a-z0-9]/g, '_') + dotExtension[1]);
                 },
             },
             aliases = {
