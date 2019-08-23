@@ -117,7 +117,7 @@ function refreshFolders(foldersSettings){
     folders = foldersSettings;
     folders.forEach(addNewFolder);
     if (folders.length > 0) {
-        show('folders-table');
+        show('folders-table-headers');
     }
 }
 
@@ -142,6 +142,7 @@ function addNewFolder(folderSettings = null){
         fillFolder(newFolder, folderSettings);
     }
     elems['add-folder-container'].parentNode.insertBefore(newFolder, elems['add-folder-container']);
+    show('folders-table-headers');
 }
 
 function deleteFolder(event){
@@ -235,6 +236,7 @@ function initSelectors(){
             'add-folder',
             'add-folder-container',
             'folders-table',
+            'folders-table-headers',
             'save',
             'reset',
             'file-input',
