@@ -517,8 +517,17 @@ const de_siteParsers = {
                     return 'https://tiktokapi.ga/' + node.getAttribute('info');
                 },
                 'deviantart.com': () => {
-                    const srcParseTry = node.src.match(/^(.+\/[^/]+\.\w{3,4})\/[^?]+(\?.+)$/);
-                    return srcParseTry && (srcParseTry[1] + srcParseTry[2]);
+                    const srcTry = node.src.match(/^(.+\/[^/]+\.\w{3,4})\/[^?]+(\?.+)$/);
+                    return srcTry[1] + srcTry[2];
+                },
+                'discordapp.com': () => {
+                    const videoSrcTry = node.currentSrc.match(/\/external\/.+\/https\/(.+\.\w{3,4})$/i);
+                    if (videoSrcTry) {
+                        return `https://${videoSrcTry[1]}`;
+                    }
+
+                    const href = node.parentNode.href;
+                    return href.includes('/attachments/') && href;
                 },
             },
             getter = getters[this.host];
@@ -562,9 +571,23 @@ const de_siteParsers = {
                 },
                 'deviantart.com': () => {
                     const title = node.getAttribute('alt'),
-                        dotExtension = node.src.match(/(\.\w{3,4})\?/);
+                        dotExtension = new URL(node.src).pathname.match(/(\.\w{3,4})(\W|$)/);
 
                     return title && dotExtension && (title.toLowerCase().replace(/[^a-z0-9]/g, '_') + dotExtension[1]);
+                },
+                'discordapp.com': () => {
+                    const filename = new URL(node.currentSrc).pathname.split('/').pop(),
+                        postElem = xpath('ancestor::div[contains(@class, "containerCozyBounded-")]', node),
+                        timeElem = postElem.querySelector('h2[class*="headerCozyMeta-"] time'),
+                        timestamp = timeElem.getAttribute('datetime'),
+                        mediaElems = Array.from(postElem.querySelectorAll('a[class*="imageWrapper-"] img, a[class*="imageWrapper-"] video'));
+                    let prefix = timestamp ? formatDate(new Date(parseInt(timestamp))) : '';
+
+                    if (mediaElems.length > 1) {
+                        prefix += ` ${mediaElems.indexOf(node) + 1}`;
+                    }
+
+                    return `${prefix} ${filename}`;
                 },
             },
             aliases = {
@@ -739,6 +762,11 @@ function xpath(path, contextNode){
 
 function isSet(object, key){
     return typeof object[key] !== 'undefined';
+}
+
+function formatDate(date){
+    const full = datePart => datePart.toString().padStart(2, '0');
+    return `${date.getFullYear()}.${full(date.getMonth() + 1)}.${full(date.getDate())}_${date.toLocaleTimeString('uk').replace(/:/g, '_')}`;
 }
 
 de_contentscript.init();
