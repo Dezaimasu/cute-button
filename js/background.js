@@ -51,20 +51,6 @@ function initSettings(details){
             settingName => newSettings[settingName] = settingsDefault[settingName]
         );
 
-        /* START for converting old settings TODO: remove later */
-        if (details.reason === 'update') {
-            const previousVersion = Number(details.previousVersion.replace(/\./g, '')),
-                previousExclusions = currentSettings['exclusions'];
-
-            if (previousVersion < 62 && !/[.#]/.test(previousExclusions)) {
-                newSettings['exclusions'] = previousExclusions.split(' ').map(x => `.${x}`).join(', ');
-            }
-            if (previousVersion < 65) {
-            	newSettings['folders'] = [];
-            }
-        }
-        /* END TODO: remove later */
-
         chrome.storage.local.set(newSettings);
         chrome.storage.local.remove(obsoleteSettingsList);
     });

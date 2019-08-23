@@ -51,7 +51,6 @@ Download.prototype = {
 
     getFilenameFromHeaders: async function(){
         const headers = await this.getHeaders();
-
         if (!headers) {
             return {};
         }
@@ -200,7 +199,7 @@ const filenameTools = {
     },
 
     trimForbiddenWinChars: function(string){
-        return (string || '').replace(/[/\\:*?"<>|\x09\u0080-\u008f]/g, '').replace(/^\.+|\.+$/g, '');
+        return (string || '').replace(/[/\\:*?"<>|\x09\u0080-\u008f]/g, '').replace(/^[. ]+|[. ]+$/g, '');
     },
 
     /*
@@ -224,7 +223,9 @@ const filenameTools = {
     },
 
     getDatetimeString: function(){
-        return new Date().toISOString().replace('T', '_').replace(/\..+/g, '').replace(/[^\d_]/g, '');
+        const date = new Date(),
+            full = datePart => datePart.toString().padStart(2, '0');
+        return `${date.getFullYear()}.${full(date.getMonth() + 1)}.${full(date.getDate())}_${date.toLocaleTimeString('uk').replace(/:/g, '_')}`;
     },
 
     getDateString: function(){
