@@ -1,11 +1,11 @@
 'use strict';
 
-const supportedFormats = '(jpg|jpeg|png|gif|bmp|webm|mp4|ogg|mp3)'; // TODO: use it for all regexps
-const regexps = {
-    extensionCheck  : new RegExp(`\\.${supportedFormats}$`),
-    filenameExtract : null, // TODO: regexp for extractFilename
-    filenameInTitle : null, // TODO: regexp for getFallbackFilename
-};
+const supportedFormats = '(jpg|jpeg|png|gif|bmp|webp|webm|mp4|ogg|mp3)',
+    regexps = {
+        extensionCheck  : new RegExp(`\\.${supportedFormats}$`),
+        filenameExtract : new RegExp(`^([^/]+\/)*([^/]+\\.${supportedFormats})([\\/][^.]+)?$`, 'i'),
+        filenameInTitle : new RegExp(`[^\\s]+\\.${supportedFormats}`, 'i'),
+    };
 
 function download(tabId, downloadRequest){
     new Download(downloadRequest, tabId).action();
@@ -76,7 +76,7 @@ Download.prototype = {
     },
 
     getFallbackFilename: function(possibleExtension){
-        const filenameTry = (this.downloadRequest.pageInfo.title || '').match(/[^\s]+\.(jpg|jpeg|png|gif|bmp|webm|mp4|ogg|mp3)/i);
+        const filenameTry = (this.downloadRequest.pageInfo.title || '').match(regexps.filenameInTitle);
         return filenameTry ? filenameTry[0] : `${filenameTools.getTimestamp()}.${possibleExtension || 'jpg'}`;
     },
 
@@ -191,7 +191,7 @@ const filenameTools = {
     */
     extractFilename: function(originalUrl){
         const url = decodeURI(originalUrl).replace(/^.*https?:\/\/([^/]+)\/+/, '').split(/[?#]/)[0].replace(/:\w+$/, '').replace(/\/{2,}/, '/'),
-            filenameTry = url.match(/^([^/]+\/)*([^/]+\.(jpg|jpeg|png|gif|bmp|webm|mp4|ogg|mp3))([\/][^.]+)?$/i);
+            filenameTry = url.match(regexps.filenameExtract);
 
         return filenameTry ?
             {filename: filenameTry[2]} :
