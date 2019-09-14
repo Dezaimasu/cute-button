@@ -530,7 +530,11 @@ const de_siteParsers = {
                     return href.includes('/attachments/') && href;
                 },
             },
-            getter = getters[this.host];
+            aliases = {
+                'mobile.twitter.com': 'twitter.com',
+                'pbs.twimg.com': 'twitter.com',
+            },
+            getter = getters[this.host] || getters[aliases[this.host]];
         let originalSrc = null;
 
         if (!de_settings.saveFullSized || !getter) {return null;}
