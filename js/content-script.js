@@ -683,10 +683,8 @@ const de_hotkeys = {
     },
 
     bindReservedHotkeys: function(){
-        Object.assign(de_hotkeys.keyboardHotkeys, {
-            '00032': Object.assign({mouseButton: 0}, de_hotkeys.fallbackRule), // Space, save to default location
-            '10032': Object.assign({mouseButton: 2}, de_hotkeys.fallbackRule), // Ctrl+Space, save to default location with original filename
-        });
+        this.assignHotkeyRule(Object.assign({mouseButton: 0, id: '00032'}, de_hotkeys.fallbackRule)); // Space, save to default location
+        this.assignHotkeyRule(Object.assign({mouseButton: 2, id: '10032'}, de_hotkeys.fallbackRule)); // Ctrl+Space, save to default location with original filename
     },
 
     buildHotkeyId: function(event){
@@ -746,7 +744,9 @@ const de_hotkeys = {
     },
 
     getPriorityLevel: function(rule){
-        if (!rule.domain) {
+        if (rule.priority) {
+        	return rule.priority;
+        } else if (!rule.domain) {
         	return 3;
         } else if (this.isExclusionRule(rule)) {
             return 2;
