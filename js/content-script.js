@@ -358,8 +358,9 @@ const de_contentscript = {
         return tools.filterBySize(node, modifier);
     },
 
-    isPositioned: function(node){
-        return window.getComputedStyle(node).position !== 'static';
+    isForRelativePositioning: function(node){
+        const nodeStyle = window.getComputedStyle(node);
+        return nodeStyle.position !== 'static' && nodeStyle.display !== 'table';
     },
 
     getPosition: function(node){
@@ -383,7 +384,7 @@ const de_contentscript = {
             bottom  : () => parentRect.bottom - nodeRect.bottom + Math.max(0, nodeRect.bottom - document.documentElement.clientHeight),
         };
 
-        if (this.isPositioned(node.offsetParent)) {
+        if (this.isForRelativePositioning(node.offsetParent)) {
             parentRect = node.offsetParent.getBoundingClientRect();
             position.container = node.offsetParent;
             position[de_settings.horizontal] = Math.max(getMinOffset(parentRect.width), sizeGettersInPositioned[de_settings.horizontal]()) + offset + 'px';
