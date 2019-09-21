@@ -326,10 +326,11 @@ const de_contentscript = {
             if (de_contentscript.isSeparateTab || ['VIDEO', 'AUDIO'].includes(node.tagName) || modifier) {
                 return false; // always show if it's a separate tab or if it's audio/video or if modifier is pressed
             }
-            if (node.complete && node.naturalWidth >= de_settings.minSize && node.naturalHeight >= de_settings.minSize) {
-                return false; // show if image is fully loaded and its actual sizes bigger than minSize
+            const isRenderedSizeBig = node.width >= de_settings.minSize && node.height >= de_settings.minSize;
+            if (node.complete && node.naturalWidth >= de_settings.minSize && node.naturalHeight >= de_settings.minSize && isRenderedSizeBig) {
+                return false; // show if image is fully loaded and its actual sizes and rendered sizes bigger than minSize
             }
-            return node.width < de_settings.minSize || node.height < de_settings.minSize; // otherwise hide if its sizes on the page smaller than minSize
+            return !isRenderedSizeBig; // otherwise hide if its rendered sizes smaller than minSize
         },
         deepSearchHostSpecific: function(node){
             de_contentscript.actualNode = de_siteParsers.getActualNode(node);
@@ -498,7 +499,7 @@ const de_siteParsers = {
                     return info['base'] + (info['w_'] || info['z_'] || info['y_'] || info['x_'])[0] + '.jpg';
                 },
                 'twitter.com': () => {
-                    return node.currentSrc.replace(/(jpg|jpeg|png)(:[a-z0-9]+)?$/i, '$1:orig').replace(/name=[a-z0-9]+/, 'name=orig');
+                    return node.currentSrc.replace(/\.(jpg|jpeg|png)(:[a-z0-9]+)?$/i, '.$1:orig').replace(/name=[a-z0-9]+/, 'name=orig');
                 },
                 'tumblr.com': function(){
                     return (node.dataset['imageurl'] || node.currentSrc).replace(/(\/[a-z0-9]{32}\/tumblr_\w+)(_\d{2,4}).(jpg|jpeg|png|gif)$/i, '$1_1280.$3');
@@ -532,8 +533,9 @@ const de_siteParsers = {
                 },
             },
             aliases = {
-                'mobile.twitter.com': 'twitter.com',
-                'pbs.twimg.com': 'twitter.com',
+                'tweetdeck.twitter.com' : 'twitter.com',
+                'mobile.twitter.com'    : 'twitter.com',
+                'pbs.twimg.com'         : 'twitter.com',
             },
             getter = getters[this.host] || getters[aliases[this.host]];
         let originalSrc = null;
