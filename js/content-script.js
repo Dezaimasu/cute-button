@@ -391,7 +391,7 @@ const de_contentscript = {
             position[de_settings.horizontal] = Math.max(getMinOffset(parentRect.width), sizeGettersInPositioned[de_settings.horizontal]()) + offset + 'px';
             position[de_settings.vertical] = Math.max(getMinOffset(parentRect.height), sizeGettersInPositioned[de_settings.vertical]()) + offset + 'px';
         } else {
-            position.container = document.body;
+            position.container = document.body.parentNode;
             position.left = sizeGettersRegular[de_settings.horizontal]() + window.scrollX + 'px';
             position.top = sizeGettersRegular[de_settings.vertical]() + window.scrollY + 'px';
         }
