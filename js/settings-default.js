@@ -13,7 +13,7 @@ const settingsDefault = {
     placeUnderCursor        : false, // TODO: change behavior, show button in the corner closest to the cursor
     saveOnHover             : false,
     showSaveDialog          : false,
-    forbidDuplicateFiles    : true,
+    forbidDuplicateFiles    : false,
     saveFullSized           : true,
     domainExclusions        : '',
     disableSpacebarHotkey   : false,

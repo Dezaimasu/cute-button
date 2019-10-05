@@ -496,7 +496,7 @@ const de_siteParsers = {
         const getters = {
                 'vk.com': () => {
                     const info = JSON.parse(node.getAttribute('onclick').match(/^.*"?temp"? *: *({[^{}]+}).*$/)[1]);
-                    return info['base'] + (info['w_'] || info['z_'] || info['y_'] || info['x_'])[0] + '.jpg';
+                    return info['w'] || info['z'] || info['y'] || info['x'];
                 },
                 'twitter.com': () => {
                     return node.currentSrc.replace(/\.(jpg|jpeg|png)(:[a-z0-9]+)?$/i, '.$1:orig').replace(/name=[a-z0-9]+/, 'name=orig');
