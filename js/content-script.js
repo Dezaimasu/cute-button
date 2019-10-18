@@ -598,8 +598,9 @@ const de_siteParsers = {
                 },
             },
             aliases = {
-                'boards.4channel.org': 'boards.4chan.org',
-                'yuki.la': 'boards.4chan.org',
+                'boards.4channel.org'   : 'boards.4chan.org',
+                'yuki.la'               : 'boards.4chan.org',
+                'arch.b4k.co'           : 'boards.fireden.net',
             },
             getter = getters[this.host] || getters[aliases[this.host]];
         let originalFilename = null;
