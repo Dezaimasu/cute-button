@@ -401,7 +401,7 @@ const de_contentscript = {
 
     getPositionUnderCursor: function(mouseEvent){
         if (!mouseEvent.target) {return null;}
-        return mouseEvent.target.offsetParent && this.isPositioned(mouseEvent.target.offsetParent) ? {
+        return mouseEvent.target.offsetParent && this.isForRelativePositioning(mouseEvent.target.offsetParent) ? {
             container: mouseEvent.target.offsetParent,
             left: mouseEvent.layerX + 'px',
             top: mouseEvent.layerY + 'px'
