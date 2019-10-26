@@ -74,6 +74,9 @@
 	"settings_saveFullSized": {
 		"message": "Всегда сохранять полноразмерные версии изображений (работает в twitter, tumblr, vk, instagram, iwara):"
 	},
+	"settings_checkByRealImageSize": {
+		"message": "Сначала проверять naturalWidth (иногда помогает с сохранением с превью)"
+	},
 	"settings_saveOnHover": {
 		"message": "Сохранять по наведению мыши с зажатыми Ctrl+Alt вместо клика (рекомендуется использовать с включенной опцией \"Без дубликатов\"):"
 	},

@@ -74,6 +74,9 @@
 	"settings_saveFullSized": {
 		"message": "始终保存全尺寸图像（适用于 Twitter、Tumblr、vk、iwara 和 Instagram）："
 	},
+	"settings_checkByRealImageSize": {
+		"message": "Check naturalWidth first (sometimes helps with saving from previews)"
+	},
 	"settings_saveOnHover": {
 		"message": "Ctrl+Alt+悬停 即保存，无需点击（推荐配合“避免重复”选项）："
 	},

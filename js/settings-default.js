@@ -18,4 +18,5 @@ const settingsDefault = {
     domainExclusions        : '',
     disableSpacebarHotkey   : false,
     styleForSaveMark        : '',
+    checkByRealImageSize    : true,
 };

@@ -49,6 +49,7 @@ const de_settings = {
         forbidDuplicateFiles    : newValue => de_settings.forbidDuplicateFiles = newValue,
         originalNameByDefault   : newValue => de_settings.originalNameButton = newValue ? 0 : 2,
         saveFullSized           : newValue => de_settings.saveFullSized = newValue,
+        checkByRealImageSize    : newValue => de_settings.checkByRealImageSize = newValue,
         disableSpacebarHotkey   : newValue => !newValue && de_hotkeys.bindReservedHotkeys(),
         domainExclusions        : newValue => de_settings.disableIfExcluded(newValue),
         styleForSaveMark        : newValue => de_settings.refreshStyleForSaveMark(newValue),
@@ -327,8 +328,13 @@ const de_contentscript = {
                 return false; // always show if it's a separate tab or if it's audio/video or if modifier is pressed
             }
             const isRenderedSizeBig = node.width >= de_settings.minSize && node.height >= de_settings.minSize;
-            if (node.complete && node.naturalWidth >= de_settings.minSize && node.naturalHeight >= de_settings.minSize && isRenderedSizeBig) {
-                return false; // show if image is fully loaded and its actual sizes and rendered sizes bigger than minSize
+            if (
+                node.complete &&
+                node.naturalWidth >= de_settings.minSize &&
+                node.naturalHeight >= de_settings.minSize &&
+                (de_settings.checkByRealImageSize || isRenderedSizeBig) // don't check by rendered size if checkByRealImageSize option enabled
+            ) {
+                return false; // show if image is fully loaded and its actual sizes bigger than minSize
             }
             return !isRenderedSizeBig; // otherwise hide if its rendered sizes smaller than minSize
         },
@@ -519,8 +525,8 @@ const de_siteParsers = {
                     return 'https://tiktokapi.ga/' + node.getAttribute('info');
                 },
                 'deviantart.com': () => {
-                    const srcTry = node.src.match(/^(.+\/[^/]+\.\w{3,4})\/[^?]+(\?.+)$/);
-                    return srcTry[1] + srcTry[2];
+                    const fullImg = xpath('self::img[contains(@class, "dev-content-full")] | self::img/following-sibling::img[contains(@class, "dev-content-full")]', node);
+                    return fullImg.currentSrc;
                 },
                 'discordapp.com': () => {
                     const videoSrcTry = node.currentSrc.match(/\/external\/.+\/https\/(.+\.\w{3,4})$/i);

@@ -74,6 +74,9 @@
 	"settings_saveFullSized": {
 		"message": "Always save full-sized images (works on twitter, tumblr, vk, instagram, iwara):"
 	},
+	"settings_checkByRealImageSize": {
+		"message": "Check naturalWidth first (sometimes helps with saving from previews)"
+	},
 	"settings_saveOnHover": {
 		"message": "Save on Ctrl+Alt+hover instead of click (recommended to use with \"No duplicates\" enabled):"
 	},
