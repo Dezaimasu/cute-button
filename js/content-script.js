@@ -365,22 +365,63 @@ const de_contentscript = {
         return tools.filterBySize(node, modifier);
     },
 
-    isForRelativePositioning: function(node){
-        const nodeStyle = window.getComputedStyle(node);
-        return nodeStyle.position !== 'static' && nodeStyle.display !== 'table';
+    isForRelativePositioning: function(offsetParent){
+        const style = getComputedStyle(offsetParent);
+        return style.position !== 'static' && style.display !== 'table';
+    },
+
+    getReplacedElementOffsets: function(node){ // TODO: non top-left button positions
+        const style = getComputedStyle(node),
+            fit = style['object-fit'],
+            position = style['object-position'], // TODO
+            nodeWidth = node.width,
+            nodeHeight = node.height,
+            imageWidth = node.naturalWidth,
+            imageHeight = node.naturalHeight;
+
+        if (!fit || fit === 'cover' || fit === 'fill') {
+        	return {x: 0, y: 0};
+        }
+
+        const imageFitsIntoContainer = imageWidth <= nodeWidth && imageHeight <= nodeHeight;
+        let imageScale;
+
+        if (fit === 'none' || (fit === 'scale-down' && imageFitsIntoContainer)) {
+            imageScale = 1;
+        } else {
+            const maxPossibleScale = fit === 'contain' && imageFitsIntoContainer ? 999999 : 1;
+
+            imageScale = Math.min(
+                nodeWidth / imageWidth,
+                nodeHeight / imageHeight,
+                maxPossibleScale
+            );
+        }
+
+        const actualImageWidth = imageWidth * imageScale,
+            actualImageHeight = imageHeight * imageScale,
+            xOffset = Math.max(nodeWidth - actualImageWidth, 0) / 2,
+            yOffset = Math.max(nodeHeight - actualImageHeight, 0) / 2;
+
+        return { // TODO: scroll
+            x: xOffset/* + Math.min(nodeRect.x, 0)*/,
+            y: yOffset/* + Math.min(nodeRect.y, 0)*/
+        };
     },
 
     getPosition: function(node){
         const nodeRect = node.getBoundingClientRect(),
-            offset = 6,
+            nodeReplacedOffsets = this.getReplacedElementOffsets(node),
+            offsetX = 6 + nodeReplacedOffsets.x,
+            offsetY = 6 + nodeReplacedOffsets.y,
             reverseOffset = 38, // offset + button width (32px)
             position = {},
             getMinOffset = sideSize => sideSize === 0 ? -999999 : 0; //hack(?) for tumblr for image containers with 0px width/height
         let parentRect;
 
         const sizeGettersRegular = {
-            left    : () => Math.max(0, nodeRect.left) + offset,
-            top     : () => Math.max(0, nodeRect.top) + offset,
+            left    : () => Math.max(0, nodeRect.left) + offsetX,
+            top     : () => Math.max(0, nodeRect.top) + offsetY,
             right   : () => Math.min(document.documentElement.clientWidth, nodeRect.right) - reverseOffset,
             bottom  : () => Math.min(document.documentElement.clientHeight, nodeRect.bottom) - reverseOffset,
         };
@@ -394,8 +435,8 @@ const de_contentscript = {
         if (this.isForRelativePositioning(node.offsetParent)) {
             parentRect = node.offsetParent.getBoundingClientRect();
             position.container = node.offsetParent;
-            position[de_settings.horizontal] = Math.max(getMinOffset(parentRect.width), sizeGettersInPositioned[de_settings.horizontal]()) + offset + 'px';
-            position[de_settings.vertical] = Math.max(getMinOffset(parentRect.height), sizeGettersInPositioned[de_settings.vertical]()) + offset + 'px';
+            position[de_settings.horizontal] = Math.max(getMinOffset(parentRect.width), sizeGettersInPositioned[de_settings.horizontal]()) + offsetX + 'px';
+            position[de_settings.vertical] = Math.max(getMinOffset(parentRect.height), sizeGettersInPositioned[de_settings.vertical]()) + offsetY + 'px';
         } else {
             position.container = document.body.parentNode;
             position.left = sizeGettersRegular[de_settings.horizontal]() + window.scrollX + 'px';
