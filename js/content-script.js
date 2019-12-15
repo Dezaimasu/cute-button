@@ -522,11 +522,7 @@ const de_siteParsers = {
                     return node.parentNode.href;
                 },
                 'tiktokapi.ga': () => {
-                    return 'https://tiktokapi.ga/' + node.getAttribute('info');
-                },
-                'deviantart.com': () => {
-                    const fullImg = xpath('self::img[contains(@class, "dev-content-full")] | self::img/following-sibling::img[contains(@class, "dev-content-full")]', node);
-                    return fullImg.currentSrc;
+                    return node.parentNode.getAttribute('videolink');
                 },
                 'discordapp.com': () => {
                     const videoSrcTry = node.currentSrc.match(/\/external\/.+\/https\/(.+\.\w{3,4})$/i);
@@ -567,7 +563,7 @@ const de_siteParsers = {
                     return container.title || container.textContent;
                 },
                 'iichan.hk': () => {
-                    return xpath('../preceding-sibling::span[@class="filesize"]/em', node).textContent.split(', ')[2];
+                    return xpath('../preceding-sibling::span[@class="filesize"]/a', node).textContent;
                 },
                 'boards.fireden.net': () => {
                     const container = xpath('(../following-sibling::div[@class="post_file"]|../../preceding-sibling::div[@class="post_file"])/a[@class="post_file_filename"]', node);
@@ -578,15 +574,10 @@ const de_siteParsers = {
                     return container.title || container.textContent;
                 },
                 'tiktokapi.ga': () => {
-                    const id = node.getAttribute('aweme'),
-                        name = node.getAttribute('info').split('&name=')[1];
+                    const parent = node.parentNode,
+                        id = parent.getAttribute('videoid'),
+                        name = parent.getAttribute('videotitle');
                     return `${id}__${name}.mp4`;
-                },
-                'deviantart.com': () => {
-                    const title = node.getAttribute('alt'),
-                        dotExtension = new URL(node.src).pathname.match(/(\.\w{3,4})(\W|$)/);
-
-                    return title && dotExtension && (title.toLowerCase().replace(/[^a-z0-9]/g, '_') + dotExtension[1]);
                 },
                 'discordapp.com': () => {
                     const filename = new URL(node.currentSrc).pathname.split('/').pop(),
@@ -607,6 +598,7 @@ const de_siteParsers = {
                 'boards.4channel.org'   : 'boards.4chan.org',
                 'yuki.la'               : 'boards.4chan.org',
                 'arch.b4k.co'           : 'boards.fireden.net',
+                '8kun.top'              : '8ch.net',
             },
             getter = getters[this.host] || getters[aliases[this.host]];
         let originalFilename = null;
