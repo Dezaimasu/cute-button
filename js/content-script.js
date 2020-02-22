@@ -581,14 +581,28 @@ const de_siteParsers = {
                 },
                 'discordapp.com': () => {
                     const filename = new URL(node.currentSrc).pathname.split('/').pop(),
-                        postElem = xpath('ancestor::div[contains(@class, "containerCozyBounded-")]', node),
-                        timeElem = postElem.querySelector('h2[class*="headerCozyMeta-"] time'),
-                        timestamp = timeElem.getAttribute('datetime'),
-                        mediaElems = Array.from(postElem.querySelectorAll('a[class*="imageWrapper-"] img, a[class*="imageWrapper-"] video'));
-                    let prefix = timestamp ? formatDate(new Date(parseInt(timestamp))) : '';
+                        postNode = xpath('ancestor::div[contains(@class, "cozyMessage-")]', node),
+                        parentPostNode = isGroupStart(postNode) ?
+                            postNode :
+                            xpath('preceding-sibling::div[contains(@class, "cozyMessage-") and contains(@class, "groupStart-")][1]', postNode),
+                        timeNode = parentPostNode.querySelector('h2[class*="header-"] span[class*="timestampCozy"] > span'),
+                        mediaInGroup = [];
+                    let prefix = formatDate(new Date(timeNode.getAttribute('aria-label'))),
+                        nodeInGroup;
 
-                    if (mediaElems.length > 1) {
-                        prefix += ` ${mediaElems.indexOf(node) + 1}`;
+                    function isGroupStart(node){
+                        return node.getAttribute('class').includes('groupStart-');
+                    }
+
+                    nodeInGroup = parentPostNode;
+                    do {
+                        const mediaNodesInCurrentNode = nodeInGroup.querySelectorAll('a[class*="imageWrapper-"] img, a[class*="imageWrapper-"] video');
+                        mediaInGroup.push(...mediaNodesInCurrentNode);
+                        nodeInGroup = nodeInGroup.nextElementSibling;
+                    } while (!isGroupStart(nodeInGroup));
+
+                    if (mediaInGroup.length > 1) {
+                        prefix += ` ${mediaInGroup.indexOf(node) + 1}`;
                     }
 
                     return `${prefix} ${filename}`;
