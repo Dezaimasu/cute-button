@@ -54,8 +54,8 @@ button#reset {
 	padding: 6px 10px;
 }
 .folders-templates-list {
-	margin-right: 10px;
 	display: inline-block;
+	margin: 4px 10px 0 0;
 }
 
 #folders-table {
