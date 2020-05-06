@@ -53,6 +53,12 @@
 	"settings_howToUse": {
 		"message": "HOW TO USE"
 	},
+	"settings_foldersRules_1": {
+		"message": "not translated"
+	},
+	"settings_foldersRules_2": {
+		"message": "not translated"
+	},
 	"settings_minSize": {
 		"message": "图像最小宽度/高度（像素）："
 	},
@@ -145,8 +151,5 @@
 	},
 	"settings_messageInvalidPath": {
 		"message": "不支持绝对路径。请阅读上方的说明。"
-	},
-	"settings_inProgress": {
-		"message": "LOCALIZATION IN PROGRESS"
 	}
 }

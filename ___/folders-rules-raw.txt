@@ -1,0 +1,33 @@
+All specified paths are relative to your browser save folder.
+If you leave "save path" field empty, it will save files straight to it.
+if you leave "filename" field empty, files will be saved with default filenames.
+File extension will be set automatically, please don't specify it explicitly.
+Using placeholders from the list below you can save files from each domain
+in their own folders, or with some specific filenames.
+
+List of available placeholders, must be surrounded with ::
+::domain:: 			Domain name of the current site
+::title::				Title of the current page
+::board_code::		Board code if exists
+::thread_number::		Thread number if exists
+::datetime::			Current date and time
+::date::				Current date
+::time::				UNIX timestamp
+::filename::			Default filename as assigned by browser
+::original_filename::	Original filename, available on most popular imageboards
+::both_filenames::		Same as empty field, filename depending on mouse button pressed
+
+You can choose mouse button or keyboard hotkey or both for each template.
+
+You can specify domain name if you want some hotkey/save template to work only on this specific site.
+You can also exclude hotkey for specific site, so it will work everywhere except this specific site.
+To do this add domain name starting with "-" symbol.
+You can get domain name either from address bar, or you can open
+Web Console (Ctrl+Shift+K) and write document.location.hostname, the result will be
+domain name you should insert into "domain name" field.
+Rules with "domain name" have higher priority than "-domain name" rules.
+Rules without domain name specified have lowest priority.
+
+Examples:
+wikipedia.org : this hotkey will only work on wikipedia.org
+-twitter.com : this hotkey will work everywhere except twitter.com

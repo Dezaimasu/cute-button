@@ -53,6 +53,12 @@
 	"settings_howToUse": {
 		"message": "ЯК ВИКОРИСТОВУВАТИ"
 	},
+	"settings_foldersRules_1": {
+		"message": "not translated"
+	},
+	"settings_foldersRules_2": {
+		"message": "not translated"
+	},
 	"settings_minSize": {
 		"message": "Мінімальна ширина/висота зображення (в пікселях):"
 	},
@@ -145,8 +151,5 @@
 	},
 	"settings_messageInvalidPath": {
 		"message": "Не можна вказувати абсолютні шляхи для завантажень. Прочитайте правила вище."
-	},
-	"settings_inProgress": {
-		"message": "ЛОКАЛІЗАЦІЯ В ПРОЦЕСІ"
 	}
 }

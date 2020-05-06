@@ -51,6 +51,11 @@ button#reset {
 
 #folders-rules {
 	white-space: pre;
+	padding: 6px 10px;
+}
+.folders-templates-list {
+	margin-right: 10px;
+	display: inline-block;
 }
 
 #folders-table {
