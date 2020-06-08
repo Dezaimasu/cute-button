@@ -437,7 +437,7 @@ const de_contentscript = {
                 {left: null, top: null, right: null, bottom: null}, // only two position properties would be set at once, other two are null on purpose to reset their default values
                 (de_settings.placeUnderCursor && that.getPositionUnderCursor(event)) || that.getPosition(that.currentNode)
             ),
-            de_siteParsers.getOriginalSrc(that.currentNode) || src || that.currentNode.src || that.bgSrc,
+            de_siteParsers.getOriginalSrc(that.currentNode) || src || that.currentNode.currentSrc || that.bgSrc,
             de_siteParsers.getOriginalFilename(that.currentNode)
         );
 
