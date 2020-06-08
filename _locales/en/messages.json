@@ -59,6 +59,9 @@
 	"settings_foldersRules_2": {
 		"message": "\nYou can choose mouse button or keyboard hotkey or both for each rule.\n\nYou can specify domain name if you want some rule to work only on this specific site.\nYou can also exclude hotkey for specific site, so it will work everywhere except this specific site.\nTo do this add domain name starting with \"-\" symbol.\nYou can get domain name either from address bar, or you can open\nWeb Console (Ctrl+Shift+K) and write document.location.hostname, the result will be\ndomain name you should insert into \"domain name\" field.\nRules with \"domain name\" have higher priority than \"-domain name\" rules.\nRules without domain name specified have lowest priority.\n\nExamples:\nwikipedia.org : this hotkey will only work on wikipedia.org\n-twitter.com : this hotkey will work everywhere except twitter.com"
 	},
+	"settings_placeholdersList": {
+		"message": "Domain name of the current site\nTitle of the current page\nBoard code if exists(e.g., b, vg)\nThread number if exists\nCurrent date and time\nCurrent date\nUNIX timestamp\nDefault filename as assigned by browser\nOriginal filename, available on most popular imageboards\nSame as empty field, filename depending on mouse button pressed"
+	},
 	"settings_minSize": {
 		"message": "Minimum image width/height (px):"
 	},
