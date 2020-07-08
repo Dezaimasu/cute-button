@@ -40,7 +40,7 @@ const de_settings = {
         exclusions              : newValue => de_settings.exclusions = newValue,
         icon                    : newValue => de_button.elem.style.backgroundImage = newValue,
         hideButton              : newValue => de_button.elem.classList.toggle('shy', newValue),
-        isCute                  : newValue => de_listeners.switch(newValue),
+        isCute                  : newValue => de_events.switchAll(newValue),
         position                : newValue => [de_settings.vertical, de_settings.horizontal] = newValue.split('-'),
         folders                 : newValue => newValue.forEach(de_hotkeys.assignHotkeyRule),
         placeUnderCursor        : newValue => de_settings.placeUnderCursor = newValue,
@@ -57,7 +57,7 @@ const de_settings = {
 
     disableIfExcluded: function(excludedDomains){
         de_settings.domainExcluded = excludedDomains.split(' ').includes(de_contentscript.pageInfo.domain);
-        de_listeners.switch(!de_settings.domainExcluded);
+        de_events.switchAll(!de_settings.domainExcluded);
     },
 
     refreshStyleForSaveMark: function(value){
@@ -85,9 +85,9 @@ const de_button = {
         that.elem.addEventListener('mouseout', that.unclick);
         that.initDownloadRequest(null, null);
 
-        Object.keys(that.globalEventsHandlers).forEach(
-            eventName => document.addEventListener(eventName, that.overrideEvent, {capture: true})
-        );
+        that.overrideAndListen('mouseup');
+        that.overrideAndListen('mousedown');
+        that.overrideAndListen('click');
     },
 
     initDownloadRequest: function(src, originalName){
@@ -101,15 +101,17 @@ const de_button = {
         };
     },
 
-    overrideEvent: function(event){
-        const that = de_button;
-        if (event.target.nodeName !== that.name) {return;}
+    overrideAndListen: function(eventType){
+        function listener(event){
+            if (event.target.nodeName !== de_button.name) {return;}
+            de_button.disableEvent(event);
+            de_button.eventsHandlers[event.type](event.button);
+        }
 
-        that.disableEvent(event);
-        that.globalEventsHandlers[event.type](event.button);
+        document.addEventListener(eventType, listener, {capture: true});
     },
 
-    globalEventsHandlers: {
+    eventsHandlers: {
         mouseup: function(eventButton){
             const that = de_button,
                 btnElem = that.elem,
@@ -229,8 +231,12 @@ const de_contentscript = {
     init: function(){
         const hostname = document.location.hostname;
 
-        window.addEventListener('mouseover', de_listeners.mouseoverListener); // asap
-        document.addEventListener('readystatechange', de_listeners.readystatechangeListener);
+        de_events.listen('mouseover'); // asap
+
+        document.addEventListener('load', function(){
+            de_contentscript.pageInfo.title = document.title;
+            de_siteParsers.checkDollchanPresence();
+        }, {once: true});
 
         this.isSeparateTab = ['image/', 'video/', 'audio/'].includes(document.contentType.substr(0, 6));
         this.srcLocation = this.isSeparateTab ? 'baseURI' : 'currentSrc';
@@ -285,8 +291,8 @@ const de_contentscript = {
                 attributeFilter : ['src']
             });
         },
-        handleAgainOn: function(eventName, node){
-            node.addEventListener(eventName, () => de_contentscript.nodeHandler(node), {once: true});
+        handleAgainOn: function(eventType, node){
+            node.addEventListener(eventType, () => de_contentscript.nodeHandler(node), {once: true});
         },
         checkForBgSrc: function(node, modifier){
             if (!modifier) {return false;}
@@ -633,52 +639,57 @@ const de_siteParsers = {
     },
 };
 
-const de_listeners = {
-    readystatechangeListener: function(event){
-        if (event.target.readyState !== 'complete') {return;}
+const de_events = {
+    listeners: {
+        mouseover: function(event){
+            if (event.target.tagName === de_button.name || (event.relatedTarget && event.relatedTarget.tagName === de_button.name)) {return;}
+            try {
+                de_contentscript.nodeHandler(event.target, event);
+            } catch (e) {
+                if (e.message.includes('de_settings')) { // settings are not initialized yet
+                    setTimeout(() => de_contentscript.nodeHandler(event.target, event), 100);
+                }
+            }
+        },
+        keydown: function(event){
+            if (de_hotkeys.isHotkeyPossible(event) && de_hotkeys.isHotkeyExists(de_hotkeys.buildHotkeyId(event))) {
+                event.preventDefault();
+            }
+        },
+        keyup: function(event){
+            const hotkeyId = de_hotkeys.buildHotkeyId(event);
 
-        de_contentscript.pageInfo.title = document.title;
-        de_siteParsers.checkDollchanPresence();
-        document.removeEventListener('readystatechange', de_listeners.readystatechangeListener);
-    },
-    mouseoverListener: function(event){
-        if (event.target.tagName === de_button.name || (event.relatedTarget && event.relatedTarget.tagName === de_button.name)) {return;}
-        try {
-            de_contentscript.nodeHandler(event.target, event);
-        } catch (e) {
-            if (!e.message.includes('de_settings')) {return;} // settings are not initialized yet
-            setTimeout(() => de_contentscript.nodeHandler(event.target, event), 100);
-        }
-    },
-    keydownListener: function(event){
-        if (de_hotkeys.isHotkeyPossible(event) && de_hotkeys.isHotkeyExists(de_hotkeys.buildHotkeyId(event))) {
-            event.preventDefault();
-        }
-    },
-    keyupListener: function(event){
-        const hotkeyId = de_hotkeys.buildHotkeyId(event);
+            if (hotkeyId === de_hotkeys.hide) {
+                de_button.hide();
+                return;
+            }
+            if (!de_hotkeys.isHotkeyPossible(event) || !de_hotkeys.isHotkeyExists(hotkeyId)) {
+                return;
+            }
 
-        if (hotkeyId === de_hotkeys.hide) {
-            de_button.hide();
-            return;
-        }
-        if (!de_hotkeys.isHotkeyPossible(event) || !de_hotkeys.isHotkeyExists(hotkeyId)) {
-            return;
-        }
+            if (de_contentscript.isSeparateTab && !de_button.isVisible()) {
+                de_contentscript.nodeHandler(document.body.childNodes[0]);
+            }
 
-        if (de_contentscript.isSeparateTab && !de_button.isVisible()) {
-            de_contentscript.nodeHandler(document.body.childNodes[0]);
-        }
-
-        de_hotkeys.selectedKeyboardRule = de_hotkeys.keyboardHotkeys[hotkeyId];
-        de_button.emulateClick(de_hotkeys.selectedKeyboardRule.mouseButton || 0);
+            de_hotkeys.selectedKeyboardRule = de_hotkeys.keyboardHotkeys[hotkeyId];
+            de_button.emulateClick(de_hotkeys.selectedKeyboardRule.mouseButton || 0);
+        },
     },
 
-    switch: function(turnOn = true){
-        const functionName = turnOn && !de_settings.domainExcluded ? 'addEventListener' : 'removeEventListener';
-        window[functionName]('mouseover', de_listeners.mouseoverListener);
-        window[functionName]('keydown', de_listeners.keydownListener);
-        window[functionName]('keyup', de_listeners.keyupListener);
+    switchAll: function(turnOn = true){
+        const functionName = turnOn && !de_settings.domainExcluded ? 'listen' : 'unlisten';
+
+        de_events[functionName]('mouseover');
+        de_events[functionName]('keydown');
+        de_events[functionName]('keyup');
+    },
+
+    listen: function(eventType){
+        window.addEventListener(eventType, de_events.listeners[eventType], {capture: true});
+    },
+
+    unlisten: function(eventType){
+        window.removeEventListener(eventType, de_events.listeners[eventType], {capture: true});
     },
 };
 
