@@ -151,7 +151,7 @@ const de_button = {
     },
 
     disableEvent: function(event){
-        event.stopPropagation();
+        event.stopImmediatePropagation();
         event.preventDefault();
     },
 
@@ -233,10 +233,12 @@ const de_contentscript = {
 
         de_events.listen('mouseover'); // asap
 
-        document.addEventListener('load', function(){
+        document.addEventListener('readystatechange', function onReadystatechange(event){ // too late for "load" event
+            if (event.target.readyState !== 'complete') {return;}
             de_contentscript.pageInfo.title = document.title;
             de_siteParsers.checkDollchanPresence();
-        }, {once: true});
+            document.removeEventListener('readystatechange', onReadystatechange);
+        });
 
         this.isSeparateTab = ['image/', 'video/', 'audio/'].includes(document.contentType.substr(0, 6));
         this.srcLocation = this.isSeparateTab ? 'baseURI' : 'currentSrc';
@@ -485,7 +487,7 @@ const de_siteParsers = {
     getActualNode: function(node){
         const dollchanHack = 'self::div[@class="de-fullimg-video-hack"]/following-sibling::video',
             siteHacks = {
-                'twitter.com'       : 'self::div[contains(@class, "GalleryNav")]/preceding-sibling::div[@class="Gallery-media"]/img',
+                'twitter.com'       : 'self::div[not(*)]/../../preceding-sibling::div[not(@class)]/div/video[not(starts-with(@src, "blob:"))]',
                 'tumblr.com'        : 'self::a/parent::div[@class="photo-wrap"]/img | self::a[@target="_blank"]/parent::div/preceding-sibling::div[@class="post_content"]/div/div[@data-imageurl] | self::span/parent::div/parent::a[@target="_blank"]/parent::div/preceding-sibling::div[@class="post_content"]/div/div[@data-imageurl] | self::div[@class="vjs-big-play-button"]/preceding-sibling::video',
                 'yandex.*'          : 'self::div[contains(@class, "preview2__arrow")]/preceding-sibling::div[contains(@class, "preview2__wrapper")]/div[@class="preview2__thumb-wrapper"]/img[contains(@class, "visible")] | self::div[contains(@class, "preview2__control")]/../preceding-sibling::div[contains(@class, "preview2__wrapper")]/div[@class="preview2__thumb-wrapper"]/img[contains(@class, "visible")]',
                 'instagram.com'     : 'self::div[parent::div/parent::div]/preceding-sibling::div/img | self::a[@role="button"]/preceding-sibling::div/div/video',
