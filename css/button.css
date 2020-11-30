@@ -4,6 +4,7 @@ html de_cbutton#de-cute-id {
 	background-repeat: no-repeat 	!important;
 	background-color: #444 			!important;
 	background-size: 28px 28px 		!important;
+	pointer-events: all				!important;
 	border-radius: 4px 				!important;
 	visibility: hidden 				!important;
 	position: absolute 				!important;
