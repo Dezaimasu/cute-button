@@ -133,7 +133,12 @@ Download.prototype = {
     }
     return !(
       filenameTemplate.endsWith('::original_filename::') ||
-      (filenameTemplate.endsWith('::both_filenames::') && this.downloadRequest.useOriginalName && this.downloadRequest.originalName)
+      (
+        filenameTemplate.endsWith('::both_filenames::') &&
+        this.downloadRequest.useOriginalName &&
+        this.downloadRequest.originalName &&
+        this.downloadRequest.originalName.match(regexps.extensionCheck)
+      )
     );
   },
 };
