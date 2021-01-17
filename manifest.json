@@ -1,48 +1,48 @@
 {
-	"manifest_version": 2,
-	"name": "Cute Save Button",
-	"version": "0.7.8",
-	"description": "__MSG_extensionDescription__",
-	"author": "Deil",
-	"default_locale": "en",
-	"icons": {
-		"48": "bestgirl.png"
-	},
-	"permissions": [
-		"downloads",
-		"storage",
-		"*://*/*"
-	],
-	"background": {
-		"scripts": [
-			"js/settings-default.js",
-			"js/background.js",
-			"js/download.js"
-		]
-	},
-	"content_scripts": [{
-		"js": [
-			"js/content-script.js"
-		],
-		"matches": [
-			"*://*/*"
-		],
-		"run_at": "document_start",
-		"all_frames": true
-	}],
-	"web_accessible_resources": [
-		"bestgirl.png"
-	],
-	"options_ui": {
-		"page": "settings.html"
-	},
-	"browser_action": {
-		"default_icon": "bestgirl.png"
-	},
-	"applications": {
-		"gecko": {
-			"id": "ochecuteextension@plaza.ink",
-			"strict_min_version": "53.0"
-		}
-	}
+  "manifest_version": 2,
+  "name": "Cute Save Button",
+  "version": "0.7.8",
+  "description": "__MSG_extensionDescription__",
+  "author": "Deil",
+  "default_locale": "en",
+  "icons": {
+    "48": "bestgirl.png"
+  },
+  "permissions": [
+    "downloads",
+    "storage",
+    "*://*/*"
+  ],
+  "background": {
+    "scripts": [
+      "js/settings-default.js",
+      "js/background.js",
+      "js/download.js"
+    ]
+  },
+  "content_scripts": [{
+    "js": [
+      "js/content-script.js"
+    ],
+    "matches": [
+      "*://*/*"
+    ],
+    "run_at": "document_start",
+    "all_frames": true
+  }],
+  "web_accessible_resources": [
+    "bestgirl.png"
+  ],
+  "options_ui": {
+    "page": "settings.html"
+  },
+  "browser_action": {
+    "default_icon": "bestgirl.png"
+  },
+  "applications": {
+    "gecko": {
+      "id": "ochecuteextension@plaza.ink",
+      "strict_min_version": "53.0"
+    }
+  }
 }
