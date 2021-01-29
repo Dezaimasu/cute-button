@@ -53,6 +53,8 @@ const de_settings = {
     disableSpacebarHotkey : newValue => !newValue && de_hotkeys.bindReservedHotkeys(),
     domainExclusions      : newValue => de_settings.disableIfExcluded(newValue),
     styleForSaveMark      : newValue => de_settings.refreshStyleForSaveMark(newValue),
+    verticalOffset        : newValue => de_settings.verticalOffset = newValue,
+    horizontalOffset      : newValue => de_settings.horizontalOffset = newValue,
   },
 
   disableIfExcluded: function(excludedDomains){
@@ -380,17 +382,22 @@ const de_contentscript = {
 
   getPosition: function(node){
     const nodeRect = node.getBoundingClientRect(),
-      offset = 6,
-      reverseOffset = 38, // offset + button width (32px)
+      buttonSideSize = 32,
+      offsets = {
+        left  : de_settings.horizontalOffset,
+        right : de_settings.horizontalOffset + buttonSideSize,
+        top   : de_settings.verticalOffset,
+        bottom: de_settings.verticalOffset + buttonSideSize,
+      },
       position = {},
       getMinOffset = sideSize => sideSize === 0 ? -999999 : 0; //hack(?) for tumblr for image containers with 0px width/height
     let parentRect;
 
     const sizeGettersRegular = {
-      left  : () => Math.max(0, nodeRect.left) + offset,
-      top   : () => Math.max(0, nodeRect.top) + offset,
-      right : () => Math.min(document.documentElement.clientWidth, nodeRect.right) - reverseOffset,
-      bottom: () => Math.min(document.documentElement.clientHeight, nodeRect.bottom) - reverseOffset,
+      left  : () => Math.max(0, nodeRect.left) + offsets.left,
+      top   : () => Math.max(0, nodeRect.top) + offsets.top,
+      right : () => Math.min(document.documentElement.clientWidth, nodeRect.right) - offsets.right,
+      bottom: () => Math.min(document.documentElement.clientHeight, nodeRect.bottom) - offsets.bottom,
     };
     const sizeGettersInPositioned = {
       left  : () => nodeRect.left - parentRect.left - Math.min(0, nodeRect.left),
@@ -402,8 +409,8 @@ const de_contentscript = {
     if (this.isForRelativePositioning(node.offsetParent)) {
       parentRect = node.offsetParent.getBoundingClientRect();
       position.container = node.offsetParent;
-      position[de_settings.horizontal] = Math.max(getMinOffset(parentRect.width), sizeGettersInPositioned[de_settings.horizontal]()) + offset + 'px';
-      position[de_settings.vertical] = Math.max(getMinOffset(parentRect.height), sizeGettersInPositioned[de_settings.vertical]()) + offset + 'px';
+      position[de_settings.horizontal] = Math.max(getMinOffset(parentRect.width), sizeGettersInPositioned[de_settings.horizontal]()) + offsets.left + 'px';
+      position[de_settings.vertical] = Math.max(getMinOffset(parentRect.height), sizeGettersInPositioned[de_settings.vertical]()) + offsets.top + 'px';
     } else {
       position.container = document.body.parentNode;
       position.left = sizeGettersRegular[de_settings.horizontal]() + window.scrollX + 'px';

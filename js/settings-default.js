@@ -19,4 +19,6 @@ const settingsDefault = {
   disableSpacebarHotkey : false,
   styleForSaveMark      : '',
   checkByRealImageSize  : true,
+  verticalOffset        : 6,
+  horizontalOffset      : 6,
 };
