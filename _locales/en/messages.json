@@ -65,6 +65,15 @@
 	"settings_minSize": {
 		"message": "Minimum image width/height (px):"
 	},
+	"settings_offsets": {
+		"message": "Distance to the image edge (px):"
+	},
+	"settings_offsetVertical": {
+		"message": "Vertical:"
+	},
+	"settings_offsetHorizontal": {
+		"message": "Horizontal:"
+	},
 	"settings_exclusions": {
 		"message": "CSS selectors for elements excluded from scanning (split by comma):"
 	},

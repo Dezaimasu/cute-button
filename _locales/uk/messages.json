@@ -65,6 +65,15 @@
 	"settings_minSize": {
 		"message": "Мінімальна ширина/висота зображення (в пікселях):"
 	},
+	"settings_offsets": {
+		"message": "Відстань до краю зображення (в пікселях):"
+	},
+	"settings_offsetVertical": {
+		"message": "По вертикалі:"
+	},
+	"settings_offsetHorizontal": {
+		"message": "По горизонталі:"
+	},
 	"settings_exclusions": {
 		"message": "CSS селектори елементів, виключених зі сканування (розділені комами):"
 	},

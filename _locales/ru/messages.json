@@ -65,6 +65,15 @@
 	"settings_minSize": {
 		"message": "Минимальная ширина/высота изображения (в пикселях):"
 	},
+	"settings_offsets": {
+		"message": "Расстояние до края изображения (в пикселях):"
+	},
+	"settings_offsetVertical": {
+		"message": "По вертикали:"
+	},
+	"settings_offsetHorizontal": {
+		"message": "По горизонтали:"
+	},
 	"settings_exclusions": {
 		"message": "CSS селекторы элементов, которые будут исключены из сканирования (разделены запятыми):"
 	},
