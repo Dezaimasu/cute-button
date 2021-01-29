@@ -25,6 +25,11 @@ input#domainExclusions,
 input#defaultSavePath {
 	width: 95%;
 }
+input#verticalOffset,
+input#horizontalOffset {
+	margin: 0 10px 0 5px;
+	width: 60px;
+}
 input[type=file] {
 	width: 350px;
 }
