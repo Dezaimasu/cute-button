@@ -36,7 +36,7 @@ const de_webextApi = {
 const de_settings = {
   setters: {
     defaultSavePath       : newValue => de_hotkeys.fallbackRule.path = newValue,
-    minSize               : newValue => de_settings.minSize = newValue,
+    minSize               : newValue => de_settings.minSize = parseInt(newValue),
     exclusions            : newValue => de_settings.exclusions = newValue,
     icon                  : newValue => de_button.elem.style.backgroundImage = newValue,
     hideButton            : newValue => de_button.elem.classList.toggle('shy', newValue),
@@ -53,8 +53,8 @@ const de_settings = {
     disableSpacebarHotkey : newValue => !newValue && de_hotkeys.bindReservedHotkeys(),
     domainExclusions      : newValue => de_settings.disableIfExcluded(newValue),
     styleForSaveMark      : newValue => de_settings.refreshStyleForSaveMark(newValue),
-    verticalOffset        : newValue => de_settings.verticalOffset = newValue,
-    horizontalOffset      : newValue => de_settings.horizontalOffset = newValue,
+    verticalOffset        : newValue => de_settings.verticalOffset = parseInt(newValue),
+    horizontalOffset      : newValue => de_settings.horizontalOffset = parseInt(newValue),
   },
 
   disableIfExcluded: function(excludedDomains){
