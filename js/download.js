@@ -43,10 +43,10 @@ Download.prototype = {
       }
     }
 
-    this.download(
-      filenameTools.replacePathPlaceholders(this.downloadRequest),
-      filenameTools.replaceFilenamePlaceholders(this.downloadRequest, extractedFilename)
-    );
+    const path = filenameTools.preparePath(filenameTools.replacePathPlaceholders(this.downloadRequest)),
+      filename = filenameTools.prepareFilename(filenameTools.replaceFilenamePlaceholders(this.downloadRequest, extractedFilename))
+
+    this.download(path, filename);
   },
 
   getFilenameFromHeaders: async function(){
@@ -80,28 +80,33 @@ Download.prototype = {
     return filenameTry ? filenameTry[0] : `${filenameTools.getTimestamp()}.${possibleExtension || 'jpg'}`;
   },
 
-  download: function(path, filename){
-    const finalPath = filenameTools.preparePath(path),
-      finalFilename = filenameTools.prepareFilename(filename);
-
+  download: function(path, filename, withReferer = true){
     chrome.downloads.download({
-        url       : this.downloadRequest.src,
-        filename    : finalPath + finalFilename,
-        saveAs      : this.downloadRequest.showSaveDialog,
-        conflictAction  : 'uniquify',
-      },
-      downloadId => {
-        if (chrome.extension.lastError) {return;}
-        this.checkForDuplicate(finalFilename, downloadId);
+      url           : this.downloadRequest.src,
+      filename      : path + filename,
+      saveAs        : this.downloadRequest.showSaveDialog,
+      conflictAction: 'uniquify',
+      headers       : withReferer ? [
+        {name: 'Referer', value: this.downloadRequest.pageInfo.href},
+      ] : [],
+    }, downloadId => {
+        if (chrome.extension.lastError) {
+          if (chrome.extension.lastError.message === 'Forbidden request header name') {
+            this.download(path, filename, false); // "Referer" header is not allowed in Chrome or pre-70 Firefox
+          }
+          return;
+        }
+
+        this.checkForDuplicate(filename, downloadId);
       }
     );
   },
 
   /*
-  * If resulted filename is not the same as the filename passed to downloads.download function,
-  * then it was modified by 'uniquify' conflict action of WebExt API,
-  * and user should be warned that he saved already existing file.
-  */
+   * If resulted filename is not the same as the filename passed to downloads.download function,
+   * then it was modified by 'uniquify' conflict action of WebExt API,
+   * and user should be warned that he saved already existing file.
+   */
   checkForDuplicate: function(originalFilename, downloadId){
     chrome.downloads.search({
       id: downloadId
@@ -117,8 +122,8 @@ Download.prototype = {
   },
 
   /*
-  * Hack for once broken(?) downloads.search, now it can't find download if called instantly from downloads.download callback
-  */
+   * Hack for once broken(?) downloads.search, now it can't find download if called instantly from downloads.download callback
+   */
   checkForDuplicateRetry: function(originalFilename, downloadId){
     if (this.duplicateCheckTry > 5) {return;}
     this.duplicateCheckTry++;
@@ -177,8 +182,8 @@ const filenameTools = {
   },
 
   /*
-  * If there's no extension in the resulting filename, get it from extracted filename
-  */
+   * If there's no extension in the resulting filename, get it from extracted filename
+   */
   addMissingExtension: function(resultingFilename, extractedFilename){
     return resultingFilename.match(regexps.extensionCheck) ?
       resultingFilename :
@@ -186,14 +191,14 @@ const filenameTools = {
   },
 
   /*
-  * Decodes url, cuts possible GET parameters, extracts filename from the url.
-  * Usually filename is located at the end, after last "/" symbol, but sometimes
-  * it might be somewhere in the middle between "/" symbols.
-  * That's why it's important to extract filename manually by looking for the last sub-string
-  * with pre-known extension located between "/" symbols.
-  * WebExt API is incapable of extracting such filenames.
-  * Cheers pineapple.
-  */
+   * Decodes url, cuts possible GET parameters, extracts filename from the url.
+   * Usually filename is located at the end, after last "/" symbol, but sometimes
+   * it might be somewhere in the middle between "/" symbols.
+   * That's why it's important to extract filename manually by looking for the last sub-string
+   * with pre-known extension located between "/" symbols.
+   * WebExt API is incapable of extracting such filenames.
+   * Cheers pineapple.
+   */
   extractFilename: function(originalUrl){
     const url = decodeURI(originalUrl).replace(/^.*https?:\/\/([^/]+)\/+/, '').split(/[?#]/)[0].replace(/:\w+$/, '').replace(/\/{2,}/, '/'),
       filenameTry = url.match(regexps.filenameExtract);
@@ -208,10 +213,10 @@ const filenameTools = {
   },
 
   /*
-  * If the path is not empty then trims leading/trailing slashes/backslashes
-  * and adds a single slash to the end for concating with filename.
-  * Doesn't matter which slashes are used in save path, WebExt API recognizes both.
-  */
+   * If the path is not empty then trims leading/trailing slashes/backslashes
+   * and adds a single slash to the end for concating with filename.
+   * Doesn't matter which slashes are used in save path, WebExt API recognizes both.
+   */
   preparePath: function(path){
     return path && (path.replace(/^\\+|\\+$|^\/+|\/+$/, '') + '/');
   },

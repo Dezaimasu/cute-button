@@ -231,8 +231,6 @@ const de_contentscript = {
   },
 
   init: function(){
-    const hostname = document.location.hostname;
-
     de_events.listen('mouseover'); // asap
 
     document.addEventListener('readystatechange', function onReadystatechange(event){ // too late for "load" event
@@ -245,13 +243,14 @@ const de_contentscript = {
     this.isSeparateTab = ['image/', 'video/', 'audio/'].includes(document.contentType.substr(0, 6));
     this.srcLocation = this.isSeparateTab ? 'baseURI' : 'currentSrc';
     this.pageInfo = {
-      domain    : hostname,
+      domain    : document.location.hostname,
+      href      : document.location.href,
       title     : null,
       threadNum : de_siteParsers.getPossibleThreadNum(),
       boardCode : de_siteParsers.getPossibleBoardCode(),
     };
 
-    de_siteParsers.setFilteredHost(hostname);
+    de_siteParsers.setFilteredHost(document.location.hostname);
 
     de_button.init();
     de_webextApi.listen();
