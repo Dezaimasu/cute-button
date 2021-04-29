@@ -85,14 +85,14 @@ const de_button = {
     that.elem.id = 'de-cute-id';
     that.elem.addEventListener('contextmenu', that.disableEvent);
     that.elem.addEventListener('mouseout', that.unclick);
-    that.initDownloadRequest(null, null);
+    that.prepareDownloadRequest(null, null);
 
     that.overrideAndListen('mouseup');
     that.overrideAndListen('mousedown');
     that.overrideAndListen('click');
   },
 
-  initDownloadRequest: function(src, originalName){
+  prepareDownloadRequest: function(src, originalName){
     this.downloadRequest = {
       src             : src,
       originalName    : originalName,
@@ -163,7 +163,7 @@ const de_button = {
     if (!this.styled) {
       de_webextApi.getButtonStyle();
     }
-    this.initDownloadRequest(src, originalName);
+    this.prepareDownloadRequest(src, originalName);
     btnElem.style.top     = position.top;
     btnElem.style.bottom  = position.bottom;
     btnElem.style.left    = position.left;
@@ -173,7 +173,7 @@ const de_button = {
   },
 
   hide: function(){
-    this.initDownloadRequest(null, null);
+    this.prepareDownloadRequest(null, null);
     this.elem.classList.remove('visible');
   },
 
@@ -281,17 +281,14 @@ const de_contentscript = {
 
     observer: new MutationObserver(mutations => {
       const target = mutations.pop().target;
-      this.handleAgainOn('load', target);
+      de_contentscript.nodeTools.handleAgainOn('load', target);
     }),
 
     addSrcObserver: function(node){
       if (node.tagName !== 'IMG') {return;}
       this.observer.disconnect();
       this.observer.observe(node, {
-        attributes      : true,
-        childList       : false,
-        characterData   : false,
-        attributeFilter : ['src']
+        attributeFilter: ['src', 'srcset'],
       });
     },
     handleAgainOn: function(eventType, node){
@@ -496,7 +493,7 @@ const de_siteParsers = {
         'twitter.com'   : 'self::div[not(*)]/../../preceding-sibling::div[not(@class)]/div/video[not(starts-with(@src, "blob:"))]',
         'tumblr.com'    : 'self::a/parent::div[@class="photo-wrap"]/img | self::a[@target="_blank"]/parent::div/preceding-sibling::div[@class="post_content"]/div/div[@data-imageurl] | self::span/parent::div/parent::a[@target="_blank"]/parent::div/preceding-sibling::div[@class="post_content"]/div/div[@data-imageurl] | self::div[@class="vjs-big-play-button"]/preceding-sibling::video',
         'yandex.*'      : 'self::div[contains(@class, "preview2__arrow")]/preceding-sibling::div[contains(@class, "preview2__wrapper")]/div[@class="preview2__thumb-wrapper"]/img[contains(@class, "visible")] | self::div[contains(@class, "preview2__control")]/../preceding-sibling::div[contains(@class, "preview2__wrapper")]/div[@class="preview2__thumb-wrapper"]/img[contains(@class, "visible")]',
-        'instagram.com' : 'self::div[parent::div/parent::div]/preceding-sibling::div/img | self::*[@role="button"]/preceding-sibling::div/div/div/video | self::div[@role="dialog"]/../../preceding-sibling::img',
+        'instagram.com' : 'self::div[parent::div/parent::div]/preceding-sibling::div/img | self::div[@role="dialog"]/../../preceding-sibling::img',
         'iwara.tv'      : 'self::div[@class="vjs-poster"]/preceding-sibling::video[@class="vjs-tech"]',
         'vk.com'        : 'self::a[contains(@class, "image_cover") and contains(@onclick, "showPhoto")]',
         'twitch.tv'     : 'self::div[@class="player-overlay"]/ancestor::div[contains(@class, "video-player__container")]/div[@class="player-video"]/video',
