@@ -384,7 +384,7 @@ const de_contentscript = {
         bottom: de_settings.verticalOffset + buttonSideSize,
       },
       position = {},
-      getMinOffset = sideSize => sideSize === 0 ? -999999 : 0; //hack(?) for tumblr for image containers with 0px width/height
+      getMinOffset = sideSize => sideSize < this.nodeTools.absoluteMinSize ? -999999 : 0; // hack to ignore offsetParent position if it's too small (usually it not represents actual image position)
     let parentRect;
 
     const sizeGettersRegular = {
