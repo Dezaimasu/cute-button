@@ -79,17 +79,15 @@ const de_button = {
   downloadRequest: {},
 
   init: function(){
-    const that = this;
+    this.elem = document.createElement(this.name);
+    this.elem.id = 'de-cute-id';
+    this.elem.addEventListener('contextmenu', this.disableEvent);
+    this.elem.addEventListener('mouseout', this.unclick);
+    this.prepareDownloadRequest(null, null);
 
-    that.elem = document.createElement(that.name);
-    that.elem.id = 'de-cute-id';
-    that.elem.addEventListener('contextmenu', that.disableEvent);
-    that.elem.addEventListener('mouseout', that.unclick);
-    that.prepareDownloadRequest(null, null);
-
-    that.overrideAndListen('mouseup');
-    that.overrideAndListen('mousedown');
-    that.overrideAndListen('click');
+    this.overrideAndListen('mouseup');
+    this.overrideAndListen('mousedown');
+    this.overrideAndListen('click');
   },
 
   prepareDownloadRequest: function(src, originalName){
@@ -575,8 +573,7 @@ const de_siteParsers = {
   },
 
   getOriginalFilename: function(node){
-    const that = this,
-      dollchanXpath = '(. | self::img/..)/parent::div[contains(@class, "de-fullimg-wrap-center")]//a[@class="de-fullimg-link" and text() != "Spoiler Image"]',
+    const dollchanXpath = '(. | self::img/..)/parent::div[contains(@class, "de-fullimg-wrap-center")]//a[@class="de-fullimg-link" and text() != "Spoiler Image"]',
       getters = {
         'boards.4chan.org': () => {
           const container = xpath('ancestor::div[contains(concat(" ", normalize-space(@class), " "), " file ")]//*[(@class="fileText" and @title) or self::a]', node);
@@ -642,7 +639,7 @@ const de_siteParsers = {
     let originalFilename = null;
 
     function tryFilenameFromDollchanImageByCenter(){
-      if (!that.dollchanImproved) {return null;}
+      if (!de_siteParsers.dollchanImproved) {return null;}
       const filenameTry = xpath(dollchanXpath, node);
 
       return filenameTry ? filenameTry.textContent : null;
