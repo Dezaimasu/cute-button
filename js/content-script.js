@@ -550,7 +550,7 @@ const de_siteParsers = {
           }
           return node.getAttribute('srcset').split(',').reduce((a, b) => {
             return getWidth(a) > getWidth(b) ? a : b;
-          }).split(' ')[0]
+          }).split(' ')[0];
         }
       },
       {
@@ -559,20 +559,30 @@ const de_siteParsers = {
           return (node.dataset['imageurl'] || node.currentSrc).replace(/(\/[a-z0-9]{32}\/tumblr_\w+)(_\d{2,4}).(jpg|jpeg|png|gif)$/i, '$1_1280.$3');
         }
       },
+      {
+        hosts: ['zerochan.net'],
+        get(){
+          const parts = node.currentSrc.match(/zerochan\.net\/([^/]+)\.\d+\.(\d+)\.(\w{3,4})$/i);
+          return parts ?
+            `https://static.zerochan.net/${parts[1]}.full.${parts[2]}.${parts[3]}` :
+            xpath('../following-sibling::p/a[img[contains(@src, "download")]]', node).href;
+        }
+      },
     ];
 
     const getter = getters.find(g => g.hosts.includes(this.host));
     if (!getter) {return null;}
 
-    let originalSrc = null;
     try {
-      originalSrc = getter.get();
-    } catch (e) {} //tfw no safe navigation operator in 2017
-
-    return originalSrc;
+      return getter.get();
+    } catch { //tfw no safe navigation operator in 2021
+      return null;
+    }
   },
 
   getOriginalFilename: function(node){
+    if (de_contentscript.isSeparateTab) {return null;}
+
     const dollchanXpath = '(. | self::img/..)/parent::div[contains(@class, "de-fullimg-wrap-center")]//a[@class="de-fullimg-link" and text() != "Spoiler Image"]',
       getters = {
         'boards.4chan.org': () => {
@@ -594,13 +604,7 @@ const de_siteParsers = {
           const container = xpath('../preceding-sibling::p[@class="fileinfo"]/span[@class="unimportant"]/a', node);
           return container.title || container.textContent;
         },
-        'tiktokapi.ga': () => {
-          const parent = node.parentNode,
-            id = parent.getAttribute('videoid'),
-            name = parent.getAttribute('videotitle');
-          return `${id}__${name}.mp4`;
-        },
-        'discordapp.com': () => {
+        'discordapp.com': () => {  // TODO: check if still works (probably not)
           const filename = new URL(node.currentSrc).pathname.split('/').pop(),
             postNode = xpath('ancestor::div[contains(@class, "cozyMessage-")]', node),
             parentPostNode = isGroupStart(postNode) ?
@@ -634,9 +638,10 @@ const de_siteParsers = {
         'yuki.la'             : 'boards.4chan.org',
         'arch.b4k.co'         : 'boards.fireden.net',
         '8kun.top'            : '8ch.net',
-      },
-      getter = getters[this.host] || getters[aliases[this.host]];
-    let originalFilename = null;
+      };
+
+    const getter = getters[this.host] || getters[aliases[this.host]];
+    if (!getter) {return null;}
 
     function tryFilenameFromDollchanImageByCenter(){
       if (!de_siteParsers.dollchanImproved) {return null;}
@@ -645,12 +650,11 @@ const de_siteParsers = {
       return filenameTry ? filenameTry.textContent : null;
     }
 
-    if (!getter || de_contentscript.isSeparateTab) {return null;}
     try {
-      originalFilename = tryFilenameFromDollchanImageByCenter() || getter();
-    } catch (e) {} //tfw still no safe navigation operator
-
-    return originalFilename;
+      return tryFilenameFromDollchanImageByCenter() || getter();
+    } catch { //tfw still no safe navigation operator
+      return null;
+    }
   },
 };
 
