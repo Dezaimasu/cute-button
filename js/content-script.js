@@ -510,32 +510,31 @@ const de_siteParsers = {
   },
 
   getOriginalSrc: function(node){
-    const getters = {
-        'vk.com': () => {
+    if (!de_settings.saveFullSized) {return null;}
+
+    const getters = [
+      {
+        hosts: ['twitter.com', 'tweetdeck.twitter.com', 'mobile.twitter.com', 'pbs.twimg.com'],
+        get(){
+          return node.currentSrc.replace(/\.(jpg|jpeg|png)(:[a-z0-9]+)?$/i, '.$1:orig').replace(/name=[a-z0-9]+/, 'name=orig');
+        }
+      },
+      {
+        hosts: ['vk.com'],
+        get(){
           const info = JSON.parse(node.getAttribute('onclick').match(/^.*"?temp"? *: *({[^{}]+}).*$/)[1]);
           return info['w'] || info['z'] || info['y'] || info['x'];
-        },
-        'twitter.com': () => {
-          return node.currentSrc.replace(/\.(jpg|jpeg|png)(:[a-z0-9]+)?$/i, '.$1:orig').replace(/name=[a-z0-9]+/, 'name=orig');
-        },
-        'tumblr.com': function(){
-          return (node.dataset['imageurl'] || node.currentSrc).replace(/(\/[a-z0-9]{32}\/tumblr_\w+)(_\d{2,4}).(jpg|jpeg|png|gif)$/i, '$1_1280.$3');
-        },
-        'instagram.com': () => {
-          function getWidth(str){
-            return Number(str.trim().match(/^.+ (\d+)w$/)[1]);
-          }
-          return node.getAttribute('srcset').split(',').reduce((a, b) => {
-            return getWidth(a) > getWidth(b) ? a : b;
-          }).split(' ')[0]
-        },
-        'iwara.tv': () => {
+        }
+      },
+      {
+        hosts: ['iwara.tv'],
+        get(){
           return node.parentNode.href;
-        },
-        'tiktokapi.ga': () => {
-          return node.parentNode.getAttribute('videolink');
-        },
-        'discordapp.com': () => {
+        }
+      },
+      {
+        hosts: ['discordapp.com'], // TODO: check if still works
+        get(){
           const videoSrcTry = node.currentSrc.match(/\/external\/.+\/https\/(.+\.\w{3,4})$/i);
           if (videoSrcTry) {
             return `https://${videoSrcTry[1]}`;
@@ -543,19 +542,33 @@ const de_siteParsers = {
 
           const href = node.parentNode.href;
           return href.includes('/attachments/') && href;
-        },
+        }
       },
-      aliases = {
-        'tweetdeck.twitter.com' : 'twitter.com',
-        'mobile.twitter.com'    : 'twitter.com',
-        'pbs.twimg.com'         : 'twitter.com',
+      {
+        hosts: ['instagram.com'],
+        get(){
+          function getWidth(str){
+            return Number(str.trim().match(/^.+ (\d+)w$/)[1]);
+          }
+          return node.getAttribute('srcset').split(',').reduce((a, b) => {
+            return getWidth(a) > getWidth(b) ? a : b;
+          }).split(' ')[0]
+        }
       },
-      getter = getters[this.host] || getters[aliases[this.host]];
-    let originalSrc = null;
+      {
+        hosts: ['tumblr.com'],
+        get(){
+          return (node.dataset['imageurl'] || node.currentSrc).replace(/(\/[a-z0-9]{32}\/tumblr_\w+)(_\d{2,4}).(jpg|jpeg|png|gif)$/i, '$1_1280.$3');
+        }
+      },
+    ];
 
-    if (!de_settings.saveFullSized || !getter) {return null;}
+    const getter = getters.find(g => g.hosts.includes(this.host));
+    if (!getter) {return null;}
+
+    let originalSrc = null;
     try {
-      originalSrc = getter();
+      originalSrc = getter.get();
     } catch (e) {} //tfw no safe navigation operator in 2017
 
     return originalSrc;
