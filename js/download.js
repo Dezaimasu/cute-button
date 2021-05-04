@@ -200,7 +200,7 @@ const filenameTools = {
    * Cheers pineapple.
    */
   extractFilename: function(originalUrl){
-    const url = decodeURI(originalUrl).replace(/^.*https?:\/\/([^/]+)\/+/, '').split(/[?#]/)[0].replace(/:\w+$/, '').replace(/\/{2,}/, '/'),
+    const url = decodeURI(originalUrl).replace(/^.*https?:\/\/([^/]+)\/+/, '').split(/[?#]/)[0].replace(/:\w+$/, '').replace(/\/{2,}/g, '/'),
       filenameTry = url.match(regexps.filenameExtract);
 
     return filenameTry ?

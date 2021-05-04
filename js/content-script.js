@@ -513,26 +513,39 @@ const de_siteParsers = {
     const getters = [
       {
         hosts: ['twitter.com', 'tweetdeck.twitter.com', 'mobile.twitter.com', 'pbs.twimg.com'],
-        get(){
+        get: () => {
           return node.currentSrc.replace(/\.(jpg|jpeg|png)(:[a-z0-9]+)?$/i, '.$1:orig').replace(/name=[a-z0-9]+/, 'name=orig');
         }
       },
       {
         hosts: ['vk.com'],
-        get(){
+        get: () => {
           const info = JSON.parse(node.getAttribute('onclick').match(/^.*"?temp"? *: *({[^{}]+}).*$/)[1]);
           return info['w'] || info['z'] || info['y'] || info['x'];
         }
       },
       {
         hosts: ['iwara.tv'],
-        get(){
+        get: () => {
           return node.parentNode.href;
         }
       },
       {
+        hosts: ['safebooru.org', 'gelbooru.com'],
+        get: () => {
+          if (node.currentSrc.includes('/images/')) {return null;}
+
+          const xpathBase = {
+            'safebooru.org' : 'div[@id="content"]/div[@id="post-view"]/div[@class="sidebar"]/div/ul/li',
+            'gelbooru.com'  : 'div[@id="container"]/section/ul[@id="tag-list"]/li',
+          };
+
+          return xpath(`/html/body/${xpathBase[this.host]}/a[text()="Original image"]`, document).href;
+        },
+      },
+      {
         hosts: ['discordapp.com'], // TODO: check if still works
-        get(){
+        get: () => {
           const videoSrcTry = node.currentSrc.match(/\/external\/.+\/https\/(.+\.\w{3,4})$/i);
           if (videoSrcTry) {
             return `https://${videoSrcTry[1]}`;
@@ -544,18 +557,15 @@ const de_siteParsers = {
       },
       {
         hosts: ['instagram.com'],
-        get(){
+        get: () => {
           return getHighresFromSrcset(node.srcset);
         }
       },
       {
         hosts: ['tumblr.com'],
-        async get(){
+        get: async () => { // TODO: synchronous version
           const highresMask = 's99999x99999';
-
-          if (node.currentSrc.includes(highresMask)) {
-          	return null;
-          }
+          if (node.currentSrc.includes(highresMask)) {return null;}
 
           if (node.srcset) {
           	return getHighresFromSrcset(node.srcset);
@@ -573,7 +583,7 @@ const de_siteParsers = {
       },
       {
         hosts: ['zerochan.net'],
-        get(){
+        get: () => {
           const parts = node.currentSrc.match(/zerochan\.net\/([^/]+)\.\d+\.(\d+)\.(\w{3,4})$/i);
           return parts ?
             `https://static.zerochan.net/${parts[1]}.full.${parts[2]}.${parts[3]}` :
