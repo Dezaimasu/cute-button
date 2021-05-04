@@ -427,7 +427,7 @@ const de_contentscript = {
     };
   },
 
-  nodeHandler: function(currentTarget, event = {}){
+  nodeHandler: async function(currentTarget, event = {}){
     const that = de_contentscript,
       src = currentTarget[that.srcLocation];
 
@@ -446,7 +446,7 @@ const de_contentscript = {
         {left: null, top: null, right: null, bottom: null}, // only two position properties would be set at once, other two are null on purpose to reset their default values
         (de_settings.placeUnderCursor && that.getPositionUnderCursor(event)) || that.getPosition(that.currentNode)
       ),
-      de_siteParsers.getOriginalSrc(that.currentNode) || src || that.currentNode.currentSrc || that.bgSrc,
+      await de_siteParsers.getOriginalSrc(that.currentNode) || src || that.currentNode.currentSrc || that.bgSrc,
       de_siteParsers.getOriginalFilename(that.currentNode)
     );
 
@@ -507,7 +507,7 @@ const de_siteParsers = {
     return (this.dollchanImproved && xpath(dollchanHack, node)) || (xpathForHost && xpath(xpathForHost, node));
   },
 
-  getOriginalSrc: function(node){
+  getOriginalSrc: async function(node){
     if (!de_settings.saveFullSized) {return null;}
 
     const getters = [
@@ -545,18 +545,30 @@ const de_siteParsers = {
       {
         hosts: ['instagram.com'],
         get(){
-          function getWidth(str){
-            return Number(str.trim().match(/^.+ (\d+)w$/)[1]);
-          }
-          return node.getAttribute('srcset').split(',').reduce((a, b) => {
-            return getWidth(a) > getWidth(b) ? a : b;
-          }).split(' ')[0];
+          return getHighresFromSrcset(node.srcset);
         }
       },
       {
         hosts: ['tumblr.com'],
-        get(){
-          return (node.dataset['imageurl'] || node.currentSrc).replace(/(\/[a-z0-9]{32}\/tumblr_\w+)(_\d{2,4}).(jpg|jpeg|png|gif)$/i, '$1_1280.$3');
+        async get(){
+          const highresMask = 's99999x99999';
+
+          if (node.currentSrc.includes(highresMask)) {
+          	return null;
+          }
+
+          if (node.srcset) {
+          	return getHighresFromSrcset(node.srcset);
+          }
+
+          const response = await fetch(node.currentSrc.replace(/\/s\d+x\d+\//, `/${highresMask}/`), {
+            method: 'GET',
+            headers: {'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'}
+          });
+          if (!response.ok) {return null;}
+
+          const html = await response.text();
+          return html.match(new RegExp(`src="(http[^"]+\\/${highresMask}\\/[^"]+)"`))[1];
         }
       },
       {
@@ -574,7 +586,7 @@ const de_siteParsers = {
     if (!getter) {return null;}
 
     try {
-      return getter.get();
+      return await getter.get();
     } catch { //tfw no safe navigation operator in 2021
       return null;
     }
@@ -817,6 +829,16 @@ function isSet(object, key){
 function formatDate(date){
   const full = datePart => datePart.toString().padStart(2, '0');
   return `${date.getFullYear()}.${full(date.getMonth() + 1)}.${full(date.getDate())}_${date.toLocaleTimeString('uk').replace(/:/g, '_')}`;
+}
+
+function getHighresFromSrcset(srcset){ // by "w" only
+  function getWidth(str){
+    return Number(str.trim().match(/^.+ (\d+)w$/)[1]);
+  }
+
+  return srcset.split(/ *, */).reduce((a, b) => {
+    return getWidth(a) > getWidth(b) ? a : b;
+  }).split(' ')[0];
 }
 
 de_contentscript.init();
