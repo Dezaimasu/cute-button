@@ -563,7 +563,7 @@ const de_siteParsers = {
       },
       {
         hosts: ['tumblr.com'],
-        get: async () => { // TODO: synchronous version
+        get: async () => {
           const highresMask = 's99999x99999';
           if (node.currentSrc.includes(highresMask)) {return null;}
 
@@ -571,6 +571,12 @@ const de_siteParsers = {
           	return getHighresFromSrcset(node.srcset);
           }
 
+          const legacyUrlParts = (node.dataset['imageurl'] || node.currentSrc).match(/^(.+\/[a-z0-9]{32}\/tumblr_\w+)(_\d{2,4}).(jpg|jpeg|png|gif)$/i);
+          if (legacyUrlParts) {
+          	return `${legacyUrlParts[1]}_1280.${legacyUrlParts[3]}`;
+          }
+
+          // TODO: synchronous version
           const response = await fetch(node.currentSrc.replace(/\/s\d+x\d+\//, `/${highresMask}/`), {
             method: 'GET',
             headers: {'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'}
