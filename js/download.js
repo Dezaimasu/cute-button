@@ -7,6 +7,15 @@ const supportedFormats = '(jpg|jpeg|png|gif|bmp|webp|webm|mp4|ogg|mp3)',
     filenameInTitle : new RegExp(`[^\\s]+\\.${supportedFormats}`, 'i'),
   };
 
+let canUseRefHeader = false;
+if (typeof browser !== 'undefined') {
+  browser.runtime.getBrowserInfo().then(info => {
+    if (info.name === 'Firefox' && info.version.substr(0, 2) >= 70) {
+      canUseRefHeader = true;
+    }
+  });
+}
+
 function download(tabId, downloadRequest){
   new Download(downloadRequest, tabId).action();
 }
@@ -86,13 +95,13 @@ Download.prototype = {
       filename      : path + filename,
       saveAs        : this.downloadRequest.showSaveDialog,
       conflictAction: 'uniquify',
-      headers       : withReferer ? [
+      headers       : canUseRefHeader && withReferer ? [
         {name: 'Referer', value: this.downloadRequest.pageInfo.href},
       ] : [],
     }, downloadId => {
         if (chrome.extension.lastError) {
-          if (chrome.extension.lastError.message === 'Forbidden request header name') {
-            this.download(path, filename, false); // "Referer" header is not allowed in Chrome or pre-70 Firefox
+          if (chrome.extension.lastError.message.includes('request header name')) {
+            this.download(path, filename, false);
           }
           return;
         }
