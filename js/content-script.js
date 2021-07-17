@@ -494,15 +494,12 @@ const de_siteParsers = {
         'instagram.com' : 'self::div[parent::div/parent::div]/preceding-sibling::div/img | self::div[@role="dialog"]/../../preceding-sibling::img',
         'iwara.tv'      : 'self::div[@class="vjs-poster"]/preceding-sibling::video[@class="vjs-tech"]',
         'vk.com'        : 'self::a[contains(@class, "image_cover") and contains(@onclick, "showPhoto")]',
-        'twitch.tv'     : 'self::div[@class="player-overlay"]/ancestor::div[contains(@class, "video-player__container")]/div[@class="player-video"]/video',
+        'twitch.tv'     : 'self::div[@data-a-target="player-overlay-click-handler"]/ancestor::div[contains(@class, "video-player__container")]/video',
         'behance.net'   : 'self::div[contains(@class, "js-prev") or contains(@class, "js-next")]/following::div[contains(@class, "js-slide-content") and not(contains(@class, "hidden"))]/img',
         '2ch.hk'        : 'self::div[@id="html5videofixer"]/preceding-sibling::video',
         'pixiv.net'     : 'self::button/ancestor::div[@role="presentation"]//img',
       },
-      aliases = {
-        'clips.twitch.tv': 'twitch.tv',
-      },
-      xpathForHost = siteHacks[this.host] || siteHacks[aliases[this.host]];
+      xpathForHost = siteHacks[this.host];
 
     return (this.dollchanImproved && xpath(dollchanHack, node)) || (xpathForHost && xpath(xpathForHost, node));
   },
@@ -525,7 +522,7 @@ const de_siteParsers = {
         }
       },
       {
-        hosts: ['iwara.tv'],
+        hosts: ['iwara.tv', 'chan.sankakucomplex.com'],
         get: () => {
           return node.parentNode.href;
         }
@@ -544,7 +541,7 @@ const de_siteParsers = {
         },
       },
       {
-        hosts: ['discordapp.com'], // TODO: check if still works
+        hosts: ['discord.com'],
         get: () => {
           const videoSrcTry = node.currentSrc.match(/\/external\/.+\/https\/(.+\.\w{3,4})$/i);
           if (videoSrcTry) {
