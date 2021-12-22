@@ -18,7 +18,7 @@ function addButtonStyles(tabId){
     runAt     : 'document_start',
     file      : 'css/button.css',
   }, () => {
-    if (chrome.extension.lastError) {return;}
+    if (chrome.runtime.lastError) {return;}
     chrome.tabs.sendMessage(tabId, 'css_injected');
   });
 }
