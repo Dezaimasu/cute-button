@@ -3,7 +3,7 @@
 const settingsDefault = {
   defaultSavePath       : '',
   minSize               : 256,
-  exclusions            : '.de-video-thumb, .de-ytube, .de-file-img, .html5-main-video',
+  exclusions            : '.de-video-thumb, .de-ytube, .de-file-img, .html5-main-video, [alt="Subreddit Icon"]',
   icon                  : `url("${chrome.runtime.getURL('bestgirl.png')}")`,
   originalNameByDefault : false,
   hideButton            : false,
