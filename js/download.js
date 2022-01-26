@@ -2,7 +2,7 @@
 
 const supportedFormats = '(jpg|jpeg|png|gif|bmp|webp|webm|mp4|ogg|mp3)',
   regexps = {
-    extensionCheck  : new RegExp(`\\.${supportedFormats}$`),
+    extensionCheck  : new RegExp(`\\.${supportedFormats}$`, 'i'),
     filenameExtract : new RegExp(`^([^/]+\/)*([^/]+\\.${supportedFormats})([\\/][^.]+)?$`, 'i'),
     filenameInTitle : new RegExp(`[^\\s]+\\.${supportedFormats}`, 'i'),
   };
