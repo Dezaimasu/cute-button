@@ -513,21 +513,18 @@ const de_siteParsers = {
         get: () => {
           return node.currentSrc.replace(/\.(jpg|jpeg|png)(:[a-z0-9]+)?$/i, '.$1:orig').replace(/name=[a-z0-9]+/, 'name=orig');
         }
-      },
-      {
+      }, {
         hosts: ['vk.com'],
         get: () => {
           const info = JSON.parse(node.getAttribute('onclick').match(/^.*"?temp"? *: *({[^{}]+}).*$/)[1]);
           return info['w'] || info['z'] || info['y'] || info['x'];
         }
-      },
-      {
+      }, {
         hosts: ['iwara.tv', 'chan.sankakucomplex.com'],
         get: () => {
           return node.parentNode.href;
         }
-      },
-      {
+      }, {
         hosts: ['safebooru.org', 'gelbooru.com'],
         get: () => {
           if (node.currentSrc.includes('/images/')) {return null;}
@@ -539,8 +536,7 @@ const de_siteParsers = {
 
           return xpath(`/html/body/${xpathBase[this.host]}/a[text()="Original image"]`, document).href;
         },
-      },
-      {
+      }, {
         hosts: ['discord.com'],
         get: () => {
           const videoSrcTry = node.currentSrc.match(/\/external\/.+\/https\/(.+\.\w{3,4})$/i);
@@ -551,14 +547,12 @@ const de_siteParsers = {
           const href = node.parentNode.href;
           return href.includes('/attachments/') && href;
         }
-      },
-      {
+      }, {
         hosts: ['instagram.com'],
         get: () => {
           return getHighresFromSrcset(node.srcset);
         }
-      },
-      {
+      }, {
         hosts: ['tumblr.com'],
         get: async () => {
           const highresMask = 's99999x99999';
@@ -583,8 +577,7 @@ const de_siteParsers = {
           const html = await response.text();
           return html.match(new RegExp(`src="(http[^"]+\\/${highresMask}\\/[^"]+)"`))[1];
         }
-      },
-      {
+      }, {
         hosts: ['zerochan.net'],
         get: () => {
           const parts = node.currentSrc.match(/zerochan\.net\/([^/]+)\.\d+\.(\d+)\.(\w{3,4})$/i);
@@ -592,6 +585,25 @@ const de_siteParsers = {
             `https://static.zerochan.net/${parts[1]}.full.${parts[2]}.${parts[3]}` :
             xpath('../following-sibling::p/a[img[contains(@src, "download")]]', node).href;
         }
+      }, {
+        hosts: ['steamcommunity.com', 'steamuserimages-a.akamaihd.net'],
+        get: () => {
+          let imw, imh, newSrc = node.currentSrc
+          const params = new URLSearchParams(new URL(newSrc).search);
+
+          if ((imw = params.get('imw')) === null) {
+            newSrc += '&imw=5000';
+          } else {
+            newSrc = newSrc.replace(`imw=${imw}`, 'imw=5000')
+          }
+          if ((imh = params.get('imh')) === null) {
+            newSrc += '&imh=5000';
+          } else {
+            newSrc = newSrc.replace(`imh=${imh}`, 'imh=5000')
+          }
+
+          return newSrc;
+        },
       },
     ];
 
@@ -600,7 +612,7 @@ const de_siteParsers = {
 
     try {
       return await getter.get();
-    } catch { //tfw no safe navigation operator in 2021
+    } catch { // tfw no safe navigation operator in 2021
       return null;
     }
   },
@@ -677,7 +689,7 @@ const de_siteParsers = {
 
     try {
       return tryFilenameFromDollchanImageByCenter() || getter();
-    } catch { //tfw still no safe navigation operator
+    } catch { // tfw still no safe navigation operator
       return null;
     }
   },
