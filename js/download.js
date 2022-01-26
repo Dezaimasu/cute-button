@@ -99,8 +99,8 @@ Download.prototype = {
         {name: 'Referer', value: this.downloadRequest.pageInfo.href},
       ] : [],
     }, downloadId => {
-        if (chrome.extension.lastError) {
-          if (chrome.extension.lastError.message.includes('request header name')) {
+        if (chrome.runtime.lastError) {
+          if (chrome.runtime.lastError.message.includes('request header name')) {
             this.download(path, filename, false);
           }
           return;
