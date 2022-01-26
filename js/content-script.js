@@ -618,7 +618,10 @@ const de_siteParsers = {
   },
 
   getOriginalFilename: function(node){
-    if (de_contentscript.isSeparateTab) {return null;}
+    const hostsWithFilenameInSrc = [
+      'steamuserimages-a.akamaihd.net'
+    ];
+    if (de_contentscript.isSeparateTab && !hostsWithFilenameInSrc.includes(this.host)) {return null;}
 
     const dollchanXpath = '(. | self::img/..)/parent::div[contains(@class, "de-fullimg-wrap-center")]//a[@class="de-fullimg-link" and text() != "Spoiler Image"]',
       getters = {
@@ -640,6 +643,9 @@ const de_siteParsers = {
         '8ch.net': () => {
           const container = xpath('../preceding-sibling::p[@class="fileinfo"]/span[@class="unimportant"]/a', node);
           return container.title || container.textContent;
+        },
+        'steamcommunity.com': () => {
+          return node.currentSrc.match(/^https:\/\/steamuserimages-a\.akamaihd\.net\/ugc\/(\d+)\/[a-z0-9]{40}\//i)[1] + '.jpg';
         },
         'discordapp.com': () => {  // TODO: check if still works (probably not)
           const filename = new URL(node.currentSrc).pathname.split('/').pop(),
@@ -671,10 +677,11 @@ const de_siteParsers = {
         },
       },
       aliases = {
-        'boards.4channel.org' : 'boards.4chan.org',
-        'yuki.la'             : 'boards.4chan.org',
-        'arch.b4k.co'         : 'boards.fireden.net',
-        '8kun.top'            : '8ch.net',
+        'boards.4channel.org'           : 'boards.4chan.org',
+        'yuki.la'                       : 'boards.4chan.org',
+        'arch.b4k.co'                   : 'boards.fireden.net',
+        '8kun.top'                      : '8ch.net',
+        'steamuserimages-a.akamaihd.net': 'steamcommunity.com',
       };
 
     const getter = getters[this.host] || getters[aliases[this.host]];
