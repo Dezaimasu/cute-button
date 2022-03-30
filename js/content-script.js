@@ -316,7 +316,7 @@ const de_contentscript = {
       return !['IMG', 'VIDEO', 'AUDIO'].includes(tagName);
     },
     filterBySrc: function(src){
-      return (!src || !src.startsWith('http') || src.startsWith('https://www.google.com/recaptcha/'));
+      return !src || !src.startsWith('http');
     },
     filterByExclusions: function(node){
       return node.matches(de_settings.exclusions);
@@ -488,7 +488,7 @@ const de_siteParsers = {
   getActualNode: function(node){
     const dollchanHack = 'self::div[@class="de-fullimg-video-hack"]/following-sibling::video',
       siteHacks = {
-        'twitter.com'   : 'self::div[not(*)]/../../preceding-sibling::div[not(@class)]/div/video[not(starts-with(@src, "blob:"))]',
+        'twitter.com'   : 'self::div[not(*)]/../../preceding-sibling::div[not(@class)]/div/video',
         'tumblr.com'    : 'self::a/parent::div[@class="photo-wrap"]/img | self::a[@target="_blank"]/parent::div/preceding-sibling::div[@class="post_content"]/div/div[@data-imageurl] | self::span/parent::div/parent::a[@target="_blank"]/parent::div/preceding-sibling::div[@class="post_content"]/div/div[@data-imageurl] | self::div[@class="vjs-big-play-button"]/preceding-sibling::video',
         'yandex.*'      : 'self::div[contains(@class, "preview2__arrow")]/preceding-sibling::div[contains(@class, "preview2__wrapper")]/div[@class="preview2__thumb-wrapper"]/img[contains(@class, "visible")] | self::div[contains(@class, "preview2__control")]/../preceding-sibling::div[contains(@class, "preview2__wrapper")]/div[@class="preview2__thumb-wrapper"]/img[contains(@class, "visible")]',
         'instagram.com' : 'self::div[parent::div/parent::div]/preceding-sibling::div/img | self::div[@role="dialog"]/../../preceding-sibling::img',
@@ -499,9 +499,12 @@ const de_siteParsers = {
         '2ch.hk'        : 'self::div[@id="html5videofixer"]/preceding-sibling::video',
         'pixiv.net'     : 'self::button/ancestor::div[@role="presentation"]//img',
       },
-      xpathForHost = siteHacks[this.host];
+      xpathForHost = `${siteHacks[this.host]}[not(starts-with(@src, "blob:"))]`;
 
-    return (this.dollchanImproved && xpath(dollchanHack, node)) || (xpathForHost && xpath(xpathForHost, node));
+    return (
+      (this.dollchanImproved && de_siteParsers.xpath(dollchanHack, node)) ||
+      (xpathForHost && de_siteParsers.xpath(xpathForHost, node))
+    );
   },
 
   getOriginalSrc: async function(node){
@@ -534,7 +537,7 @@ const de_siteParsers = {
             'gelbooru.com'  : 'div[@id="container"]/section/ul[@id="tag-list"]/li',
           };
 
-          return xpath(`/html/body/${xpathBase[this.host]}/a[text()="Original image"]`, document).href;
+          return de_siteParsers.xpath(`/html/body/${xpathBase[this.host]}/a[text()="Original image"]`, document).href;
         },
       }, {
         hosts: ['discord.com'],
@@ -550,7 +553,7 @@ const de_siteParsers = {
       }, {
         hosts: ['instagram.com'],
         get: () => {
-          return getHighresFromSrcset(node.srcset);
+          return de_siteParsers.getHighresFromSrcset(node.srcset);
         }
       }, {
         hosts: ['tumblr.com'],
@@ -559,7 +562,7 @@ const de_siteParsers = {
           if (node.currentSrc.includes(highresMask)) {return null;}
 
           if (node.srcset) {
-          	return getHighresFromSrcset(node.srcset);
+          	return de_siteParsers.getHighresFromSrcset(node.srcset);
           }
 
           const legacyUrlParts = (node.dataset['imageurl'] || node.currentSrc).match(/^(.+\/[a-z0-9]{32}\/tumblr_\w+)(_\d{2,4}).(jpg|jpeg|png|gif)$/i);
@@ -583,7 +586,7 @@ const de_siteParsers = {
           const parts = node.currentSrc.match(/zerochan\.net\/([^/]+)\.\d+\.(\d+)\.(\w{3,4})$/i);
           return parts ?
             `https://static.zerochan.net/${parts[1]}.full.${parts[2]}.${parts[3]}` :
-            xpath('../following-sibling::p/a[img[contains(@src, "download")]]', node).href;
+            de_siteParsers.xpath('../following-sibling::p/a[img[contains(@src, "download")]]', node).href;
         }
       }, {
         hosts: ['steamcommunity.com', 'steamuserimages-a.akamaihd.net'],
@@ -619,61 +622,33 @@ const de_siteParsers = {
 
   getOriginalFilename: function(node){
     const hostsWithFilenameInSrc = [
-      'steamuserimages-a.akamaihd.net'
+      'steamuserimages-a.akamaihd.net',
     ];
     if (de_contentscript.isSeparateTab && !hostsWithFilenameInSrc.includes(this.host)) {return null;}
 
     const dollchanXpath = '(. | self::img/..)/parent::div[contains(@class, "de-fullimg-wrap-center")]//a[@class="de-fullimg-link" and text() != "Spoiler Image"]',
       getters = {
         'boards.4chan.org': () => {
-          const container = xpath('ancestor::div[contains(concat(" ", normalize-space(@class), " "), " file ")]//*[(@class="fileText" and @title) or self::a]', node);
+          const container = de_siteParsers.xpath('ancestor::div[contains(concat(" ", normalize-space(@class), " "), " file ")]//*[(@class="fileText" and @title) or self::a]', node);
           return container.title || container.textContent;
         },
         '2ch.hk': () => {
-          const container = xpath('ancestor::figure[@class="image" or @class="post__image"]/figcaption/a', node);
+          const container = de_siteParsers.xpath('ancestor::figure[@class="image" or @class="post__image"]/figcaption/a', node);
           return container.title || container.textContent;
         },
         'iichan.hk': () => {
-          return xpath('../preceding-sibling::span[@class="filesize"]/a', node).textContent;
+          return de_siteParsers.xpath('../preceding-sibling::span[@class="filesize"]/a', node).textContent;
         },
         'boards.fireden.net': () => {
-          const container = xpath('(../following-sibling::div[@class="post_file"]|../../preceding-sibling::div[@class="post_file"])/a[@class="post_file_filename"]', node);
+          const container = de_siteParsers.xpath('(../following-sibling::div[@class="post_file"]|../../preceding-sibling::div[@class="post_file"])/a[@class="post_file_filename"]', node);
           return container.title || container.textContent;
         },
         '8ch.net': () => {
-          const container = xpath('../preceding-sibling::p[@class="fileinfo"]/span[@class="unimportant"]/a', node);
+          const container = de_siteParsers.xpath('../preceding-sibling::p[@class="fileinfo"]/span[@class="unimportant"]/a', node);
           return container.title || container.textContent;
         },
         'steamcommunity.com': () => {
           return node.currentSrc.match(/^https:\/\/steamuserimages-a\.akamaihd\.net\/ugc\/(\d+)\/[a-z0-9]{40}\//i)[1] + '.jpg';
-        },
-        'discordapp.com': () => {  // TODO: check if still works (probably not)
-          const filename = new URL(node.currentSrc).pathname.split('/').pop(),
-            postNode = xpath('ancestor::div[contains(@class, "cozyMessage-")]', node),
-            parentPostNode = isGroupStart(postNode) ?
-              postNode :
-              xpath('preceding-sibling::div[contains(@class, "cozyMessage-") and contains(@class, "groupStart-")][1]', postNode),
-            timeNode = parentPostNode.querySelector('h2[class*="header-"] span[class*="timestampCozy"] > span'),
-            mediaInGroup = [];
-          let prefix = formatDate(new Date(timeNode.getAttribute('aria-label'))),
-            nodeInGroup;
-
-          function isGroupStart(node){
-            return node.getAttribute('class').includes('groupStart-');
-          }
-
-          nodeInGroup = parentPostNode;
-          do {
-            const mediaNodesInCurrentNode = nodeInGroup.querySelectorAll('a[class*="imageWrapper-"] img, a[class*="imageWrapper-"] video');
-            mediaInGroup.push(...mediaNodesInCurrentNode);
-            nodeInGroup = nodeInGroup.nextElementSibling;
-          } while (!isGroupStart(nodeInGroup));
-
-          if (mediaInGroup.length > 1) {
-            prefix += ` ${mediaInGroup.indexOf(node) + 1}`;
-          }
-
-          return `${prefix} ${filename}`;
         },
       },
       aliases = {
@@ -689,7 +664,7 @@ const de_siteParsers = {
 
     function tryFilenameFromDollchanImageByCenter(){
       if (!de_siteParsers.dollchanImproved) {return null;}
-      const filenameTry = xpath(dollchanXpath, node);
+      const filenameTry = de_siteParsers.xpath(dollchanXpath, node);
 
       return filenameTry ? filenameTry.textContent : null;
     }
@@ -699,6 +674,20 @@ const de_siteParsers = {
     } catch { // tfw still no safe navigation operator
       return null;
     }
+  },
+
+  xpath: function(path, contextNode){
+    return document.evaluate(path, contextNode, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
+  },
+
+  getHighresFromSrcset: function(srcset){ // by "w" only
+    function getWidth(str){
+      return Number(str.trim().match(/^.+ (\d+)w$/)[1]);
+    }
+
+    return srcset.split(/ *, */).reduce((a, b) => {
+      return getWidth(a) > getWidth(b) ? a : b;
+    }).split(' ')[0];
   },
 };
 
@@ -793,7 +782,7 @@ const de_hotkeys = {
   },
 
   isHotkeyExists: function(hotkeyId){
-    return isSet(this.keyboardHotkeys, hotkeyId);
+    return typeof this.keyboardHotkeys[hotkeyId] !== 'undefined';
   },
 
   isNoScroll: function(){
@@ -849,28 +838,5 @@ const de_hotkeys = {
     return rule.domain.startsWith('-');
   },
 };
-
-function xpath(path, contextNode){
-  return document.evaluate(path, contextNode, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
-}
-
-function isSet(object, key){
-  return typeof object[key] !== 'undefined';
-}
-
-function formatDate(date){
-  const full = datePart => datePart.toString().padStart(2, '0');
-  return `${date.getFullYear()}.${full(date.getMonth() + 1)}.${full(date.getDate())}_${date.toLocaleTimeString('uk').replace(/:/g, '_')}`;
-}
-
-function getHighresFromSrcset(srcset){ // by "w" only
-  function getWidth(str){
-    return Number(str.trim().match(/^.+ (\d+)w$/)[1]);
-  }
-
-  return srcset.split(/ *, */).reduce((a, b) => {
-    return getWidth(a) > getWidth(b) ? a : b;
-  }).split(' ')[0];
-}
 
 de_contentscript.init();
