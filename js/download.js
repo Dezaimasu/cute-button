@@ -10,7 +10,7 @@ const supportedFormats = '(jpg|jpeg|png|gif|bmp|webp|webm|mp4|ogg|mp3)',
 let canUseRefHeader = false;
 if (typeof browser !== 'undefined') {
   browser.runtime.getBrowserInfo().then(info => {
-    if (info.name === 'Firefox' && info.version.substr(0, 2) >= 70) {
+    if (info.name === 'Firefox' && info.version.split('.')[0] >= 70) {
       canUseRefHeader = true;
     }
   });
