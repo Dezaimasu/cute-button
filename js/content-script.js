@@ -498,7 +498,6 @@ const de_siteParsers = {
         'instagram.com' : 'self::div[parent::div/parent::div]/preceding-sibling::div/img | self::div[@role="dialog"]/../../preceding-sibling::img',
         'iwara.tv'      : 'self::div[@class="vjs-poster"]/preceding-sibling::video[@class="vjs-tech"]',
         'vk.com'        : 'self::a[contains(@class, "image_cover") and contains(@onclick, "showPhoto")]',
-        'twitch.tv'     : 'self::div[@data-a-target="player-overlay-click-handler"]/ancestor::div[contains(@class, "video-player__container")]/div/video',
         'behance.net'   : 'self::div[contains(@class, "js-prev") or contains(@class, "js-next")]/following::div[contains(@class, "js-slide-content") and not(contains(@class, "hidden"))]/img',
         '2ch.hk'        : 'self::div[@id="html5videofixer"]/preceding-sibling::video',
         'pixiv.net'     : 'self::button/ancestor::div[@role="presentation"]//img',
