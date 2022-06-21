@@ -76,6 +76,7 @@ const de_button = {
   elem: null,
   name: 'DE_CBUTTON',
   styled: false,
+  setVisibleTimeout: null,
   downloadRequest: {},
 
   init: function(){
@@ -156,21 +157,24 @@ const de_button = {
   },
 
   show: function(position, src, originalName){
-    const btnElem = this.elem;
-
     if (!this.styled) {
       de_webextApi.getButtonStyle();
     }
     this.prepareDownloadRequest(src, originalName);
-    btnElem.style.top     = position.top;
-    btnElem.style.bottom  = position.bottom;
-    btnElem.style.left    = position.left;
-    btnElem.style.right   = position.right;
-    position.container.appendChild(btnElem);
-    setTimeout(() => btnElem.classList.add('visible'), 32);
+    this.elem.style.top     = position.top;
+    this.elem.style.bottom  = position.bottom;
+    this.elem.style.left    = position.left;
+    this.elem.style.right   = position.right;
+    position.container.appendChild(this.elem);
+
+    this.setVisibleTimeout = setTimeout(() => {
+      de_button.elem.classList.add('visible');
+      de_button.setVisibleTimeout = null;
+    }, 32);
   },
 
   hide: function(){
+    if (this.setVisibleTimeout) {return;}
     this.prepareDownloadRequest(null, null);
     this.elem.classList.remove('visible');
   },
@@ -266,7 +270,7 @@ const de_contentscript = {
   refreshHistoryLifetime: function(){
     const historyLifetime = 300000; // 5 minutes
     clearTimeout(this.historyTimer);
-    this.historyTimer = setTimeout(() => this.downloadsHistory = [], historyLifetime);
+    this.historyTimer = setTimeout(() => de_contentscript.downloadsHistory = [], historyLifetime);
   },
 
   addSaveMark: function(){
