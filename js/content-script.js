@@ -610,6 +610,11 @@ const de_siteParsers = {
 
           return newSrc;
         },
+      }, {
+        hosts: ['space.bilibili.com'],
+        get: () => {
+          return node.currentSrc.split('@')[0];
+        }
       },
     ];
 
