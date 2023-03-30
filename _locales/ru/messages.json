@@ -129,7 +129,7 @@
 		"message": "Снизу справа"
 	},
 	"settings_placeUnderCursor": {
-		"message": "Размещать кнопку под курсором"
+		"message": "Размещать кнопку под курсором (переключение с помощью ESC)"
 	},
 	"settings_placeUnderCursorWarning": {
 		"message": "ЭКСПЕРИМЕНТАЛЬНАЯ ФУНКЦИЯ, очень кривая"
