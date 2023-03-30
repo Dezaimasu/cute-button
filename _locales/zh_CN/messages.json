@@ -129,7 +129,7 @@
 		"message": "右下"
 	},
 	"settings_placeUnderCursor": {
-		"message": "按钮放在鼠标光标下"
+		"message": "按钮放在鼠标光标下（用ESC切换）"
 	},
 	"settings_placeUnderCursorWarning": {
 		"message": "实验性功能，极易卡顿"
