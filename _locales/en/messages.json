@@ -129,10 +129,7 @@
 		"message": "Bottom right"
 	},
 	"settings_placeUnderCursor": {
-		"message": "Place button under cursor"
-	},
-	"settings_placeUnderCursorWarning": {
-		"message": "EXPERIMENTAL, very clunky"
+		"message": "Place button under cursor (can be toggled at any point with ESC)"
 	},
 	"settings_filenamePrefix": {
 		"message": "Filename prefix:"
