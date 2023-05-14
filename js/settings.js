@@ -255,7 +255,7 @@ function initSelectors(){
 }
 
 function enableInputListeners(inputsContainer){
-  inputsContainer.querySelectorAll('select, input').forEach(editableElem => {
+  inputsContainer.querySelectorAll('select, input, textarea').forEach(editableElem => {
     editableElem.addEventListener('input', event => {
       enableSave();
       if (!event.target.classList.contains('path')) {return;}

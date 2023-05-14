@@ -20,8 +20,8 @@ table#main td#folders-container {
 	margin-left: 20px;
 	cursor: pointer;
 }
-input#exclusions,
-input#domainExclusions,
+textarea#exclusions,
+textarea#domainExclusions,
 input#defaultSavePath {
 	width: 95%;
 }
