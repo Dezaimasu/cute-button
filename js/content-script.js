@@ -615,6 +615,11 @@ const de_siteParsers = {
         get: () => {
           return node.currentSrc.split('@')[0];
         }
+      }, {
+        hosts: ['2ch.hk', '2ch.life'],
+        get: () => {
+          return node.classList.contains('post__file-preview') && node.parentNode.href;
+        }
       },
     ];
 
