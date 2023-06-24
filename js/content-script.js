@@ -668,6 +668,9 @@ const de_siteParsers = {
         'steamcommunity.com': () => {
           return node.currentSrc.match(/^https:\/\/steamuserimages-a\.akamaihd\.net\/ugc\/(\d+)\/[a-z0-9]{40}\//i)[1] + '.jpg';
         },
+        'iwara.tv': () => {
+          return node.currentSrc.match(/[?&]filename=([^&]+)/)[1];
+        },
       },
       aliases = {
         'boards.4channel.org'           : 'boards.4chan.org',
