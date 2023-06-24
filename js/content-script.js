@@ -522,11 +522,11 @@ const de_siteParsers = {
       }, {
         hosts: ['vk.com'],
         get: () => {
-          const info = JSON.parse(node.getAttribute('onclick').match(/^.*"?temp"? *: *({[^{}]+}).*$/)[1]);
-          return info['w'] || info['z'] || info['y'] || info['x'];
+          const srcset = JSON.parse(node.parentNode.dataset.options)['temp'];
+          return srcset['w'] || srcset['z'] || srcset['y'] || srcset['x'];
         }
       }, {
-        hosts: ['iwara.tv', 'chan.sankakucomplex.com'],
+        hosts: ['chan.sankakucomplex.com'],
         get: () => {
           return node.parentNode.href;
         }
