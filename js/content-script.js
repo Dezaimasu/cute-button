@@ -496,7 +496,7 @@ const de_siteParsers = {
         'tumblr.com'    : 'self::a/parent::div[@class="photo-wrap"]/img | self::a[@target="_blank"]/parent::div/preceding-sibling::div[@class="post_content"]/div/div[@data-imageurl] | self::span/parent::div/parent::a[@target="_blank"]/parent::div/preceding-sibling::div[@class="post_content"]/div/div[@data-imageurl] | self::div[@class="vjs-big-play-button"]/preceding-sibling::video',
         'yandex.*'      : 'self::div[contains(@class, "preview2__arrow")]/preceding-sibling::div[contains(@class, "preview2__wrapper")]/div[@class="preview2__thumb-wrapper"]/img[contains(@class, "visible")] | self::div[contains(@class, "preview2__control")]/../preceding-sibling::div[contains(@class, "preview2__wrapper")]/div[@class="preview2__thumb-wrapper"]/img[contains(@class, "visible")]',
         'instagram.com' : 'self::div[parent::div/parent::div]/preceding-sibling::div/img | self::div[@role="dialog"]/../../preceding-sibling::img',
-        'iwara.tv'      : 'self::div[@class="vjs-poster"]/preceding-sibling::video[@class="vjs-tech"]',
+        'iwara.tv'      : 'self::div[@class="videoPlayer__bg"]/parent::div[@class="videoPlayer"]//video[@class="vjs-tech"]',
         'vk.com'        : 'self::a[contains(@class, "image_cover") and contains(@onclick, "showPhoto")]',
         'behance.net'   : 'self::div[contains(@class, "js-prev") or contains(@class, "js-next")]/following::div[contains(@class, "js-slide-content") and not(contains(@class, "hidden"))]/img',
         '2ch.hk'        : 'self::div[@id="html5videofixer"]/preceding-sibling::video',
@@ -524,6 +524,11 @@ const de_siteParsers = {
         get: () => {
           const srcset = JSON.parse(node.parentNode.dataset.options)['temp'];
           return srcset['w'] || srcset['z'] || srcset['y'] || srcset['x'];
+        }
+      }, {
+        hosts: ['iwara.tv'],
+        get: () => {
+          return de_siteParsers.xpath('self::img/../../a[@class="slideshow__expand"]', node).href;
         }
       }, {
         hosts: ['chan.sankakucomplex.com'],
