@@ -145,14 +145,13 @@ Download.prototype = {
     if (filenameTemplate.includes('::filename::')) {
     	return true;
     }
-    return !(
+
+    return (
       filenameTemplate.endsWith('::original_filename::') ||
-      (
-        filenameTemplate.endsWith('::both_filenames::') &&
-        this.downloadRequest.useOriginalName &&
-        this.downloadRequest.originalName &&
-        this.downloadRequest.originalName.match(regexps.extensionCheck)
-      )
+      (filenameTemplate.endsWith('::both_filenames::') && this.downloadRequest.useOriginalName)
+    ) && (
+      !this.downloadRequest.originalName ||
+      !this.downloadRequest.originalName.match(regexps.extensionCheck)
     );
   },
 };
