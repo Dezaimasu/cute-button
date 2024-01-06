@@ -92,6 +92,10 @@ const de_button = {
   },
 
   prepareDownloadRequest: function(src, originalName){
+    if (!de_contentscript.pageInfo.title && src) {
+      de_contentscript.pageInfo.title = document.title;
+    }
+
     this.downloadRequest = {
       src             : src,
       originalName    : originalName,
@@ -235,12 +239,9 @@ const de_contentscript = {
   init: function(){
     de_events.listen('mouseover'); // asap
 
-    document.addEventListener('readystatechange', function onReadystatechange(event){ // too late for "load" event
-      if (event.target.readyState !== 'complete') {return;}
-      de_contentscript.pageInfo.title = document.title;
-      de_siteParsers.checkDollchanPresence();
-      document.removeEventListener('readystatechange', onReadystatechange);
-    });
+    document.addEventListener('readystatechange', function(event){ // too late for "load" event
+      event.target.readyState === 'complete' && de_siteParsers.checkDollchanPresence();
+    }, {once: true});
 
     this.isSeparateTab = ['image/', 'video/', 'audio/'].includes(document.contentType.substr(0, 6));
     this.srcLocation = this.isSeparateTab ? 'baseURI' : 'currentSrc';
