@@ -661,9 +661,9 @@ const de_siteParsers = {
           const container = de_siteParsers.xpath('(../following-sibling::div[@class="post_file"]|../../preceding-sibling::div[@class="post_file"])/a[@class="post_file_filename"]', node);
           return container.title || container.textContent;
         },
-        '8ch.net': () => {
-          const container = de_siteParsers.xpath('../preceding-sibling::p[@class="fileinfo"]/span[@class="unimportant"]/a', node);
-          return container.title || container.textContent;
+        'endchan.gg': () => {
+          const container = de_siteParsers.xpath('../preceding-sibling::div[@class="uploadDetails"]/a[@class="originalNameLink"]', node);
+          return container.download || container.textContent;
         },
         'steamcommunity.com': () => {
           return node.currentSrc.match(/^https:\/\/steamuserimages-a\.akamaihd\.net\/ugc\/(\d+)\/[a-z0-9]{40}\//i)[1] + '.jpg';
@@ -676,7 +676,6 @@ const de_siteParsers = {
         'boards.4channel.org'           : 'boards.4chan.org',
         'yuki.la'                       : 'boards.4chan.org',
         'arch.b4k.co'                   : 'boards.fireden.net',
-        '8kun.top'                      : '8ch.net',
         'steamuserimages-a.akamaihd.net': 'steamcommunity.com',
       };
 
