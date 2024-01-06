@@ -239,9 +239,11 @@ const de_contentscript = {
   init: function(){
     de_events.listen('mouseover'); // asap
 
-    document.addEventListener('readystatechange', function(event){ // too late for "load" event
-      event.target.readyState === 'complete' && de_siteParsers.checkDollchanPresence();
-    }, {once: true});
+    document.addEventListener('readystatechange', function onReadystatechange(event){ // too late for "load" event
+      if (event.target.readyState !== 'complete') {return;}
+      de_siteParsers.checkDollchanPresence();
+      document.removeEventListener('readystatechange', onReadystatechange);
+    });
 
     this.isSeparateTab = ['image/', 'video/', 'audio/'].includes(document.contentType.substr(0, 6));
     this.srcLocation = this.isSeparateTab ? 'baseURI' : 'currentSrc';
