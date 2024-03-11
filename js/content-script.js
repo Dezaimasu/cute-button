@@ -507,6 +507,7 @@ const de_siteParsers = {
         'behance.net'     : 'self::div[contains(@class, "js-prev") or contains(@class, "js-next")]/following::div[contains(@class, "js-slide-content") and not(contains(@class, "hidden"))]/img',
         '2ch.hk'          : 'self::div[@id="html5videofixer"]/preceding-sibling::video',
         'pixiv.net'       : 'self::button/ancestor::div[@role="presentation"]//img',
+        'streamable.com'  : 'self::div[@class="svp-events-catcher"]/preceding-sibling::video',
       },
       xpathForHost = `${siteHacks[this.host]}[not(starts-with(@src, "blob:"))]`;
 
