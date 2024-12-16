@@ -496,7 +496,6 @@ const de_siteParsers = {
     const dollchanHack = 'self::div[@class="de-fullimg-video-hack"]/following-sibling::video',
       twitchHack = 'self::div[@data-a-target="player-overlay-click-handler"]/ancestor::div[@data-a-target="video-ref"]/video', // TODO: proper aliases
       siteHacks = {
-        'twitter.com'     : 'self::div[not(*)]/../../preceding-sibling::div[not(@class)]/div/video',
         'tumblr.com'      : 'self::a/parent::div[@class="photo-wrap"]/img | self::a[@target="_blank"]/parent::div/preceding-sibling::div[@class="post_content"]/div/div[@data-imageurl] | self::span/parent::div/parent::a[@target="_blank"]/parent::div/preceding-sibling::div[@class="post_content"]/div/div[@data-imageurl] | self::div[@class="vjs-big-play-button"]/preceding-sibling::video',
         'yandex.*'        : 'self::div[contains(@class, "preview2__arrow")]/preceding-sibling::div[contains(@class, "preview2__wrapper")]/div[@class="preview2__thumb-wrapper"]/img[contains(@class, "visible")] | self::div[contains(@class, "preview2__control")]/../preceding-sibling::div[contains(@class, "preview2__wrapper")]/div[@class="preview2__thumb-wrapper"]/img[contains(@class, "visible")]',
         'instagram.com'   : 'self::div[parent::div/parent::div]/preceding-sibling::div/img | self::div[@role="dialog"]/../../preceding-sibling::img',
@@ -522,7 +521,7 @@ const de_siteParsers = {
 
     const getters = [
       {
-        hosts: ['twitter.com', 'tweetdeck.twitter.com', 'mobile.twitter.com', 'pbs.twimg.com'],
+        hosts: ['twitter.com', 'tweetdeck.twitter.com', 'mobile.twitter.com', 'pbs.twimg.com', 'x.com'],
         get: () => {
           return node.currentSrc.replace(/\.(jpg|jpeg|png)(:[a-z0-9]+)?$/i, '.$1:orig').replace(/name=[a-z0-9]+/, 'name=orig');
         }
