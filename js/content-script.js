@@ -423,14 +423,12 @@ const de_contentscript = {
 
   getPositionUnderCursor: function(mouseEvent){
     if (!mouseEvent.target) {return null;}
-    return mouseEvent.target.offsetParent && this.isForRelativePositioning(mouseEvent.target.offsetParent) ? {
-      container : mouseEvent.target.offsetParent,
-      left      : mouseEvent.layerX + 'px',
-      top       : mouseEvent.layerY + 'px'
-    } : {
-      container : document.body,
-      left      : mouseEvent.clientX + window.scrollX + 'px',
-      top       : mouseEvent.clientY + window.scrollY + 'px'
+
+    const offset = 16; // half button size, so the cursor would be right in the center
+    return {
+      container : document.body.parentNode,
+      left      : de_events.cursorPosition.x + window.scrollX - offset + 'px',
+      top       : de_events.cursorPosition.y + window.scrollY - offset + 'px',
     };
   },
 
@@ -448,18 +446,24 @@ const de_contentscript = {
     that.previousSrc = src;
     that.currentNode = that.actualNode || currentTarget;
 
-    de_button.show(
-      Object.assign(
-        {left: null, top: null, right: null, bottom: null}, // only two position properties would be set at once, other two are null on purpose to reset their default values
-        (de_settings.placeUnderCursor && that.getPositionUnderCursor(event)) || that.getPosition(that.currentNode)
-      ),
-      await de_siteParsers.getOriginalSrc(that.currentNode) || src || that.currentNode.currentSrc || that.bgSrc,
-      de_siteParsers.getOriginalFilename(that.currentNode)
-    );
+    let position = {left: null, top: null, right: null, bottom: null}; // only two position properties would be set at once, other two are null on purpose to reset their default values
+    const finalSrc = await de_siteParsers.getOriginalSrc(that.currentNode) || src || that.currentNode.currentSrc || that.bgSrc,
+      originalFilename = de_siteParsers.getOriginalFilename(that.currentNode);
 
-    if (event.ctrlKey && event.altKey && de_settings.saveOnHover) {
-      de_button.emulateClick();
-      de_button.jerkClass('visible');
+    if (de_settings.placeUnderCursor) {
+      setTimeout(() => {
+        Object.assign(position, that.getPositionUnderCursor(event));
+        de_button.show(position, finalSrc, originalFilename);
+      }, 75); // waiting for the user to stop the cursor
+
+    } else {
+      Object.assign(position, that.getPosition(that.currentNode));
+      de_button.show(position, finalSrc, originalFilename);
+
+      if (event.ctrlKey && event.altKey && de_settings.saveOnHover) {
+        de_button.emulateClick();
+        de_button.jerkClass('visible');
+      }
     }
 
     that.bgSrc = null;
@@ -718,6 +722,8 @@ const de_siteParsers = {
 };
 
 const de_events = {
+  cursorPosition: {x: 0, y: 0},
+
   listeners: {
     mouseover: function(event){
       if (event.target.tagName === de_button.name || (event.relatedTarget && event.relatedTarget.tagName === de_button.name)) {return;}
@@ -728,6 +734,10 @@ const de_events = {
           setTimeout(() => de_contentscript.nodeHandler(event.target, event), 100);
         }
       }
+    },
+    mousemove: function(event){
+      de_events.cursorPosition.x = event.clientX;
+      de_events.cursorPosition.y = event.clientY;
     },
     keydown: function(event){
       if (de_hotkeys.isHotkeyPossible(event) && de_hotkeys.isHotkeyExists(de_hotkeys.buildHotkeyId(event))) {
@@ -758,6 +768,7 @@ const de_events = {
     const functionName = turnOn && !de_settings.domainExcluded ? 'listen' : 'unlisten';
 
     de_events[functionName]('mouseover');
+    de_events[functionName]('mousemove');
     de_events[functionName]('keydown');
     de_events[functionName]('keyup');
   },

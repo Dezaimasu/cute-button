@@ -10,7 +10,7 @@ const settingsDefault = {
   isCute                : true,
   position              : 'top-left',
   folders               : [],
-  placeUnderCursor      : false, // TODO: change behavior, show button in the corner closest to the cursor
+  placeUnderCursor      : false,
   saveOnHover           : false,
   showSaveDialog        : false,
   forbidDuplicateFiles  : false,

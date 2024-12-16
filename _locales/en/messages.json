@@ -96,7 +96,7 @@
 		"message": "Check naturalWidth first (sometimes helps with saving from previews)"
 	},
 	"settings_saveOnHover": {
-		"message": "Save on Ctrl+Alt+hover instead of click (recommended to use with \"No duplicates\" enabled):"
+		"message": "Save on Ctrl+Alt+hover instead of click, doesn't work with \"Place button under cursor\" (recommended to use with \"No duplicates\" enabled):"
 	},
 	"settings_forbidDuplicateFiles": {
 		"message": "No duplicates (prevent saving of the same file multiple times):"
@@ -130,9 +130,6 @@
 	},
 	"settings_placeUnderCursor": {
 		"message": "Place button under cursor"
-	},
-	"settings_placeUnderCursorWarning": {
-		"message": "EXPERIMENTAL, very clunky"
 	},
 	"settings_filenamePrefix": {
 		"message": "Filename prefix:"
