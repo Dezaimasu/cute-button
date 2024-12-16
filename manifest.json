@@ -39,10 +39,10 @@
   "browser_action": {
     "default_icon": "bestgirl.png"
   },
-  "applications": {
+  "browser_specific_settings": {
     "gecko": {
       "id": "ochecuteextension@plaza.ink",
-      "strict_min_version": "53.0"
+      "strict_min_version": "58.0"
     }
   }
 }
