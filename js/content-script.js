@@ -607,7 +607,7 @@ const de_siteParsers = {
             de_siteParsers.xpath('../following-sibling::p/a[img[contains(@src, "download")]]', node).href;
         }
       }, {
-        hosts: ['steamcommunity.com', 'steamuserimages-a.akamaihd.net'],
+        hosts: ['steamcommunity.com', 'images.steamusercontent.com'],
         get: () => {
           let imw, imh, newSrc = node.currentSrc
           const params = new URLSearchParams(new URL(newSrc).search);
@@ -650,7 +650,7 @@ const de_siteParsers = {
 
   getOriginalFilename: function(node){
     const hostsWithFilenameInSrc = [
-      'steamuserimages-a.akamaihd.net',
+      'images.steamusercontent.com',
     ];
     if (de_contentscript.isSeparateTab && !hostsWithFilenameInSrc.includes(this.host)) {return null;}
 
@@ -659,6 +659,9 @@ const de_siteParsers = {
         'boards.4chan.org': () => {
           const container = de_siteParsers.xpath('ancestor::div[contains(concat(" ", normalize-space(@class), " "), " file ")]//*[(@class="fileText" and @title) or self::a]', node);
           return container.title || container.textContent;
+        },
+        '8chan.moe': () => {
+          return de_siteParsers.xpath('../preceding-sibling::summary/div/a[@class="originalNameLink"]', node).textContent;
         },
         '2ch.hk': () => {
           const container = de_siteParsers.xpath('ancestor::figure[@class="image" or @class="post__image"]/figcaption/a', node);
@@ -676,7 +679,7 @@ const de_siteParsers = {
           return container.download || container.textContent;
         },
         'steamcommunity.com': () => {
-          return node.currentSrc.match(/^https:\/\/steamuserimages-a\.akamaihd\.net\/ugc\/(\d+)\/[a-z0-9]{40}\//i)[1] + '.jpg';
+          return node.currentSrc.match(/^https:\/\/images\.steamusercontent\.com\/ugc\/(\d+)\/[a-z0-9]{40}\//i)[1] + '.jpg';
         },
         'iwara.tv': () => {
           return node.currentSrc.match(/[?&]filename=([^&]+)/)[1];
@@ -685,8 +688,9 @@ const de_siteParsers = {
       aliases = {
         'boards.4channel.org'           : 'boards.4chan.org',
         'yuki.la'                       : 'boards.4chan.org',
-        'arch.b4k.co'                   : 'boards.fireden.net',
-        'steamuserimages-a.akamaihd.net': 'steamcommunity.com',
+        'arch.b4k.dev'                  : 'boards.fireden.net',
+        'images.steamusercontent.com'   : 'steamcommunity.com',
+        '8chan.se'                      : '8chan.moe',
       };
 
     const getter = getters[this.host] || getters[aliases[this.host]];

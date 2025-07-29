@@ -234,6 +234,7 @@ const filenameTools = {
       decodedFilename = filename;
     }
 
+    // TODO: do not replace % with _ (might be %2F in [sound=catboxblablabla] filename)
     return this.trimForbiddenWinChars(decodedFilename);
   },
 
