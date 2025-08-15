@@ -303,7 +303,7 @@ const de_contentscript = {
     checkForBgSrc: function(node, modifier){
       if (!modifier) {return false;}
 
-      const bgImg = getComputedStyle(node).getPropertyValue('background-image');
+      const bgImg = window.getComputedStyle(node).getPropertyValue('background-image');
       if (bgImg) {
         const bgUrlMatches = bgImg.match(/^url\([\s"']*(https?:\/\/[^\s"']+)[\s"']*\).*/i);
         if (bgUrlMatches) {
@@ -378,8 +378,9 @@ const de_contentscript = {
   },
 
   isForRelativePositioning: function(node){
-    const nodeStyle = window.getComputedStyle(node);
-    return nodeStyle.position !== 'static' && nodeStyle.display !== 'table';
+    if (!node.offsetParent) {return false;}
+    const parentStyle = window.getComputedStyle(node.offsetParent);
+    return parentStyle.position !== 'static' && parentStyle.display !== 'table';
   },
 
   getPosition: function(node){
@@ -408,7 +409,7 @@ const de_contentscript = {
       bottom: () => parentRect.bottom - nodeRect.bottom + Math.max(0, nodeRect.bottom - document.documentElement.clientHeight),
     };
 
-    if (this.isForRelativePositioning(node.offsetParent)) {
+    if (this.isForRelativePositioning(node)) {
       parentRect = node.offsetParent.getBoundingClientRect();
       position.container = node.offsetParent;
       position[de_settings.horizontal] = Math.max(getMinOffset(parentRect.width), sizeGettersInPositioned[de_settings.horizontal]()) + offsets.left + 'px';
