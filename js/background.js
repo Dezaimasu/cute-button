@@ -10,7 +10,7 @@ chrome.runtime.onMessage.addListener((message, sender) => {
   }
 });
 
-/* To override "user" originated css rules form other extensions */
+/* To override "USER" originated css rules from other extensions */
 function addButtonStyles(tabId){
   chrome.scripting.insertCSS({
     files : ['css/button.css'],
@@ -19,7 +19,6 @@ function addButtonStyles(tabId){
       tabId     : tabId,
       allFrames : true,
     },
-    // runAt : 'document_start', // TODO: v3 replacement?
   }).then(() => {
     if (chrome.runtime.lastError) {return;}
     chrome.tabs.sendMessage(tabId, 'css_injected');
@@ -38,11 +37,11 @@ function switchPageStyles(tabId, style, turnOn){
   });
 }
 
-/* For options initialization after installation */
+/* For options initialization after (re)installation */
 chrome.runtime.onInstalled.addListener(initSettings);
 function initSettings(details){
   chrome.runtime.onInstalled.removeListener(initSettings);
-  chrome.storage.local.get(null, currentSettings => {
+  chrome.storage.local.get(null).then(currentSettings => {
     const actualSettingsNames = Object.keys(settingsDefault),
       currentSettingsNames = Object.keys(currentSettings),
       newSettings = {},
@@ -71,15 +70,18 @@ function setCuteState(state){
 }
 
 chrome.action.onClicked.addListener(() => {
-  chrome.storage.local.get('isCute', items => chrome.storage.local.set({'isCute': !items.isCute}));
+  chrome.storage.local.get('isCute').then(
+    items => chrome.storage.local.set({'isCute': !items.isCute})
+  );
 });
 
 chrome.storage.onChanged.addListener(changes => {
-  if (typeof changes.isCute === 'undefined') {return;}
+  if (changes.isCute === undefined) {return;}
   setCuteState(changes.isCute.newValue);
 });
-chrome.storage.local.get('isCute', items => setCuteState(items.isCute));
+chrome.storage.local.get('isCute').then(items => setCuteState(items.isCute));
 
+/* Check if we can pass "Referer" header to download() */
 if (browser !== undefined) {
   browser.runtime.getBrowserInfo().then(info => {
     if (info.name === 'Firefox' && info.version.split('.')[0] >= 70) {

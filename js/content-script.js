@@ -30,7 +30,7 @@ const de_webextApi = {
     }
 
     chrome.storage.onChanged.addListener(settings => setSettings(settings, true));
-    chrome.storage.local.get(null, setSettings);
+    chrome.storage.local.get(null).then(setSettings);
   },
 };
 
@@ -824,7 +824,7 @@ const de_hotkeys = {
   },
 
   isHotkeyExists: function(hotkeyId){
-    return typeof this.keyboardHotkeys[hotkeyId] !== 'undefined';
+    return this.keyboardHotkeys[hotkeyId] !== undefined;
   },
 
   isNoScroll: function(){

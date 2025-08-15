@@ -91,17 +91,16 @@ Download.prototype = {
       headers       : canUseRefHeader && withReferer ? [
         {name: 'Referer', value: this.downloadRequest.pageInfo.href},
       ] : [],
-    }, downloadId => {
-        if (chrome.runtime.lastError) {
-          if (chrome.runtime.lastError.message.includes('request header name')) {
-            this.download(path, filename, false);
-          }
-          return;
+    }).then(downloadId => {
+      if (chrome.runtime.lastError) {
+        if (chrome.runtime.lastError.message.includes('request header name')) {
+          this.download(path, filename, false);
         }
-
-        this.checkForDuplicate(filename, downloadId);
+        return;
       }
-    );
+
+      this.checkForDuplicate(filename, downloadId);
+    });
   },
 
   /*
@@ -112,7 +111,7 @@ Download.prototype = {
   checkForDuplicate: function(originalFilename, downloadId){
     chrome.downloads.search({
       id: downloadId
-    }, downloadItems => {
+    }).then(downloadItems => {
       if (!downloadItems[0]) {
       	this.checkForDuplicateRetry(originalFilename, downloadId);
       	return;
