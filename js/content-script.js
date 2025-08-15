@@ -23,6 +23,7 @@ const de_webextApi = {
       de_hotkeys.reset();
 
       Object.entries(settings).forEach(([settingName, setting]) => {
+        if (settingName.startsWith('~')) {return;}
         const settingValue = isChanges ? setting.newValue : setting;
         de_settings.setters[settingName](settingValue);
       });

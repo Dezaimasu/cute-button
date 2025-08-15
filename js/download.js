@@ -7,15 +7,6 @@ const supportedFormats = '(jpg|jpeg|png|gif|bmp|webp|webm|mp4|ogg|mp3)',
     filenameInTitle : new RegExp(`[^\\s]+\\.${supportedFormats}`, 'i'),
   };
 
-let canUseRefHeader = false;
-if (typeof browser !== 'undefined') {
-  browser.runtime.getBrowserInfo().then(info => {
-    if (info.name === 'Firefox' && info.version.split('.')[0] >= 70) {
-      canUseRefHeader = true;
-    }
-  });
-}
-
 function download(tabId, downloadRequest){
   new Download(downloadRequest, tabId).action();
 }
@@ -89,7 +80,9 @@ Download.prototype = {
     return filenameTry ? filenameTry[0] : `${filenameTools.getTimestamp()}.${possibleExtension || 'jpg'}`;
   },
 
-  download: function(path, filename, withReferer = true){
+  download: async function(path, filename, withReferer = true){
+    const canUseRefHeader = await chrome.storage.session.get('~canUseRefHeader');
+
     chrome.downloads.download({
       url           : this.downloadRequest.src,
       filename      : path + filename,

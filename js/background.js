@@ -12,12 +12,15 @@ chrome.runtime.onMessage.addListener((message, sender) => {
 
 /* To override "user" originated css rules form other extensions */
 function addButtonStyles(tabId){
-  chrome.tabs.insertCSS(tabId, {
-    allFrames : true,
-    cssOrigin : 'user',
-    runAt     : 'document_start',
-    file      : 'css/button.css',
-  }, () => {
+  chrome.scripting.insertCSS({
+    files : ['css/button.css'],
+    origin: 'USER',
+    target: {
+      tabId     : tabId,
+      allFrames : true,
+    },
+    // runAt : 'document_start', // TODO: v3 replacement?
+  }).then(() => {
     if (chrome.runtime.lastError) {return;}
     chrome.tabs.sendMessage(tabId, 'css_injected');
   });
@@ -25,10 +28,13 @@ function addButtonStyles(tabId){
 
 function switchPageStyles(tabId, style, turnOn){
   const action = turnOn ? 'insertCSS' : 'removeCSS';
-  chrome.tabs[action](tabId, {
-    allFrames : true,
-    cssOrigin : 'user',
-    code      : style,
+  chrome.scripting[action]({
+    css   : style,
+    origin: 'USER',
+    target: {
+      tabId     : tabId,
+      allFrames : true,
+    },
   });
 }
 
@@ -60,11 +66,11 @@ function initSettings(details){
 function setCuteState(state){
   const stateProps = state ? {text: 'on', color: '#6D6'} : {text: 'off', color: '#D66'};
 
-  chrome.browserAction.setBadgeText({text: stateProps.text});
-  chrome.browserAction.setBadgeBackgroundColor({color: stateProps.color});
+  chrome.action.setBadgeText({text: stateProps.text});
+  chrome.action.setBadgeBackgroundColor({color: stateProps.color});
 }
 
-chrome.browserAction.onClicked.addListener(() => {
+chrome.action.onClicked.addListener(() => {
   chrome.storage.local.get('isCute', items => chrome.storage.local.set({'isCute': !items.isCute}));
 });
 
@@ -73,3 +79,11 @@ chrome.storage.onChanged.addListener(changes => {
   setCuteState(changes.isCute.newValue);
 });
 chrome.storage.local.get('isCute', items => setCuteState(items.isCute));
+
+if (browser !== undefined) {
+  browser.runtime.getBrowserInfo().then(info => {
+    if (info.name === 'Firefox' && info.version.split('.')[0] >= 70) {
+      browser.storage.session.set({'~canUseRefHeader': true});
+    }
+  });
+}

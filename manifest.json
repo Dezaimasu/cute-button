@@ -1,7 +1,7 @@
 {
-  "manifest_version": 2,
+  "manifest_version": 3,
   "name": "Cute Save Button",
-  "version": "0.8.4",
+  "version": "0.8.5",
   "description": "__MSG_extensionDescription__",
   "author": "Deil",
   "default_locale": "en",
@@ -11,6 +11,9 @@
   "permissions": [
     "downloads",
     "storage",
+    "scripting"
+  ],
+  "host_permissions": [
     "*://*/*"
   ],
   "background": {
@@ -30,19 +33,26 @@
     "run_at": "document_start",
     "all_frames": true
   }],
-  "web_accessible_resources": [
-    "bestgirl.png"
-  ],
+  "web_accessible_resources": [{
+    "resources": [
+      "bestgirl.png"
+    ],
+    "matches": [
+      "<all_urls>"
+    ]
+  }],
   "options_ui": {
     "page": "settings.html"
   },
-  "browser_action": {
-    "default_icon": "bestgirl.png"
+  "action": {
+    "default_icon": {
+      "48": "bestgirl.png"
+    }
   },
   "browser_specific_settings": {
     "gecko": {
       "id": "ochecuteextension@plaza.ink",
-      "strict_min_version": "58.0"
+      "strict_min_version": "109.0"
     }
   }
 }
