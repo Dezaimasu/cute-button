@@ -1,7 +1,7 @@
 {
-  "manifest_version": 2,
+  "manifest_version": 3,
   "name": "Cute Save Button",
-  "version": "0.8.2",
+  "version": "0.8.5",
   "description": "__MSG_extensionDescription__",
   "author": "Deil",
   "default_locale": "en",
@@ -11,14 +11,13 @@
   "permissions": [
     "downloads",
     "storage",
+    "scripting"
+  ],
+  "host_permissions": [
     "*://*/*"
   ],
   "background": {
-    "scripts": [
-      "js/settings-default.js",
-      "js/background.js",
-      "js/download.js"
-    ]
+    "service_worker": "js/service-worker.js"
   },
   "content_scripts": [{
     "js": [
@@ -30,13 +29,18 @@
     "run_at": "document_start",
     "all_frames": true
   }],
-  "web_accessible_resources": [
-    "bestgirl.png"
-  ],
+  "web_accessible_resources": [{
+    "resources": [
+      "bestgirl.png"
+    ],
+    "matches": [
+      "<all_urls>"
+    ]
+  }],
   "options_ui": {
     "page": "settings.html"
   },
-  "browser_action": {
+  "action": {
     "default_icon": {
       "48": "bestgirl.png"
     }

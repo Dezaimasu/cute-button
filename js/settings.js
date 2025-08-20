@@ -22,7 +22,7 @@ function i18n(){
 -------------------- Generic functions --------------------
 */
 function loadOptions(){
-  chrome.storage.local.get(settingsDefault, result => {
+  chrome.storage.local.get(settingsDefault).then(result => {
     setOptionsValues(result);
     additionalOptionsProcessing(result);
     saveOptions();
