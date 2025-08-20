@@ -3,7 +3,6 @@ table#main {
 	border: 1px solid grey;
 	width: 100%;
   font-family: 'Segoe UI', 'SegoeUI', Inter, sans-serif;
-  font-size: 0.75em;
 }
 table#main > tbody > tr:not(#path-restrictions):not(.folder) > td {
 	border-bottom: 1px solid grey;
@@ -70,13 +69,13 @@ button#reset {
 	width: 100%;
 }
 #folders-table .folder td * {
-	width: 100%;
+	width: 97%;
 }
 #folders-table #col-domain	{width: 20%;}
 #folders-table #col-modifier{width: 8%;}
 #folders-table #col-hotkey 	{width: 7%;}
 #folders-table #col-mouse 	{width: 8%;}
-#folders-table #col-path 	{width: 25%;}
+#folders-table #col-path 	  {width: 25%;}
 #folders-table #col-filename{width: 18%;}
 #folders-table #col-delete 	{width: 4%;}
 

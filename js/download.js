@@ -81,7 +81,7 @@ Download.prototype = {
   },
 
   download: async function(path, filename, withReferer = true){
-    const canUseRefHeader = await chrome.storage.session.get('~canUseRefHeader');
+    const {['~canUseRefHeader']: canUseRefHeader} = await chrome.storage.session.get('~canUseRefHeader');
 
     chrome.downloads.download({
       url           : this.downloadRequest.src,

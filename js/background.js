@@ -82,10 +82,12 @@ chrome.storage.onChanged.addListener(changes => {
 chrome.storage.local.get('isCute').then(items => setCuteState(items.isCute));
 
 /* Check if we can pass "Referer" header to download() */
-if (browser !== undefined) {
-  browser.runtime.getBrowserInfo().then(info => {
-    if (info.name === 'Firefox' && info.version.split('.')[0] >= 70) {
-      browser.storage.session.set({'~canUseRefHeader': true});
-    }
-  });
-}
+try {
+  if (browser !== undefined) {
+    browser.runtime.getBrowserInfo().then(info => {
+      if (info.name === 'Firefox' && info.version.split('.')[0] >= 70) {
+        browser.storage.session.set({'~canUseRefHeader': true});
+      }
+    });
+  }
+} catch {} // "browser" variable throws an error in Chrome
