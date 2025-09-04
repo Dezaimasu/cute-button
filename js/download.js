@@ -92,14 +92,16 @@ Download.prototype = {
         {name: 'Referer', value: this.downloadRequest.pageInfo.href},
       ] : [],
     }).then(downloadId => {
-      if (chrome.runtime.lastError) {
+      if (!downloadId && chrome.runtime.lastError) {
         if (chrome.runtime.lastError.message.includes('request header name')) {
           this.download(path, filename, false);
         }
         return;
       }
 
-      this.checkForDuplicate(filename, downloadId);
+      setTimeout(async() => { // there was a bug in Firefox when downloads.search() couldn't find the DownloadItem when called instantly from downloads.download() callback
+        await this.checkForDuplicate(downloadId, filename);
+      }, 50);
     });
   },
 
@@ -108,27 +110,11 @@ Download.prototype = {
    * then it was modified by 'uniquify' conflict action of WebExt API,
    * and user should be warned that he saved already existing file.
    */
-  checkForDuplicate: function(originalFilename, downloadId){
-    chrome.downloads.search({
-      id: downloadId
-    }).then(downloadItems => {
-      if (!downloadItems[0]) {
-      	this.checkForDuplicateRetry(originalFilename, downloadId);
-      	return;
-      }
-      if (downloadItems[0].filename && !downloadItems[0].filename.endsWith(originalFilename)) {
-        chrome.tabs.sendMessage(this.tabId, 'duplicate_warning');
-      }
-    });
-  },
-
-  /*
-   * Hack for once broken(?) downloads.search, now it can't find download if called instantly from downloads.download callback
-   */
-  checkForDuplicateRetry: function(originalFilename, downloadId){
-    if (this.duplicateCheckTry > 5) {return;}
-    this.duplicateCheckTry++;
-    setTimeout(() => this.checkForDuplicate(originalFilename, downloadId), 50);
+  checkForDuplicate: async function(downloadId, originalFilename){
+    const downloadItem = (await chrome.downloads.search({id: downloadId}))[0];
+    if (downloadItem.filename && !downloadItem.filename.endsWith(originalFilename)) {
+      chrome.tabs.sendMessage(this.tabId, 'duplicate_warning');
+    }
   },
 
   filenameExtractionRequired: function(){
