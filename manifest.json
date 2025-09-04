@@ -11,7 +11,8 @@
   "permissions": [
     "downloads",
     "storage",
-    "scripting"
+    "scripting",
+    "declarativeNetRequestWithHostAccess"
   ],
   "host_permissions": [
     "*://*/*"

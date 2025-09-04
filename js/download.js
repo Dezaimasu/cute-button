@@ -63,11 +63,35 @@ Download.prototype = {
   },
 
   getHeaders: async function(){
-    let response = await fetch(this.downloadRequest.src, {method: 'HEAD'});
+    const refererRule = {
+      id: 1,
+      action: {
+        type          : 'modifyHeaders',
+        requestHeaders: [{
+          header    : 'Referer',
+          operation : 'set',
+          value     : this.downloadRequest.pageInfo.href,
+        }],
+      },
+      condition: {
+        urlFilter     : `|${this.downloadRequest.src}|`,
+        resourceTypes : ['xmlhttprequest'],
+      },
+    };
 
+    await chrome.declarativeNetRequest.updateSessionRules({
+      removeRuleIds : [refererRule.id],
+      addRules      : [refererRule],
+    });
+
+    let response = await fetch(this.downloadRequest.src, {method: 'HEAD'});
     if ([404, 405, 501].includes(response.status)) { // HEAD request method is not supported / allowed / implemented by server
       response = await fetch(this.downloadRequest.src, {method: 'GET'});
     }
+
+    await chrome.declarativeNetRequest.updateSessionRules({
+      removeRuleIds: [refererRule.id],
+    });
 
     return response.ok ? {
       contentType: response.headers.get('content-type'),
