@@ -34,14 +34,6 @@
     "run_at": "document_start",
     "all_frames": true
   }],
-  "web_accessible_resources": [{
-    "resources": [
-      "bestgirl.png"
-    ],
-    "matches": [
-      "<all_urls>"
-    ]
-  }],
   "options_ui": {
     "page": "settings.html",
     "open_in_tab": true

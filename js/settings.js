@@ -100,7 +100,6 @@ function refreshIcon(){
 
 function fileInputListener(){
   const reader = new FileReader();
-  reader.readAsDataURL(miscElems['file-input'].files[0]);
   reader.onload = function(){
     if (reader.result.length > 2097152) {
       showMessage('File is too big (~2MB maximum).', 'error');
@@ -109,6 +108,7 @@ function fileInputListener(){
     setValue('icon', `url("${reader.result}")`);
     refreshIcon();
   };
+  reader.readAsDataURL(miscElems['file-input'].files[0]);
 }
 
 function resetIcon(){
