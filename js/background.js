@@ -59,6 +59,13 @@ function initSettings(details){
     chrome.storage.local.set(newSettings);
     chrome.storage.local.remove(obsoleteSettingsList);
   });
+
+  /* replace icon's old url with base64 encoded */
+  chrome.storage.local.get('icon').then(({icon}) => {
+    if (icon === fallbackIcon) {
+      chrome.storage.local.set({icon: defaultSettings.icon});
+    }
+  });
 }
 
 /* Turns on/off content script across all tabs */

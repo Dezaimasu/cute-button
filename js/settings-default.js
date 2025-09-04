@@ -23,6 +23,8 @@ const defaultSettings = {
   horizontalOffset      : 6,
 };
 
+const fallbackIcon = `url("${chrome.runtime.getURL('bestgirl.png')}")`;
+
 (function setDefaultIcon(){
   fetch(chrome.runtime.getURL('bestgirl.png')).then(response => {
     const reader = new FileReader();
@@ -31,6 +33,6 @@ const defaultSettings = {
     };
     response.blob().then(blob => reader.readAsDataURL(blob));
   }).catch(() => {
-    defaultSettings.icon = `url("${chrome.runtime.getURL('bestgirl.png')}")`;
+    defaultSettings.icon = fallbackIcon;
   });
 })();
