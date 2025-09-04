@@ -152,9 +152,12 @@
 	"settings_save": {
 		"message": "保存"
 	},
-	"settings_reset": {
+	"settings_reset_all": {
 		"message": "全部重置"
 	},
+  "settings_reset": {
+    "message": "重置"
+  },
 	"settings_messageSuccess": {
 		"message": "已保存设置。"
 	},

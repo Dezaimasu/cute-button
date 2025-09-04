@@ -152,9 +152,12 @@
 	"settings_save": {
 		"message": "Зберегти"
 	},
-	"settings_reset": {
+	"settings_reset_all": {
 		"message": "Скинути все"
 	},
+  "settings_reset": {
+    "message": "Скинути"
+  },
 	"settings_messageSuccess": {
 		"message": "Налаштування збережені."
 	},

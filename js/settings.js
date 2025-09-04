@@ -36,6 +36,7 @@ function saveOptions(){
   Object.keys(settingsDefault).forEach(optionName => newSettings[optionName] = getValue(optionName));
   newSettings.folders = folders;
   chrome.storage.local.set(newSettings);
+  resetIconInput();
   disableSave();
 }
 
@@ -93,7 +94,8 @@ function toggle(elem){
 -------------------- Icon --------------------
 */
 function refreshIcon(){
-  elems['de-cute-id'].style.backgroundImage = settings['icon'].value;
+  elems['de-cute-id'].style.backgroundImage = getValue('icon');
+  elems['reset-icon'].disabled = getValue('icon') === settingsDefault.icon;
 }
 
 function fileInputListener(){
@@ -104,9 +106,19 @@ function fileInputListener(){
       showMessage('File is too big (~2MB maximum).', 'error');
       return;
     }
-    settings['icon'].value = `url("${reader.result}")`;
+    setValue('icon', `url("${reader.result}")`);
     refreshIcon();
   };
+}
+
+function resetIcon(){
+  setValue('icon', settingsDefault.icon);
+  refreshIcon();
+  enableSave();
+}
+
+function resetIconInput(){
+  elems['file-input'].value = null;
 }
 
 /*
@@ -239,6 +251,7 @@ function initSelectors(){
       'folders-table-headers',
       'save',
       'reset',
+      'reset-icon',
       'file-input',
       'message',
       'save-mark-example',
@@ -281,6 +294,7 @@ function init(){
 
   elems['save-mark-example'].addEventListener('click', setExampleCss);
   elems['file-input'].addEventListener('change', fileInputListener);
+  elems['reset-icon'].addEventListener('click', resetIcon);
   elems['reset'].addEventListener('click', resetOptions);
   elems['save'].addEventListener('click', event => {
     if (allSavePathsAreValid()) {
