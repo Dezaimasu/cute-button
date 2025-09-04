@@ -1,6 +1,6 @@
 'use strict';
 
-const settingsDefault = {
+const defaultSettings = {
   defaultSavePath       : '',
   minSize               : 256,
   exclusions            : '.de-video-thumb, .de-ytube, .de-file-img, .html5-main-video, [alt="Subreddit Icon"], [src^="https://www.google.com/recaptcha/"]',

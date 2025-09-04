@@ -1,6 +1,6 @@
 'use strict';
 
-const settings = {}, elems = {};
+const settingsElems = {}, miscElems = {};
 let folders;
 
 /*
@@ -22,7 +22,7 @@ function i18n(){
 -------------------- Generic functions --------------------
 */
 function loadOptions(){
-  chrome.storage.local.get(settingsDefault).then(result => {
+  chrome.storage.local.get(defaultSettings).then(result => {
     setOptionsValues(result);
     additionalOptionsProcessing(result);
     saveOptions();
@@ -33,7 +33,7 @@ function saveOptions(){
   const newSettings = {};
   prepareCurrentFoldersForSave();
   prepareCss();
-  Object.keys(settingsDefault).forEach(optionName => newSettings[optionName] = getValue(optionName));
+  Object.keys(defaultSettings).forEach(optionName => newSettings[optionName] = getValue(optionName));
   newSettings.folders = folders;
   chrome.storage.local.set(newSettings);
   resetIconInput();
@@ -41,37 +41,37 @@ function saveOptions(){
 }
 
 function resetOptions(){
-  setOptionsValues(settingsDefault);
-  additionalOptionsProcessing(settingsDefault);
+  setOptionsValues(defaultSettings);
+  additionalOptionsProcessing(defaultSettings);
   enableSave();
 }
 
 function setOptionsValues(optionsValues){
-  Object.keys(settingsDefault).forEach(optionName => setValue(optionName, optionsValues[optionName]));
+  Object.keys(defaultSettings).forEach(optionName => setValue(optionName, optionsValues[optionName]));
 }
 
 function getValue(optionName){
-  return settings[optionName][settings[optionName].dataset.valueLocation];
+  return settingsElems[optionName][settingsElems[optionName].dataset.valueLocation];
 }
 
 function setValue(optionName, optionValue){
-  settings[optionName][settings[optionName].dataset.valueLocation] = optionValue;
+  settingsElems[optionName][settingsElems[optionName].dataset.valueLocation] = optionValue;
 }
 
 function disableSave(){
-  elems['save'].disabled = true;
+  miscElems['save'].disabled = true;
 }
 
 function enableSave(){
-  elems['save'].disabled = false;
+  miscElems['save'].disabled = false;
 }
 
 function showMessage(message, type){
-  elems['message'].textContent = message;
-  elems['message'].classList.add(type);
+  miscElems['message'].textContent = message;
+  miscElems['message'].classList.add(type);
   setTimeout(() => {
-    elems['message'].textContent = '';
-    elems['message'].classList.remove(type);
+    miscElems['message'].textContent = '';
+    miscElems['message'].classList.remove(type);
   }, 3000);
 }
 
@@ -81,10 +81,10 @@ function additionalOptionsProcessing(options){
 }
 
 function show(elemName){
-  elems[elemName].classList.remove('hidden-block');
+  miscElems[elemName].classList.remove('hidden-block');
 }
 function hide(elemName){
-  elems[elemName].classList.add('hidden-block');
+  miscElems[elemName].classList.add('hidden-block');
 }
 function toggle(elem){
   elem.classList.toggle('hidden-block');
@@ -94,13 +94,13 @@ function toggle(elem){
 -------------------- Icon --------------------
 */
 function refreshIcon(){
-  elems['de-cute-id'].style.backgroundImage = getValue('icon');
-  elems['reset-icon'].disabled = getValue('icon') === settingsDefault.icon;
+  miscElems['de-cute-id'].style.backgroundImage = getValue('icon');
+  miscElems['reset-icon'].disabled = getValue('icon') === defaultSettings.icon;
 }
 
 function fileInputListener(){
   const reader = new FileReader();
-  reader.readAsDataURL(elems['file-input'].files[0]);
+  reader.readAsDataURL(miscElems['file-input'].files[0]);
   reader.onload = function(){
     if (reader.result.length > 2097152) {
       showMessage('File is too big (~2MB maximum).', 'error');
@@ -112,13 +112,13 @@ function fileInputListener(){
 }
 
 function resetIcon(){
-  setValue('icon', settingsDefault.icon);
+  setValue('icon', defaultSettings.icon);
   refreshIcon();
   enableSave();
 }
 
 function resetIconInput(){
-  elems['file-input'].value = null;
+  miscElems['file-input'].value = null;
 }
 
 /*
@@ -144,7 +144,7 @@ function prepareCurrentFoldersForSave(){
 }
 
 function addNewFolder(folderSettings = null){
-  const newFolder = elems['blank-folder'].cloneNode(true);
+  const newFolder = miscElems['blank-folder'].cloneNode(true);
 
   newFolder.removeAttribute('id');
   newFolder.querySelector('.key').addEventListener('keyup', keyInputListener);
@@ -153,7 +153,7 @@ function addNewFolder(folderSettings = null){
   if (folderSettings) {
     fillFolder(newFolder, folderSettings);
   }
-  elems['add-folder-container'].parentNode.insertBefore(newFolder, elems['add-folder-container']);
+  miscElems['add-folder-container'].parentNode.insertBefore(newFolder, miscElems['add-folder-container']);
   show('folders-table-headers');
 }
 
@@ -242,8 +242,8 @@ function prepareCss(){
 -------------------- Initialization --------------------
 */
 function initSelectors(){
-  const settingsElems = Object.keys(settingsDefault),
-    otherElems = [
+  const settingsElemIds = Object.keys(defaultSettings),
+    miscElemIds = [
       'blank-folder',
       'add-folder',
       'add-folder-container',
@@ -258,12 +258,12 @@ function initSelectors(){
       'de-cute-id',
     ];
 
-  settingsElems.forEach(name => {
-    settings[name] = document.querySelector(`#${name}`);
-    settings[name].dataset.valueLocation = settings[name].type === 'checkbox' ? 'checked' : 'value';
+  settingsElemIds.forEach(name => {
+    settingsElems[name] = document.querySelector(`#${name}`);
+    settingsElems[name].dataset.valueLocation = settingsElems[name].type === 'checkbox' ? 'checked' : 'value';
   });
-  otherElems.forEach(name => {
-    elems[name] = document.querySelector(`#${name}`);
+  miscElemIds.forEach(name => {
+    miscElems[name] = document.querySelector(`#${name}`);
   });
 }
 
@@ -292,11 +292,11 @@ function init(){
   i18n();
   initSelectors();
 
-  elems['save-mark-example'].addEventListener('click', setExampleCss);
-  elems['file-input'].addEventListener('change', fileInputListener);
-  elems['reset-icon'].addEventListener('click', resetIcon);
-  elems['reset'].addEventListener('click', resetOptions);
-  elems['save'].addEventListener('click', event => {
+  miscElems['save-mark-example'].addEventListener('click', setExampleCss);
+  miscElems['file-input'].addEventListener('change', fileInputListener);
+  miscElems['reset-icon'].addEventListener('click', resetIcon);
+  miscElems['reset'].addEventListener('click', resetOptions);
+  miscElems['save'].addEventListener('click', event => {
     if (allSavePathsAreValid()) {
       saveOptions();
       showMessage(messages.success);
@@ -305,7 +305,7 @@ function init(){
       showMessage(messages.invalidPath, 'error');
     }
   });
-  elems['add-folder'].addEventListener('click', event => {
+  miscElems['add-folder'].addEventListener('click', event => {
     addNewFolder();
     enableSave();
   });

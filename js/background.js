@@ -42,7 +42,7 @@ chrome.runtime.onInstalled.addListener(initSettings);
 function initSettings(details){
   chrome.runtime.onInstalled.removeListener(initSettings);
   chrome.storage.local.get(null).then(currentSettings => {
-    const actualSettingsNames = Object.keys(settingsDefault),
+    const actualSettingsNames = Object.keys(defaultSettings),
       currentSettingsNames = Object.keys(currentSettings),
       newSettings = {},
       newSettingsList = arrayDiff(actualSettingsNames, currentSettingsNames),
@@ -53,7 +53,7 @@ function initSettings(details){
     }
 
     newSettingsList.forEach(
-      settingName => newSettings[settingName] = settingsDefault[settingName]
+      settingName => newSettings[settingName] = defaultSettings[settingName]
     );
 
     chrome.storage.local.set(newSettings);
