@@ -1,0 +1,2 @@
+"C:\Program Files\7-Zip\7z.exe" a -tzip -mx9 cute-button.zip _locales css js LICENSE settings.html manifest.chrome.json bestgirl.png
+"C:\Program Files\7-Zip\7z.exe" rn cute-button.zip manifest.chrome.json manifest.json

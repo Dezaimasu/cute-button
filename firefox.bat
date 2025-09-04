@@ -1,0 +1,1 @@
+"C:\Program Files\7-Zip\7z.exe" a -tzip -mx9 cute-button.xpi _locales css js LICENSE settings.html manifest.json bestgirl.png -xr!js/service-worker.js
