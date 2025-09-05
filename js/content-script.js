@@ -500,19 +500,19 @@ const de_siteParsers = {
 
   getActualNode: function(node){
     const dollchanHack = 'self::div[@class="de-fullimg-video-hack"]/following-sibling::video',
-      twitchHack = 'self::div[@data-a-target="player-overlay-click-handler"]/ancestor::div[@data-a-target="video-ref"]/video', // TODO: proper aliases
+      twitchHack = 'self::div[@data-a-target="player-overlay-click-handler"]/ancestor::div[@data-a-target="video-ref"]/video[@src]', // TODO: proper aliases
       siteHacks = {
-        'tumblr.com'      : 'self::a/parent::div[@class="photo-wrap"]/img | self::a[@target="_blank"]/parent::div/preceding-sibling::div[@class="post_content"]/div/div[@data-imageurl] | self::span/parent::div/parent::a[@target="_blank"]/parent::div/preceding-sibling::div[@class="post_content"]/div/div[@data-imageurl] | self::div[@class="vjs-big-play-button"]/preceding-sibling::video',
+        'tumblr.com'      : 'self::a/parent::div[@class="photo-wrap"]/img | self::a[@target="_blank"]/parent::div/preceding-sibling::div[@class="post_content"]/div/div[@data-imageurl] | self::span/parent::div/parent::a[@target="_blank"]/parent::div/preceding-sibling::div[@class="post_content"]/div/div[@data-imageurl] | self::div[@class="vjs-big-play-button"]/preceding-sibling::video[@src]',
         'yandex.*'        : 'self::div[contains(@class, "preview2__arrow")]/preceding-sibling::div[contains(@class, "preview2__wrapper")]/div[@class="preview2__thumb-wrapper"]/img[contains(@class, "visible")] | self::div[contains(@class, "preview2__control")]/../preceding-sibling::div[contains(@class, "preview2__wrapper")]/div[@class="preview2__thumb-wrapper"]/img[contains(@class, "visible")]',
         'instagram.com'   : 'self::div[parent::div/parent::div]/preceding-sibling::div/img | self::div[@role="dialog"]/../../preceding-sibling::img',
-        'iwara.tv'        : 'self::div[@class="videoPlayer__bg"]/parent::div[@class="videoPlayer"]//video[@class="vjs-tech"]',
+        'iwara.tv'        : 'self::div[@class="videoPlayer__bg"]/parent::div[@class="videoPlayer"]//video[@class="vjs-tech" and @src]',
         'vk.com'          : 'self::a[contains(@class, "image_cover") and contains(@onclick, "showPhoto")]',
         'twitch.tv'       : twitchHack,
         'clips.twitch.tv' : twitchHack,
         'behance.net'     : 'self::div[contains(@class, "js-prev") or contains(@class, "js-next")]/following::div[contains(@class, "js-slide-content") and not(contains(@class, "hidden"))]/img',
-        '2ch.hk'          : 'self::div[@id="html5videofixer"]/preceding-sibling::video',
+        '2ch.hk'          : 'self::div[@id="html5videofixer"]/preceding-sibling::video[@src]',
         'pixiv.net'       : 'self::button/ancestor::div[@role="presentation"]//img',
-        'streamable.com'  : 'self::div[@class="svp-events-catcher"]/preceding-sibling::video',
+        'streamable.com'  : 'self::div[@class="svp-events-catcher"]/preceding-sibling::video[@src]',
       },
       xpathForHost = `${siteHacks[this.host]}[not(starts-with(@src, "blob:"))]`;
 
