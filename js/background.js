@@ -91,6 +91,7 @@ chrome.storage.local.get('isCute').then(items => setCuteState(items.isCute));
 /* Check if we can pass "Referer" header to download() */
 try {
   if (browser !== undefined) {
+    browser.storage.session.set({'~isFirefox': true});
     browser.runtime.getBrowserInfo().then(info => {
       if (info.name === 'Firefox' && info.version.split('.')[0] >= 70) {
         browser.storage.session.set({'~canUseRefHeader': true});

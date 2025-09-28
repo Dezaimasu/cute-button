@@ -105,9 +105,9 @@ Download.prototype = {
   },
 
   download: async function(path, filename, withReferer = true){
-    const {['~canUseRefHeader']: canUseRefHeader} = await chrome.storage.session.get('~canUseRefHeader');
-
-    chrome.downloads.download({
+    const isFirefox = await getFlag('isFirefox'),
+      canUseRefHeader = await getFlag('canUseRefHeader');
+    let options = {
       url           : this.downloadRequest.src,
       filename      : path + filename,
       saveAs        : this.downloadRequest.showSaveDialog,
@@ -115,7 +115,12 @@ Download.prototype = {
       headers       : canUseRefHeader && withReferer ? [
         {name: 'Referer', value: this.downloadRequest.pageInfo.href},
       ] : [],
-    }).then(downloadId => {
+    };
+    if (isFirefox) {
+    	options.incognito = this.downloadRequest.pageInfo.isPrivateMode;
+    }
+
+    chrome.downloads.download(options).then(downloadId => {
       if (!downloadId && chrome.runtime.lastError) {
         if (chrome.runtime.lastError.message.includes('request header name')) {
           this.download(path, filename, false);
@@ -153,6 +158,10 @@ Download.prototype = {
       this.downloadRequest.originalName.match(regexps.extensionCheck)
     );
   },
+};
+
+const getFlag = async function(option){
+  return (await chrome.storage.session.get(`~${option}`))[`~${option}`];
 };
 
 const filenameTools = {

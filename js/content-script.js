@@ -225,16 +225,17 @@ const de_contentscript = {
   currentNode       : null, // the node button is currently shown on
   srcLocation       : null,
   previousSrc       : null,
-  isSeparateTab     : null,
+  isSeparateTab     : false,
   historyTimer      : null,
   insertedRuleIndex : null,
   downloadsHistory  : [],
   classForSaveMark  : 'cute-and-saved',
   pageInfo          : {
-    domain    : null,
-    title     : null,
-    threadNum : null,
-    boardCode : null,
+    domain        : null,
+    title         : null,
+    threadNum     : null,
+    boardCode     : null,
+    isPrivateMode : false,
   },
 
   init: function(){
@@ -249,11 +250,12 @@ const de_contentscript = {
     this.isSeparateTab = ['image/', 'video/', 'audio/'].includes(document.contentType.substr(0, 6));
     this.srcLocation = this.isSeparateTab ? 'baseURI' : 'currentSrc';
     this.pageInfo = {
-      domain    : document.location.hostname,
-      href      : document.location.href,
-      title     : null,
-      threadNum : de_siteParsers.getPossibleThreadNum(),
-      boardCode : de_siteParsers.getPossibleBoardCode(),
+      domain        : document.location.hostname,
+      href          : document.location.href,
+      title         : null,
+      threadNum     : de_siteParsers.getPossibleThreadNum(),
+      boardCode     : de_siteParsers.getPossibleBoardCode(),
+      isPrivateMode : chrome.extension.inIncognitoContext,
     };
 
     de_siteParsers.setFilteredHost(document.location.hostname);
