@@ -574,11 +574,6 @@ const de_siteParsers = {
           return href.includes('/attachments/') && href;
         }
       }, {
-        hosts: ['instagram.com'],
-        get: () => {
-          return de_siteParsers.getHighresFromSrcset(node.srcset);
-        }
-      }, {
         hosts: ['tumblr.com'],
         get: async () => {
           const highresMask = 's99999x99999';
@@ -644,7 +639,11 @@ const de_siteParsers = {
     ];
 
     const getter = getters.find(g => g.hosts.includes(this.host));
-    if (!getter) {return null;}
+    if (!getter) {
+      return node.srcset ?
+        de_siteParsers.getHighresFromSrcset(node.srcset) :
+        null;
+    }
 
     try {
       return await getter.get();
