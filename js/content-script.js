@@ -479,6 +479,7 @@ const de_siteParsers = {
 
   setFilteredHost: function(hostname){
     this.host = hostname.replace(/^www\./, '')
+      .replace(/^[a-z]{2}\.(.+\..+)$/, '$1')
       .replace(/^((.*)\.)?(tumblr\.com)$/, 'tumblr.com')
       .replace(/^yandex\.[a-z]{2,3}$/, 'yandex.*')
       .replace(/^(ecchi\.)?(iwara\.tv)$/, 'iwara.tv');
