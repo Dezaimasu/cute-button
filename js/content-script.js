@@ -534,8 +534,11 @@ const de_siteParsers = {
       }, {
         hosts: ['vk.com'],
         get: () => {
-          const srcset = JSON.parse(node.parentNode.dataset.options)['temp'];
-          return srcset['w'] || srcset['z'] || srcset['y'] || srcset['x'];
+          const match1 = node.currentSrc.match(/([?&])as=((\d+x\d+,?)+)/),
+            match2 = node.currentSrc.match(/([?&])cs=(\d+x0)/),
+            biggestWidth = Math.max(...match1[2].split(',').map(a => parseInt(a.split('x')[0])));
+
+          return node.currentSrc.replace(match2[0], `${match2[1]}cs=${biggestWidth}x0`);
         }
       }, {
         hosts: ['iwara.tv'],
