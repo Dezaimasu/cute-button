@@ -514,15 +514,15 @@ const de_siteParsers = {
         '2ch.hk'          : 'self::div[@id="html5videofixer"]/preceding-sibling::video[@src]',
         'pixiv.net'       : 'self::button/ancestor::div[@role="presentation"]//img',
         'streamable.com'  : 'self::div[@class="svp-events-catcher"]/preceding-sibling::video[@src]',
+        'pinterest.com'   : 'self::div/ancestor::div[@class="PinCard__imageWrapper" or @data-test-id="pin-closeup-image" or @data-test-id="pincard-image-without-link"]//img',
       };
     let xpathForHost = siteHacks[this.host];
     if (xpathForHost) {
+      const blobFilter = 'not(starts-with(@src, "blob:"))';
       xpathForHost = xpathForHost.endsWith(']') ?
-        xpathForHost.replace(/]$/, 'and not(starts-with(@src, "blob:"))]') :
-        `${xpathForHost}[not(starts-with(@src, "blob:"))]`;
+        xpathForHost.replace(/]$/, ` and ${blobFilter}]`) :
+        `${xpathForHost}[${blobFilter}]`;
     }
-
-    console.log(xpathForHost, de_siteParsers.xpath(xpathForHost, node));
 
     return (
       (this.dollchanImproved && de_siteParsers.xpath(dollchanHack, node)) ||
@@ -726,9 +726,9 @@ const de_siteParsers = {
     return document.evaluate(path, contextNode, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
   },
 
-  getHighresFromSrcset: function(srcset){ // by "w" only
+  getHighresFromSrcset: function(srcset){
     function getWidth(str){
-      return Number(str.trim().match(/^.+ (\d+)w$/)[1]);
+      return Number(str.trim().match(/^.+ (\d+)[wx]$/)[1]);
     }
 
     return srcset.split(/ *, */).reduce((a, b) => {
