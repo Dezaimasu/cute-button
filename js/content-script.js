@@ -514,8 +514,15 @@ const de_siteParsers = {
         '2ch.hk'          : 'self::div[@id="html5videofixer"]/preceding-sibling::video[@src]',
         'pixiv.net'       : 'self::button/ancestor::div[@role="presentation"]//img',
         'streamable.com'  : 'self::div[@class="svp-events-catcher"]/preceding-sibling::video[@src]',
-      },
-      xpathForHost = `${siteHacks[this.host]}[not(starts-with(@src, "blob:"))]`;
+      };
+    let xpathForHost = siteHacks[this.host];
+    if (xpathForHost) {
+      xpathForHost = xpathForHost.endsWith(']') ?
+        xpathForHost.replace(/]$/, 'and not(starts-with(@src, "blob:"))]') :
+        `${xpathForHost}[not(starts-with(@src, "blob:"))]`;
+    }
+
+    console.log(xpathForHost, de_siteParsers.xpath(xpathForHost, node));
 
     return (
       (this.dollchanImproved && de_siteParsers.xpath(dollchanHack, node)) ||
