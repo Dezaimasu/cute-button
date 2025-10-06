@@ -556,21 +556,33 @@ const de_siteParsers = {
           return de_siteParsers.xpath('self::img/../../a[@class="slideshow__expand"]', node).href;
         }
       }, {
-        hosts: ['chan.sankakucomplex.com'],
+        hosts: ['chan.sankakucomplex.com', 'zerochan.net'],
         get: () => {
           return node.parentNode.href;
         }
       }, {
-        hosts: ['safebooru.org', 'gelbooru.com'],
+        hosts: ['safebooru.org', 'gelbooru.com', 'rule34.xxx', 'danbooru.donmai.us'],
         get: () => {
           if (node.currentSrc.includes('/images/')) {return null;}
 
           const xpathBase = {
-            'safebooru.org' : 'div[@id="content"]/div[@id="post-view"]/div[@class="sidebar"]/div/ul/li',
-            'gelbooru.com'  : 'div[@id="container"]/section/ul[@id="tag-list"]/li',
+            'safebooru.org'          : 'div[@id="content"]/div[@id="post-view"]/div[@class="sidebar"]/div',
+            'gelbooru.com'           : 'div[@id="container"]/section[@class="aside"]',
+            'rule34.xxx'             : '/div[@class="sidebar"]/div[@class="link-list"]',
+            'danbooru.donmai.us'     : '/aside[@id="sidebar"]/section[@id="post-options"]',
+          }, aFilter = {
+            'safebooru.org'          : 'contains(text(), "Original image")',
+            'gelbooru.com'           : 'text()="Original image"',
+            'rule34.xxx'             : 'text()="Original image"',
+            'danbooru.donmai.us'     : 'text()="View original"',
           };
 
-          return de_siteParsers.xpath(`/html/body/${xpathBase[this.host]}/a[text()="Original image"]`, document).href;
+          return de_siteParsers.xpath(`/html/body/${xpathBase[this.host]}/ul/li/a[${aFilter[this.host]}]`, document).href;
+        },
+      }, {
+        hosts: ['e621.net'],
+        get: () => {
+          return de_siteParsers.xpath('parent::section/following-sibling::div[@id="image-resize-notice"]//a[@id="image-resize-link"]', node).href;
         },
       }, {
         hosts: ['discord.com'],
@@ -607,14 +619,6 @@ const de_siteParsers = {
 
           const html = await response.text();
           return html.match(new RegExp(`src="(http[^"]+\\/${highresMask}\\/[^"]+)"`))[1];
-        }
-      }, {
-        hosts: ['zerochan.net'],
-        get: () => {
-          const parts = node.currentSrc.match(/zerochan\.net\/([^/]+)\.\d+\.(\d+)\.(\w{3,4})$/i);
-          return parts ?
-            `https://static.zerochan.net/${parts[1]}.full.${parts[2]}.${parts[3]}` :
-            de_siteParsers.xpath('../following-sibling::p/a[img[contains(@src, "download")]]', node).href;
         }
       }, {
         hosts: ['steamcommunity.com', 'images.steamusercontent.com'],
