@@ -451,8 +451,12 @@ const de_contentscript = {
     that.currentNode = that.actualNode || currentTarget;
 
     let position = {left: null, top: null, right: null, bottom: null}; // only two position properties would be set at once, other two are null on purpose to reset their default values
-    const finalSrc = await de_siteParsers.getOriginalSrc(that.currentNode) || src || that.currentNode.currentSrc || that.bgSrc,
-      originalFilename = de_siteParsers.getOriginalFilename(that.currentNode);
+    let finalSrc = await de_siteParsers.getOriginalSrc(that.currentNode) || src || that.currentNode.currentSrc || that.bgSrc;
+    const originalFilename = de_siteParsers.getOriginalFilename(that.currentNode);
+
+    if (finalSrc.startsWith('//')) {
+      finalSrc = document.location.protocol + finalSrc;
+    }
 
     if (de_settings.placeUnderCursor) {
       setTimeout(() => {
