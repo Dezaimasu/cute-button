@@ -681,7 +681,7 @@ const de_siteParsers = {
         '8chan.moe': () => {
           return de_siteParsers.xpath('../preceding-sibling::summary/div/a[@class="originalNameLink"]', node).textContent;
         },
-        '2ch.hk': () => {
+        '2ch.su': () => {
           const container = de_siteParsers.xpath('ancestor::figure[@class="image" or @class="post__image"]/figcaption/a', node);
           return container.title || container.textContent;
         },
@@ -708,7 +708,8 @@ const de_siteParsers = {
         'yuki.la'                       : 'boards.4chan.org',
         'arch.b4k.dev'                  : 'boards.fireden.net',
         'images.steamusercontent.com'   : 'steamcommunity.com',
-        '8chan.se'                      : '8chan.moe',
+        '2ch.org'                       : '2ch.su',
+        '2ch.life'                      : '2ch.su',
       };
 
     const getter = getters[this.host] || getters[aliases[this.host]];
