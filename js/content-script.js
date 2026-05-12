@@ -38,7 +38,8 @@ const de_settings = {
   setters: {
     defaultSavePath       : newValue => de_hotkeys.fallbackRule.path = newValue,
     minSize               : newValue => de_settings.minSize = parseInt(newValue),
-    exclusions            : newValue => de_settings.exclusions = newValue,
+    exclusions            : newValue =>
+      de_settings.exclusions = '.de-video-thumb, .de-ytube, .de-file-img, .html5-main-video, [alt="Subreddit Icon"], [src^="https://www.google.com/recaptcha/"], div[role="checkbox"], ' + newValue,
     icon                  : newValue => de_button.elem.style.backgroundImage = newValue,
     hideButton            : newValue => de_button.elem.classList.toggle('shy', newValue),
     isCute                : newValue => de_events.switchAll(newValue),
