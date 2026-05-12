@@ -485,14 +485,36 @@ const de_contentscript = {
 
 const de_siteParsers = {
   host: null,
+  hostForHacks: null,
   dollchanImproved: null,
 
-  setFilteredHost: function(hostname){ // TODO: replace aliases here
+  setFilteredHost: function(hostname){
     this.host = hostname.replace(/^www\./, '')
       .replace(/^[a-z]{2}\.(.+\..+)$/, '$1')
       .replace(/^((.*)\.)?(tumblr\.com)$/, 'tumblr.com')
-      .replace(/^yandex\.[a-z]{2,3}$/, 'yandex.*')
+      .replace(/^yandex\.[a-z]{2,3}$/, 'yandex.ru')
       .replace(/^(ecchi\.)?(iwara\.tv)$/, 'iwara.tv');
+
+    const aliases = {
+      // actual aliases
+      '2ch.org'                     : '2ch.su',
+      '2ch.life'                    : '2ch.su',
+      'clips.twitch.tv'             : 'twitch.tv',
+      'x.com'                       : 'twitter.com',
+      'mobile.twitter.com'          : 'twitter.com',
+      'pbs.twimg.com'               : 'twitter.com',
+      'tweetdeck.twitter.com'       : 'twitter.com',
+      'images.steamusercontent.com' : 'steamcommunity.com',
+      // websites with the similar markup
+      'yuki.la'                     : 'boards.4chan.org',
+      'boards.fireden.net'          : 'arch.b4k.dev',
+      'gelbooru.com'                : 'danbooru.donmai.us',
+      'rule34.xxx'                  : 'danbooru.donmai.us',
+      'safebooru.org'               : 'danbooru.donmai.us',
+      'zerochan.net'                : 'chan.sankakucomplex.com',
+    };
+
+    this.hostForHacks = aliases[this.host] || this.host;
   },
 
   getPossibleBoardCode: function(){
@@ -511,26 +533,20 @@ const de_siteParsers = {
 
   getActualNode: function(node){
     const dollchanHack = 'self::div[@class="de-fullimg-video-hack"]/following-sibling::video',
-      twitchHack = 'self::div[@data-a-target="player-overlay-click-handler"]/ancestor::div[@data-a-target="video-ref"]/video[@src]', // TODO: proper aliases
       siteHacks = {
         'tumblr.com'      : 'self::a/parent::div[@class="photo-wrap"]/img | self::a[@target="_blank"]/parent::div/preceding-sibling::div[@class="post_content"]/div/div[@data-imageurl] | self::span/parent::div/parent::a[@target="_blank"]/parent::div/preceding-sibling::div[@class="post_content"]/div/div[@data-imageurl] | self::div[@class="vjs-big-play-button"]/preceding-sibling::video',
-        'yandex.*'        : 'self::div[contains(@class, "preview2__arrow")]/preceding-sibling::div[contains(@class, "preview2__wrapper")]/div[@class="preview2__thumb-wrapper"]/img[contains(@class, "visible")] | self::div[contains(@class, "preview2__control")]/../preceding-sibling::div[contains(@class, "preview2__wrapper")]/div[@class="preview2__thumb-wrapper"]/img[contains(@class, "visible")]',
+        'yandex.ru'       : 'self::div[contains(@class, "preview2__arrow")]/preceding-sibling::div[contains(@class, "preview2__wrapper")]/div[@class="preview2__thumb-wrapper"]/img[contains(@class, "visible")] | self::div[contains(@class, "preview2__control")]/../preceding-sibling::div[contains(@class, "preview2__wrapper")]/div[@class="preview2__thumb-wrapper"]/img[contains(@class, "visible")]',
         'instagram.com'   : 'self::div[parent::div/parent::div]/preceding-sibling::div/img | self::div[@role="dialog"]/../../preceding-sibling::img',
         'iwara.tv'        : 'self::div[@class="videoPlayer__bg"]/parent::div[@class="videoPlayer"]//video[@class="vjs-tech" and @src]',
         'vk.com'          : 'self::div[contains(@class, "vkitMusicOverlayAttachment")]/parent::a/img',
-        'twitch.tv'       : twitchHack,
-        'clips.twitch.tv' : twitchHack,
+        'twitch.tv'       : 'self::div[@data-a-target="player-overlay-click-handler"]/ancestor::div[@data-a-target="video-ref"]/video[@src]',
         'behance.net'     : 'self::div[contains(@class, "js-prev") or contains(@class, "js-next")]/following::div[contains(@class, "js-slide-content") and not(contains(@class, "hidden"))]/img',
-        '2ch.hk'          : 'self::div[@id="html5videofixer"]/preceding-sibling::video',
+        '2ch.su'          : 'self::div[@id="html5videofixer"]/preceding-sibling::video',
         'pixiv.net'       : 'self::button/ancestor::div[@role="presentation"]//img',
         'streamable.com'  : 'self::div[@class="svp-events-catcher"]/preceding-sibling::video',
         'pinterest.com'   : 'self::div/ancestor::div[@class="PinCard__imageWrapper" or @data-test-id="pin-closeup-image" or @data-test-id="pincard-image-without-link"]//img',
-      },
-      aliases = {
-        '2ch.org' : '2ch.su',
-        '2ch.life': '2ch.su',
       };
-    let xpathForHost = siteHacks[this.host] || siteHacks[aliases[this.host]];
+    let xpathForHost = siteHacks[this.hostForHacks];
     if (xpathForHost) {
       const blobFilter = 'not(starts-with(@src, "blob:"))';
       xpathForHost = xpathForHost.endsWith(']') ?
@@ -547,124 +563,101 @@ const de_siteParsers = {
   getOriginalSrc: async function(node){
     if (!de_settings.saveFullSized) {return null;}
 
-    const getters = [
-      {
-        hosts: ['twitter.com', 'tweetdeck.twitter.com', 'mobile.twitter.com', 'pbs.twimg.com', 'x.com'],
-        get: () => {
-          return node.currentSrc.replace(/\.(jpg|jpeg|png)(:[a-z0-9]+)?$/i, '.$1:orig').replace(/name=[a-z0-9]+/, 'name=orig');
-        }
-      }, {
-        hosts: ['vk.com'],
-        get: () => {
-          const match1 = node.currentSrc.match(/([?&])as=((\d+x\d+,?)+)/),
-            match2 = node.currentSrc.match(/([?&])cs=(\d+x0)/),
-            biggestWidth = Math.max(...match1[2].split(',').map(a => parseInt(a.split('x')[0])));
-
-          return node.currentSrc.replace(match2[0], `${match2[1]}cs=${biggestWidth}x0`);
-        }
-      }, {
-        hosts: ['iwara.tv'],
-        get: () => {
-          return de_siteParsers.xpath('self::img/../../a[@class="slideshow__expand"]', node).href;
-        }
-      }, {
-        hosts: ['chan.sankakucomplex.com', 'zerochan.net'],
-        get: () => {
-          return node.parentNode.href;
-        }
-      }, {
-        hosts: ['safebooru.org', 'gelbooru.com', 'rule34.xxx', 'danbooru.donmai.us'],
-        get: () => {
-          if (node.currentSrc.includes('/images/')) {return null;}
-
-          const xpathBase = {
-            'safebooru.org'          : 'div[@id="content"]/div[@id="post-view"]/div[@class="sidebar"]/div',
-            'gelbooru.com'           : 'div[@id="container"]/section[@class="aside"]',
-            'rule34.xxx'             : '/div[@class="sidebar"]/div[@class="link-list"]',
-            'danbooru.donmai.us'     : '/aside[@id="sidebar"]/section[@id="post-options"]',
-          }, aFilter = {
-            'safebooru.org'          : 'contains(text(), "Original image")',
-            'gelbooru.com'           : 'text()="Original image"',
-            'rule34.xxx'             : 'text()="Original image"',
-            'danbooru.donmai.us'     : 'text()="View original"',
-          };
-
-          return de_siteParsers.xpath(`/html/body/${xpathBase[this.host]}/ul/li/a[${aFilter[this.host]}]`, document).href;
-        },
-      }, {
-        hosts: ['e621.net'],
-        get: () => {
-          return de_siteParsers.xpath('parent::section/following-sibling::div[@id="image-resize-notice"]//a[@id="image-resize-link"]', node).href;
-        },
-      }, {
-        hosts: ['discord.com'],
-        get: () => {
-          const videoSrcTry = node.currentSrc.match(/\/external\/.+\/https\/(.+\.\w{3,4})$/i);
-          if (videoSrcTry) {
-            return `https://${videoSrcTry[1]}`;
-          }
-
-          const href = node.parentNode.href;
-          return href.includes('/attachments/') && href;
-        }
-      }, {
-        hosts: ['tumblr.com'],
-        get: async () => {
-          const highresMask = 's99999x99999';
-          if (node.currentSrc.includes(highresMask)) {return null;}
-
-          if (node.srcset) {
-          	return de_siteParsers.getHighresFromSrcset(node.srcset);
-          }
-
-          const legacyUrlParts = (node.dataset['imageurl'] || node.currentSrc).match(/^(.+\/[a-z0-9]{32}\/tumblr_\w+)(_\d{2,4}).(jpg|jpeg|png|gif)$/i);
-          if (legacyUrlParts) {
-          	return `${legacyUrlParts[1]}_1280.${legacyUrlParts[3]}`;
-          }
-
-          // TODO: synchronous version
-          const response = await fetch(node.currentSrc.replace(/\/s\d+x\d+\//, `/${highresMask}/`), {
-            method: 'GET',
-            headers: {'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'}
-          });
-          if (!response.ok) {return null;}
-
-          const html = await response.text();
-          return html.match(new RegExp(`src="(http[^"]+\\/${highresMask}\\/[^"]+)"`))[1];
-        }
-      }, {
-        hosts: ['steamcommunity.com', 'images.steamusercontent.com'],
-        get: () => {
-          let imw, imh, newSrc = node.currentSrc
-          const params = new URLSearchParams(new URL(newSrc).search);
-
-          if ((imw = params.get('imw')) === null) {
-            newSrc += '&imw=5000';
-          } else {
-            newSrc = newSrc.replace(`imw=${imw}`, 'imw=5000')
-          }
-          if ((imh = params.get('imh')) === null) {
-            newSrc += '&imh=5000';
-          } else {
-            newSrc = newSrc.replace(`imh=${imh}`, 'imh=5000')
-          }
-
-          return newSrc;
-        },
-      }, {
-        hosts: ['space.bilibili.com'],
-        get: () => {
-          return node.currentSrc.split('@')[0];
-        }
-      }, {
-        hosts: ['2ch.hk', '2ch.life'],
-        get: () => {
-          return node.classList.contains('post__file-preview') && node.parentNode.href;
-        }
+    const getters = {
+      'twitter.com': () => {
+        return node.currentSrc.replace(/\.(jpg|jpeg|png)(:[a-z0-9]+)?$/i, '.$1:orig').replace(/name=[a-z0-9]+/, 'name=orig');
       },
-    ];
+      'vk.com': () => {
+        const match1 = node.currentSrc.match(/([?&])as=((\d+x\d+,?)+)/),
+          match2 = node.currentSrc.match(/([?&])cs=(\d+x0)/),
+          biggestWidth = Math.max(...match1[2].split(',').map(a => parseInt(a.split('x')[0])));
 
-    const getter = getters.find(g => g.hosts.includes(this.host));
+        return node.currentSrc.replace(match2[0], `${match2[1]}cs=${biggestWidth}x0`);
+      },
+      'iwara.tv': () => {
+        return de_siteParsers.xpath('self::img/../../a[@class="slideshow__expand"]', node).href;
+      },
+      'chan.sankakucomplex.com': () => {
+        return node.parentNode.href;
+      },
+      'danbooru.donmai.us': () => {
+        if (node.currentSrc.includes('/images/')) {return null;}
+
+        const xpathBase = {
+          'safebooru.org'          : 'div[@id="content"]/div[@id="post-view"]/div[@class="sidebar"]/div',
+          'gelbooru.com'           : 'div[@id="container"]/section[@class="aside"]',
+          'rule34.xxx'             : '/div[@class="sidebar"]/div[@class="link-list"]',
+          'danbooru.donmai.us'     : '/aside[@id="sidebar"]/section[@id="post-options"]',
+        }, aFilter = {
+          'safebooru.org'          : 'contains(text(), "Original image")',
+          'gelbooru.com'           : 'text()="Original image"',
+          'rule34.xxx'             : 'text()="Original image"',
+          'danbooru.donmai.us'     : 'text()="View original"',
+        };
+
+        return de_siteParsers.xpath(`/html/body/${xpathBase[this.host]}/ul/li/a[${aFilter[this.host]}]`, document).href;
+      },
+      'e621.net': () => {
+        return de_siteParsers.xpath('parent::section/following-sibling::div[@id="image-resize-notice"]//a[@id="image-resize-link"]', node).href;
+      },
+      'discord.com': () => {
+        const videoSrcTry = node.currentSrc.match(/\/external\/.+\/https\/(.+\.\w{3,4})$/i);
+        if (videoSrcTry) {
+          return `https://${videoSrcTry[1]}`;
+        }
+
+        const href = node.parentNode.href;
+        return href.includes('/attachments/') && href;
+      },
+      'tumblr.com': async () => {
+        const highresMask = 's99999x99999';
+        if (node.currentSrc.includes(highresMask)) {return null;}
+
+        if (node.srcset) {
+          return de_siteParsers.getHighresFromSrcset(node.srcset);
+        }
+
+        const legacyUrlParts = (node.dataset['imageurl'] || node.currentSrc).match(/^(.+\/[a-z0-9]{32}\/tumblr_\w+)(_\d{2,4}).(jpg|jpeg|png|gif)$/i);
+        if (legacyUrlParts) {
+          return `${legacyUrlParts[1]}_1280.${legacyUrlParts[3]}`;
+        }
+
+        // TODO: synchronous version
+        const response = await fetch(node.currentSrc.replace(/\/s\d+x\d+\//, `/${highresMask}/`), {
+          method: 'GET',
+          headers: {'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'}
+        });
+        if (!response.ok) {return null;}
+
+        const html = await response.text();
+        return html.match(new RegExp(`src="(http[^"]+\\/${highresMask}\\/[^"]+)"`))[1];
+      },
+      'steamcommunity.com': () => {
+        let imw, imh, newSrc = node.currentSrc
+        const params = new URLSearchParams(new URL(newSrc).search);
+
+        if ((imw = params.get('imw')) === null) {
+          newSrc += '&imw=5000';
+        } else {
+          newSrc = newSrc.replace(`imw=${imw}`, 'imw=5000')
+        }
+        if ((imh = params.get('imh')) === null) {
+          newSrc += '&imh=5000';
+        } else {
+          newSrc = newSrc.replace(`imh=${imh}`, 'imh=5000')
+        }
+
+        return newSrc;
+      },
+      'space.bilibili.com': () => {
+        return node.currentSrc.split('@')[0];
+      },
+      '2ch.su': () => {
+        return node.classList.contains('post__file-preview') && node.parentNode.href;
+      },
+    };
+
+    const getter = getters[this.hostForHacks];
     if (!getter) {
       return node.srcset ?
         de_siteParsers.getHighresFromSrcset(node.srcset) :
@@ -682,7 +675,7 @@ const de_siteParsers = {
     const hostsWithFilenameInSrc = [
       'images.steamusercontent.com',
     ];
-    if (de_contentscript.isSeparateTab && !hostsWithFilenameInSrc.includes(this.host)) {return null;}
+    if (de_contentscript.isSeparateTab && !hostsWithFilenameInSrc.includes(this.hostForHacks)) {return null;}
 
     const dollchanXpath = '(. | self::img/..)/parent::div[contains(@class, "de-fullimg-wrap-center")]//a[@class="de-fullimg-link" and text() != "Spoiler Image"]',
       getters = {
@@ -700,7 +693,7 @@ const de_siteParsers = {
         'iichan.hk': () => {
           return de_siteParsers.xpath('../preceding-sibling::span[@class="filesize"]/a', node).textContent;
         },
-        'boards.fireden.net': () => {
+        'arch.b4k.dev': () => {
           const container = de_siteParsers.xpath('(../following-sibling::div[@class="post_file"]|../../preceding-sibling::div[@class="post_file"])/a[@class="post_file_filename"]', node);
           return container.title || container.textContent;
         },
@@ -714,16 +707,9 @@ const de_siteParsers = {
         'iwara.tv': () => {
           return node.currentSrc.match(/[?&]filename=([^&]+)/)[1];
         },
-      },
-      aliases = {
-        'yuki.la'                       : 'boards.4chan.org',
-        'arch.b4k.dev'                  : 'boards.fireden.net',
-        'images.steamusercontent.com'   : 'steamcommunity.com',
-        '2ch.org'                       : '2ch.su',
-        '2ch.life'                      : '2ch.su',
       };
 
-    const getter = getters[this.host] || getters[aliases[this.host]];
+    const getter = getters[this.hostForHacks];
     if (!getter) {return null;}
 
     function tryFilenameFromDollchanImageByCenter(){
