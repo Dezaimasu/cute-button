@@ -302,8 +302,8 @@ const de_contentscript = {
     handleAgainOn: function(eventType, node){
       node.addEventListener(eventType, () => de_contentscript.nodeHandler(node), {once: true});
     },
-    checkForBgSrc: function(node, modifier){
-      if (!modifier) {return false;}
+    checkForBgSrc: function(node, shiftModifier){
+      if (!shiftModifier) {return false;}
 
       const bgImg = window.getComputedStyle(node).getPropertyValue('background-image');
       if (bgImg) {
@@ -328,18 +328,18 @@ const de_contentscript = {
     filterBySrc: function(src){
       return !src || !src.startsWith('http');
     },
-    filterByExclusions: function(node){
+    filterByExclusions: function(node){ // TODO: split exclusion rules to system (always on, not visible to user) and user-defined (current settings field) exclusions
       return node.matches(de_settings.exclusions);
     },
-    filterBySize: function(node, modifier){
+    filterBySize: function(node, shiftModifier){
       if (node.tagName === 'IMG' && (node.width < this.absoluteMinSize || node.height < this.absoluteMinSize)) {
         return true; // never show on too small images
       }
-      if (!modifier && (node.tagName === 'AUDIO' || this.isSmallVideo(node))) {
-        return true; // don't show on audio tags or video tags with small height (would block play button) unless modifier pressed
+      if (!shiftModifier && (node.tagName === 'AUDIO' || this.isSmallVideo(node))) {
+        return true; // don't show on audio tags or video tags with small height (would block play button) unless shiftModifier pressed
       }
-      if (de_contentscript.isSeparateTab || ['VIDEO', 'AUDIO'].includes(node.tagName) || modifier) {
-        return false; // always show if it's a separate tab or if it's audio/video or if modifier is pressed
+      if (de_contentscript.isSeparateTab || ['VIDEO', 'AUDIO'].includes(node.tagName) || shiftModifier) {
+        return false; // always show if it's a separate tab or if it's audio/video or if shiftModifier is pressed
       }
       const isRenderedSizeBig = node.width >= de_settings.minSize && node.height >= de_settings.minSize;
       if (
@@ -358,11 +358,15 @@ const de_contentscript = {
     },
   },
 
-  isTrash: function(node, modifier){
+  isTrash: function(node, shiftModifier){
     const tools = de_contentscript.nodeTools;
+    const filteredByExclusions = tools.filterByExclusions(node);
     if (
-      tools.checkForBgSrc(node, modifier) ||
-      tools.deepSearchHostSpecific(node)
+      (
+        tools.checkForBgSrc(node, shiftModifier) ||
+        tools.deepSearchHostSpecific(node)
+      ) &&
+      !filteredByExclusions
     ) {
       return false;
     }
@@ -372,11 +376,11 @@ const de_contentscript = {
     tools.addSrcObserver(node);
     if (
       tools.filterBySrc(node[de_contentscript.srcLocation]) ||
-      tools.filterByExclusions(node)
+      filteredByExclusions
     ) {
       return true;
     }
-    return tools.filterBySize(node, modifier);
+    return tools.filterBySize(node, shiftModifier);
   },
 
   isForRelativePositioning: function(node){
@@ -483,7 +487,7 @@ const de_siteParsers = {
   host: null,
   dollchanImproved: null,
 
-  setFilteredHost: function(hostname){
+  setFilteredHost: function(hostname){ // TODO: replace aliases here
     this.host = hostname.replace(/^www\./, '')
       .replace(/^[a-z]{2}\.(.+\..+)$/, '$1')
       .replace(/^((.*)\.)?(tumblr\.com)$/, 'tumblr.com')
@@ -509,20 +513,24 @@ const de_siteParsers = {
     const dollchanHack = 'self::div[@class="de-fullimg-video-hack"]/following-sibling::video',
       twitchHack = 'self::div[@data-a-target="player-overlay-click-handler"]/ancestor::div[@data-a-target="video-ref"]/video[@src]', // TODO: proper aliases
       siteHacks = {
-        'tumblr.com'      : 'self::a/parent::div[@class="photo-wrap"]/img | self::a[@target="_blank"]/parent::div/preceding-sibling::div[@class="post_content"]/div/div[@data-imageurl] | self::span/parent::div/parent::a[@target="_blank"]/parent::div/preceding-sibling::div[@class="post_content"]/div/div[@data-imageurl] | self::div[@class="vjs-big-play-button"]/preceding-sibling::video[@src]',
+        'tumblr.com'      : 'self::a/parent::div[@class="photo-wrap"]/img | self::a[@target="_blank"]/parent::div/preceding-sibling::div[@class="post_content"]/div/div[@data-imageurl] | self::span/parent::div/parent::a[@target="_blank"]/parent::div/preceding-sibling::div[@class="post_content"]/div/div[@data-imageurl] | self::div[@class="vjs-big-play-button"]/preceding-sibling::video',
         'yandex.*'        : 'self::div[contains(@class, "preview2__arrow")]/preceding-sibling::div[contains(@class, "preview2__wrapper")]/div[@class="preview2__thumb-wrapper"]/img[contains(@class, "visible")] | self::div[contains(@class, "preview2__control")]/../preceding-sibling::div[contains(@class, "preview2__wrapper")]/div[@class="preview2__thumb-wrapper"]/img[contains(@class, "visible")]',
         'instagram.com'   : 'self::div[parent::div/parent::div]/preceding-sibling::div/img | self::div[@role="dialog"]/../../preceding-sibling::img',
         'iwara.tv'        : 'self::div[@class="videoPlayer__bg"]/parent::div[@class="videoPlayer"]//video[@class="vjs-tech" and @src]',
-        'vk.com'          : 'self::a[contains(@class, "image_cover") and contains(@onclick, "showPhoto")]',
+        'vk.com'          : 'self::div[contains(@class, "vkitMusicOverlayAttachment")]/parent::a/img',
         'twitch.tv'       : twitchHack,
         'clips.twitch.tv' : twitchHack,
         'behance.net'     : 'self::div[contains(@class, "js-prev") or contains(@class, "js-next")]/following::div[contains(@class, "js-slide-content") and not(contains(@class, "hidden"))]/img',
-        '2ch.hk'          : 'self::div[@id="html5videofixer"]/preceding-sibling::video[@src]',
+        '2ch.hk'          : 'self::div[@id="html5videofixer"]/preceding-sibling::video',
         'pixiv.net'       : 'self::button/ancestor::div[@role="presentation"]//img',
-        'streamable.com'  : 'self::div[@class="svp-events-catcher"]/preceding-sibling::video[@src]',
+        'streamable.com'  : 'self::div[@class="svp-events-catcher"]/preceding-sibling::video',
         'pinterest.com'   : 'self::div/ancestor::div[@class="PinCard__imageWrapper" or @data-test-id="pin-closeup-image" or @data-test-id="pincard-image-without-link"]//img',
+      },
+      aliases = {
+        '2ch.org' : '2ch.su',
+        '2ch.life': '2ch.su',
       };
-    let xpathForHost = siteHacks[this.host];
+    let xpathForHost = siteHacks[this.host] || siteHacks[aliases[this.host]];
     if (xpathForHost) {
       const blobFilter = 'not(starts-with(@src, "blob:"))';
       xpathForHost = xpathForHost.endsWith(']') ?
@@ -708,7 +716,6 @@ const de_siteParsers = {
         },
       },
       aliases = {
-        'boards.4channel.org'           : 'boards.4chan.org',
         'yuki.la'                       : 'boards.4chan.org',
         'arch.b4k.dev'                  : 'boards.fireden.net',
         'images.steamusercontent.com'   : 'steamcommunity.com',

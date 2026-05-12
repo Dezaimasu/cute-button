@@ -12,9 +12,8 @@ function download(tabId, downloadRequest){
 }
 
 function Download(downloadRequest, tabId){
-  this.downloadRequest    = downloadRequest;
-  this.tabId              = tabId;
-  this.duplicateCheckTry  = 0;
+  this.downloadRequest  = downloadRequest;
+  this.tabId            = tabId;
 }
 
 Download.prototype = {
@@ -80,8 +79,7 @@ Download.prototype = {
     };
 
     await chrome.declarativeNetRequest.updateSessionRules({
-      removeRuleIds : [refererRule.id],
-      addRules      : [refererRule],
+      addRules: [refererRule],
     });
 
     let response = await fetch(this.downloadRequest.src, {method: 'HEAD'});
@@ -238,15 +236,12 @@ const filenameTools = {
   },
 
   prepareFilename: function(filename){
-    let decodedFilename;
     try {
-      decodedFilename = decodeURI(filename);
-    } catch (e) { // malformed URI sequence
-      decodedFilename = filename;
-    }
+      filename = decodeURI(filename);
+    } catch {} // malformed URI sequence
 
-    // TODO: do not replace % with _ (might be %2F in [sound=catboxblablabla] filename)
-    return this.trimForbiddenWinChars(decodedFilename);
+    // TODO: find out why Firefox (and Chrome?) escapes "%" symbol in filename passed to downloads.download(), thus breaking %2F in [sound=catboxblablabla] filenames
+    return this.trimForbiddenWinChars(filename);
   },
 
   getDatetimeString: function(){
