@@ -506,7 +506,7 @@ const de_siteParsers = {
   },
 
   checkDollchanPresence: function(){
-    setTimeout(() => {de_siteParsers.dollchanImproved = !!document.querySelector('#de-main');}, 1000);
+    setTimeout(() => {de_siteParsers.dollchanImproved = !!document.querySelector('#de-main-container, #de-main');}, 1000);
   },
 
   getActualNode: function(node){
