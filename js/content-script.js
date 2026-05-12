@@ -23,9 +23,8 @@ const de_webextApi = {
       de_hotkeys.reset();
 
       Object.entries(settings).forEach(([settingName, setting]) => {
-        if (settingName.startsWith('~')) {return;}
         const settingValue = isChanges ? setting.newValue : setting;
-        de_settings.setters[settingName](settingValue);
+        de_settings.setters[settingName] && de_settings.setters[settingName](settingValue);
       });
     }
 
@@ -38,8 +37,8 @@ const de_settings = {
   setters: {
     defaultSavePath       : newValue => de_hotkeys.fallbackRule.path = newValue,
     minSize               : newValue => de_settings.minSize = parseInt(newValue),
-    exclusions            : newValue =>
-      de_settings.exclusions = '.de-video-thumb, .de-ytube, .de-file-img, .html5-main-video, [alt="Subreddit Icon"], [src^="https://www.google.com/recaptcha/"], div[role="checkbox"], ' + newValue,
+    cssExclusionsUser     : newValue => de_settings.setCssExclusions(newValue, true),
+    cssExclusionsSystem   : newValue => de_settings.setCssExclusions(newValue, false),
     icon                  : newValue => de_button.elem.style.backgroundImage = newValue,
     hideButton            : newValue => de_button.elem.classList.toggle('shy', newValue),
     isCute                : newValue => de_events.switchAll(newValue),
@@ -71,6 +70,11 @@ const de_settings = {
       de_settings.styleForSaveMark = newCssString;
       de_webextApi.switchPageStyle(newCssString, true);
     }
+  },
+
+  setCssExclusions: function(value, userDefined){
+    de_settings[userDefined ? 'cssExclusionsUser' : 'cssExclusionsSystem'] = value;
+    de_settings.exclusions = `${de_settings.cssExclusionsUser || ''}, ${de_settings.cssExclusionsSystem || ''}`.replace(/, ,/g, ',').replace(/,+/g, ',').replace(/^ *,+ *| *,+ *$/g, '');
   },
 };
 

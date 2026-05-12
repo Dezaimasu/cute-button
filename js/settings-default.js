@@ -3,7 +3,8 @@
 const defaultSettings = {
   defaultSavePath       : '',
   minSize               : 256,
-  exclusions            : '',
+  cssExclusionsUser     : '',
+  cssExclusionsSystem   : '.de-video-thumb, .de-ytube, .de-file-img, .html5-main-video, [alt="Subreddit Icon"], [src^="https://www.google.com/recaptcha/"], div[role="checkbox"]',
   icon                  : undefined,
   originalNameByDefault : false,
   hideButton            : false,

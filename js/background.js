@@ -42,6 +42,21 @@ chrome.runtime.onInstalled.addListener(initSettings);
 function initSettings(details){
   chrome.runtime.onInstalled.removeListener(initSettings);
   chrome.storage.local.get(null).then(currentSettings => {
+
+    /* renamed setting; TODO: delete this later (in ~1 year) */
+    if (currentSettings.exclusions && !currentSettings.cssExclusionsUser) {
+      let legacyExclusions = currentSettings.exclusions;
+
+      /* remove system-defined exclusions from user-defined exclusions */
+      currentSettings.cssExclusionsSystem.split(', ').forEach(exc => {
+        exc = exc.replace('[', '\\[').replace('^', '\\^').replace('.', '\\.');
+        legacyExclusions = legacyExclusions.replace(new RegExp(`(^|[ ,]+)${exc}([ ,]+|$)`), ',');
+      });
+
+      legacyExclusions = legacyExclusions.replace(/,+/g, ',').replace(/^ *,+ *| *,+ *$/g, '');
+      chrome.storage.local.set({cssExclusionsUser: legacyExclusions});
+    }
+
     const actualSettingsNames = Object.keys(defaultSettings),
       currentSettingsNames = Object.keys(currentSettings),
       newSettings = {},
@@ -60,7 +75,7 @@ function initSettings(details){
     chrome.storage.local.remove(obsoleteSettingsList);
   });
 
-  /* replace icon's old url with base64 encoded */
+  /* replace icon's old url with base64 encoded; TODO: delete later (in ~1 year) */
   chrome.storage.local.get('icon').then(({icon}) => {
     if (icon === fallbackIcon) {
       chrome.storage.local.set({icon: defaultSettings.icon});

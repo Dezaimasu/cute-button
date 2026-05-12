@@ -21,7 +21,7 @@ table#main td#folders-container {
 	margin-left: 20px;
 	cursor: pointer;
 }
-textarea#exclusions,
+textarea#cssExclusionsUser,
 textarea#domainExclusions,
 input#defaultSavePath {
 	width: 95%;
