@@ -490,10 +490,9 @@ const de_siteParsers = {
 
   setFilteredHost: function(hostname){
     this.host = hostname.replace(/^www\./, '')
-      .replace(/^[a-z]{2}\.(.+\..+)$/, '$1')
+      .replace(/^[a-z]{2}\.(.+\..+)$/, '$1') // language subdomains
       .replace(/^((.*)\.)?(tumblr\.com)$/, 'tumblr.com')
-      .replace(/^yandex\.[a-z]{2,3}$/, 'yandex.ru')
-      .replace(/^(ecchi\.)?(iwara\.tv)$/, 'iwara.tv');
+      .replace(/^yandex\.[a-z]{2,3}$/, 'yandex.ru');
 
     const aliases = {
       // actual aliases
@@ -505,6 +504,7 @@ const de_siteParsers = {
       'pbs.twimg.com'               : 'twitter.com',
       'tweetdeck.twitter.com'       : 'twitter.com',
       'images.steamusercontent.com' : 'steamcommunity.com',
+      'ecchi.iwara.tv'              : 'iwara.tv',
       // websites with the similar markup
       'yuki.la'                     : 'boards.4chan.org',
       'boards.fireden.net'          : 'arch.b4k.dev',
