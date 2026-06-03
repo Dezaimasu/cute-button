@@ -513,6 +513,7 @@ const de_siteParsers = {
       // websites with the similar markup
       'yuki.la'                     : 'boards.4chan.org',
       'boards.fireden.net'          : 'arch.b4k.dev',
+      'desuarchive.org'             : 'arch.b4k.dev',
       'gelbooru.com'                : 'danbooru.donmai.us',
       'rule34.xxx'                  : 'danbooru.donmai.us',
       'safebooru.org'               : 'danbooru.donmai.us',
