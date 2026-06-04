@@ -671,7 +671,7 @@ const de_siteParsers = {
     }
 
     try {
-      return await getter.get();
+      return await getter();
     } catch { // tfw no safe navigation operator in 2021
       return null;
     }
