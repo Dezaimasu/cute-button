@@ -690,7 +690,7 @@ const de_siteParsers = {
           return container.title || container.textContent;
         },
         '8chan.moe': () => {
-          return de_siteParsers.xpath('../preceding-sibling::summary/div/a[@class="originalNameLink"]', node).textContent;
+          return de_siteParsers.xpath('(..|.)/preceding-sibling::summary/div[@class="uploadDetails"]//a[@class="originalNameLink"]', node).textContent;
         },
         '2ch.su': () => {
           const container = de_siteParsers.xpath('ancestor::figure[@class="image" or @class="post__image"]/figcaption/a', node);
