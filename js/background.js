@@ -57,7 +57,8 @@ function initSettings(details){
       chrome.storage.local.set({cssExclusionsUser: legacyExclusions});
     }
 
-    const actualSettingsNames = Object.keys(defaultSettings),
+    const systemSettingsNames = ['cssExclusionsSystem'],
+      actualSettingsNames = Object.keys(defaultSettings),
       currentSettingsNames = Object.keys(currentSettings),
       newSettings = {},
       newSettingsList = arrayDiff(actualSettingsNames, currentSettingsNames),
@@ -67,7 +68,7 @@ function initSettings(details){
       return arr1.filter(x => arr2.indexOf(x) === -1);
     }
 
-    newSettingsList.forEach(
+    newSettingsList.concat(systemSettingsNames).forEach(
       settingName => newSettings[settingName] = defaultSettings[settingName]
     );
 
