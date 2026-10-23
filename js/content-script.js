@@ -333,7 +333,7 @@ const de_contentscript = {
     filterBySrc: function(src){
       return !src || !src.startsWith('http');
     },
-    filterByExclusions: function(node){ // TODO: split exclusion rules to system (always on, not visible to user) and user-defined (current settings field) exclusions
+    filterByExclusions: function(node){
       return node.matches(de_settings.exclusions);
     },
     filterBySize: function(node, shiftModifier){
