@@ -1,6 +1,6 @@
 'use strict';
 
-const supportedFormats = '(jpg|jpeg|png|gif|bmp|webp|webm|mp4|ogg|mp3)',
+const supportedFormats = '(jpg|jpeg|png|gif|bmp|webp|webm|mp4|avif|ogg|mp3)',
   regexps = {
     extensionCheck  : new RegExp(`\\.${supportedFormats}$`, 'i'),
     filenameExtract : new RegExp(`^([^/]+\/)*([^/]+\\.${supportedFormats})([\\/][^.]+)?$`, 'i'),
