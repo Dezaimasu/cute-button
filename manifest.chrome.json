@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Cute Save Button",
-  "version": "0.8.6",
+  "version": "0.8.6.1",
   "description": "__MSG_extensionDescription__",
   "author": "Deil",
   "default_locale": "en",
@@ -11,7 +11,8 @@
   "permissions": [
     "downloads",
     "storage",
-    "scripting"
+    "scripting",
+    "declarativeNetRequestWithHostAccess"
   ],
   "host_permissions": [
     "*://*/*"
