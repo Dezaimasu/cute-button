@@ -106,12 +106,11 @@ chrome.storage.local.get('isCute').then(items => setCuteState(items.isCute));
 
 /* Check if we can pass "Referer" header to download() */
 try {
-  if (browser !== undefined) {
-    browser.storage.session.set({'~isFirefox': true});
+  if (browser !== undefined && browser.runtime?.getBrowserInfo !== undefined) {
     browser.runtime.getBrowserInfo().then(info => {
-      if (info.name === 'Firefox' && info.version.split('.')[0] >= 70) {
-        browser.storage.session.set({'~canUseRefHeader': true});
+      if (info.name === 'Firefox') {
+        browser.storage.session.set({'~isFirefox': true});
       }
     });
   }
-} catch {} // "browser" variable throws an error in Chrome
+} catch {} // "browser" variable used to throw an error in Chrome, now Chrome supports it, starting from version 148, leaving try catch just to be sure

@@ -103,19 +103,21 @@ Download.prototype = {
   },
 
   download: async function(path, filename, withReferer = true){
-    const isFirefox = await getFlag('isFirefox'),
-      canUseRefHeader = await getFlag('canUseRefHeader');
+    const isFirefox = await getFlag('isFirefox');
     let options = {
       url           : this.downloadRequest.src,
       filename      : path + filename,
       saveAs        : this.downloadRequest.showSaveDialog,
       conflictAction: 'uniquify',
-      headers       : canUseRefHeader && withReferer ? [
-        {name: 'Referer', value: this.downloadRequest.pageInfo.href},
-      ] : [],
     };
+
     if (isFirefox) {
     	options.incognito = this.downloadRequest.pageInfo.isPrivateMode;
+      if (withReferer) {
+      	options.headers = [
+          {name: 'Referer', value: this.downloadRequest.pageInfo.href}
+        ];
+      }
     }
 
     chrome.downloads.download(options).then(downloadId => {
