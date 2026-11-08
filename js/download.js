@@ -79,19 +79,23 @@ Download.prototype = {
     };
 
     await chrome.declarativeNetRequest.updateSessionRules({
+      removeRuleIds: [refererRule.id],
       addRules: [refererRule],
     });
 
-    let response = await fetch(this.downloadRequest.src, {method: 'HEAD'});
-    if ([404, 405, 501].includes(response.status)) { // HEAD request method is not supported / allowed / implemented by server
-      response = await fetch(this.downloadRequest.src, {method: 'GET'});
+    let response;
+    try {
+      response = await fetch(this.downloadRequest.src, {method: 'HEAD'});
+      if ([404, 405, 501].includes(response.status)) { // HEAD request method is not supported / allowed / implemented by server
+        response = await fetch(this.downloadRequest.src, {method: 'GET'});
+      }
+    } finally {
+      await chrome.declarativeNetRequest.updateSessionRules({
+        removeRuleIds: [refererRule.id],
+      });
     }
 
-    await chrome.declarativeNetRequest.updateSessionRules({
-      removeRuleIds: [refererRule.id],
-    });
-
-    return response.ok ? {
+    return response && response.ok ? {
       contentType: response.headers.get('content-type'),
       contentDisposition: response.headers.get('content-disposition'),
     } : null;
