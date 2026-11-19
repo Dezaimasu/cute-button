@@ -81,13 +81,15 @@ const de_settings = {
 const de_button = {
   elem: null,
   name: 'DE_CBUTTON',
+  elemId: 'de-cute-id',
+  cssSelector: 'DE_CBUTTON#de-cute-id',
   styled: false,
   setVisibleTimeout: null,
   downloadRequest: {},
 
   init: function(){
     this.elem = document.createElement(this.name);
-    this.elem.id = 'de-cute-id';
+    this.elem.id = this.elemId;
     this.elem.addEventListener('contextmenu', this.disableEvent);
     this.elem.addEventListener('mouseout', this.unclick);
     this.prepareDownloadRequest(null, null);
@@ -186,6 +188,7 @@ const de_button = {
   hide: function(){
     if (this.setVisibleTimeout) {return;}
     this.prepareDownloadRequest(null, null);
+    this.tryReattachElem();
     this.elem.classList.remove('visible');
   },
 
@@ -221,6 +224,14 @@ const de_button = {
     clpbrd.select();
     document.execCommand('copy');
     body.removeChild(clpbrd);
+  },
+
+  tryReattachElem: function(){
+    if (this.elem.isConnected) {return;}
+    const detachedElem = document.querySelector(this.cssSelector);
+    if (detachedElem) {
+      this.elem = detachedElem;
+    }
   },
 };
 
